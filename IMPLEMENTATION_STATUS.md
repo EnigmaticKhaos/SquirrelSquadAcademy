@@ -114,6 +114,12 @@ This document tracks the implementation status of features across the platform, 
   - Progress tracking and eligibility checks
   - Real-time data from backend
 
+### Learning Goals
+- ✅ Goals dashboard with real-time stats cards and status filters
+- ✅ Goal list with rich progress cards (deadlines, rewards, custom criteria)
+- ✅ Modal-driven creation & editing flow for all goal types plus rewards/deadlines
+- ✅ Inline actions for refresh progress, pause/resume, delete, and bulk "refresh all"
+
 ### Social Features
 - ✅ **Feed/Posts**
   - Page fully integrated with backend API
@@ -237,10 +243,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ **Mentorship**
   - Backend: Complete mentorship system
   - **Missing**: Mentor application, mentor matching, session scheduling
-
-- ❌ **Learning Goals**
-  - Backend: Complete learning goal system
-  - **Missing**: Goal creation, tracking UI, progress visualization
 
 - ❌ **Learning Analytics**
   - Backend: Complete analytics service

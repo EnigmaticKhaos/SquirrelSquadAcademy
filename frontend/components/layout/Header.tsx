@@ -15,70 +15,76 @@ export default function Header() {
     router.push('/');
   };
 
-  return (
-    <header className="bg-gray-800 border-b border-gray-700 shadow-sm">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-400">🐿️ SquirrelSquad</span>
-            </Link>
-          </div>
+    return (
+      <header className="bg-gray-800 border-b border-gray-700 shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <span className="text-2xl font-bold text-blue-400">🐿️ SquirrelSquad</span>
+              </Link>
+            </div>
 
-          <nav className="flex items-center space-x-6">
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/courses"
-                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
-                >
-                  Courses
-                </Link>
-                <Link
-                  href="/learning-paths"
-                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
-                >
-                  Learning Paths
-                </Link>
-                <NotificationBell />
-                {user._id && (
-                  <Link href={`/profile/${user._id}`}>
-                    <Avatar src={user.profilePhoto} name={user.username} size="sm" />
+            <nav className="flex items-center space-x-6">
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Dashboard
                   </Link>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/register"
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                  Sign up
-                </Link>
-              </>
-            )}
-          </nav>
+                  <Link
+                    href="/courses"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Courses
+                  </Link>
+                  <Link
+                    href="/learning-paths"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Learning Paths
+                  </Link>
+                  <Link
+                    href="/learning-goals"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Learning Goals
+                  </Link>
+                  <NotificationBell />
+                  {user._id && (
+                    <Link href={`/profile/${user._id}`}>
+                      <Avatar src={user.profilePhoto} name={user.username} size="sm" />
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
+            </nav>
+          </div>
         </div>
-      </div>
-    </header>
-  );
+      </header>
+    );
 }
 

@@ -396,6 +396,52 @@ export interface Challenge {
   updatedAt: string;
 }
 
+export type LearningGoalType =
+  | 'complete_courses'
+  | 'earn_xp'
+  | 'reach_level'
+  | 'complete_assignments'
+  | 'complete_lessons'
+  | 'maintain_streak'
+  | 'share_projects'
+  | 'custom';
+
+export type LearningGoalStatus = 'active' | 'completed' | 'failed' | 'paused';
+
+export interface LearningGoal {
+  _id: string;
+  user: string | User;
+  title: string;
+  description?: string;
+  type: LearningGoalType;
+  targetValue: number;
+  currentValue: number;
+  customCriteria?: {
+    type?: string;
+    value?: any;
+    [key: string]: any;
+  };
+  hasDeadline: boolean;
+  deadline?: string;
+  xpReward?: number;
+  badgeReward?: string | Badge;
+  achievementReward?: string | Achievement;
+  status: LearningGoalStatus;
+  startedAt: string;
+  completedAt?: string;
+  progressPercentage: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LearningGoalStats {
+  total: number;
+  active: number;
+  completed: number;
+  failed: number;
+  byType: Record<string, number>;
+}
+
 export interface LeaderboardEntry {
   rank: number;
   user: {
