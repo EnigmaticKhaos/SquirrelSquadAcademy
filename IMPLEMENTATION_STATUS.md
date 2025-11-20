@@ -152,6 +152,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ Mentor discovery with match scores plus inline mentorship request workflow
 - ✅ Request management (incoming/outgoing) with accept/decline handling
 - ✅ Session logging, milestones tracking, and mentorship completion feedback
+- ✅ Mentor application portal with availability toggles and mentor-only notifications
 
 - ✅ **Projects**
   - Listing page fully integrated with backend API

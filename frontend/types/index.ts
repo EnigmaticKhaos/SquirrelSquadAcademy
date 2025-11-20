@@ -70,19 +70,24 @@ export interface User {
     currentPeriodEnd?: string;
   };
   
-  // Mentor status
-  mentorStatus?: {
-    isMentor: boolean;
-    isAvailable: boolean;
-    specialties?: string[];
-    mentorBio?: string;
-    stats?: {
-      totalMentees: number;
-      activeMentorships: number;
-      completedMentorships: number;
-      averageRating: number;
+    // Mentor status
+    mentorStatus?: {
+      isMentor: boolean;
+      isAvailable: boolean;
+      specialties?: string[];
+      mentorBio?: string;
+      maxMentees?: number;
+      applicationDate?: string;
+      approvedDate?: string;
+      preferredCommunicationMethod?: MentorshipCommunicationMethod;
+      meetingFrequency?: MentorshipMeetingFrequency;
+      stats?: {
+        totalMentees: number;
+        activeMentorships: number;
+        completedMentorships: number;
+        averageRating: number;
+      };
     };
-  };
   
   createdAt: string;
   updatedAt: string;
@@ -869,6 +874,8 @@ export type MentorshipStatus = 'pending' | 'active' | 'completed' | 'cancelled';
 export type MentorshipRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
 export type MentorshipCommunicationMethod = 'message' | 'video' | 'both';
 export type MentorshipMeetingFrequency = 'weekly' | 'biweekly' | 'monthly';
+export type MentorApplicationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type MentorApplicationPriority = 'auto_approve' | 'review' | 'auto_reject';
 
 export interface MentorshipSession {
   _id: string;
@@ -932,6 +939,39 @@ export interface MentorSuggestion {
   matchScore: number;
   completedCourses: number;
   experience: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+}
+
+export interface MentorApplication {
+  _id: string;
+  user: string | User;
+  status: MentorApplicationStatus;
+  priority: MentorApplicationPriority;
+  motivation: string;
+  specialties: string[];
+  experience?: string;
+  availability?: {
+    hoursPerWeek?: number;
+    timezone?: string;
+    preferredTimes?: string[];
+  };
+  maxMentees?: number;
+  autoEvaluation?: {
+    level: number;
+    coursesCompleted: number;
+    averageRating: number;
+    warningCount: number;
+    accountAge: number;
+    meetsAutoApproveCriteria: boolean;
+    meetsAutoRejectCriteria: boolean;
+    aiRecommendation?: 'approve' | 'review' | 'reject';
+    aiReason?: string;
+  };
+  reviewedBy?: string | User;
+  reviewedAt?: string;
+  reviewNotes?: string;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ============================================================================

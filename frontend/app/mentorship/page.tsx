@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { PageHeader } from '@/components/layout';
 import {
@@ -126,6 +127,7 @@ export default function MentorshipPage() {
     mentorshipId: null,
   });
   const [completeForm, setCompleteForm] = useState({ rating: '5', feedback: '' });
+  const [detailMentorship, setDetailMentorship] = useState<Mentorship | null>(null);
 
   const mentorshipFilters = useMemo(() => {
     return {
@@ -301,7 +303,15 @@ export default function MentorshipPage() {
     }
   };
 
-  const renderMentorshipCard = (mentorship: Mentorship) => {
+const renderMentorshipCard = (
+  mentorship: Mentorship,
+  handlers: {
+    onLogSession: (id: string) => void;
+    onAddMilestone: (id: string) => void;
+    onComplete: (id: string) => void;
+    onViewDetails: (mentorship: Mentorship) => void;
+  }
+) => {
     const mentorUser = typeof mentorship.mentor === 'string' ? null : mentorship.mentor;
     const menteeUser = typeof mentorship.mentee === 'string' ? null : mentorship.mentee;
     return (
@@ -399,33 +409,36 @@ export default function MentorshipPage() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-3 pt-2">
-            {mentorship.status === 'active' && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSessionModal({ open: true, mentorshipId: mentorship._id })}
-                >
-                  Log Session
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setMilestoneModal({ open: true, mentorshipId: mentorship._id })}
-                >
-                  Add Milestone
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setCompleteModal({ open: true, mentorshipId: mentorship._id })}
-                >
-                  Complete Mentorship
-                </Button>
-              </>
-            )}
-          </div>
+            <div className="flex flex-wrap gap-3 pt-2">
+              {mentorship.status === 'active' && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlers.onLogSession(mentorship._id)}
+                  >
+                    Log Session
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlers.onAddMilestone(mentorship._id)}
+                  >
+                    Add Milestone
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handlers.onComplete(mentorship._id)}
+                  >
+                    Complete Mentorship
+                  </Button>
+                </>
+              )}
+              <Button size="sm" variant="ghost" onClick={() => handlers.onViewDetails(mentorship)}>
+                View Details
+              </Button>
+            </div>
         </CardContent>
       </Card>
     );
@@ -546,10 +559,15 @@ export default function MentorshipPage() {
         <Header />
         <main className="flex-1">
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <PageHeader
-            title="Mentorship Hub"
-            description="Manage your mentorships, respond to requests, and discover mentors aligned with your goals."
-          />
+            <PageHeader
+              title="Mentorship Hub"
+              description="Manage your mentorships, respond to requests, and discover mentors aligned with your goals."
+              actions={
+                <Link href="/mentorship/mentor">
+                  <Button variant="outline">Mentor Settings</Button>
+                </Link>
+              }
+            />
 
           {actionError && (
             <div className="mb-4">
@@ -610,11 +628,18 @@ export default function MentorshipPage() {
                   onClick: () => setRequestTab('incoming'),
                 }}
               />
-            ) : (
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                {mentorships.map(renderMentorshipCard)}
-              </div>
-            )}
+              ) : (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {mentorships.map((mentorship) =>
+                    renderMentorshipCard(mentorship, {
+                      onLogSession: (id) => setSessionModal({ open: true, mentorshipId: id }),
+                      onAddMilestone: (id) => setMilestoneModal({ open: true, mentorshipId: id }),
+                      onComplete: (id) => setCompleteModal({ open: true, mentorshipId: id }),
+                      onViewDetails: (m) => setDetailMentorship(m),
+                    })
+                  )}
+                </div>
+              )}
           </section>
 
           <section className="mt-10 space-y-4">
@@ -864,6 +889,101 @@ export default function MentorshipPage() {
             </Button>
           </div>
         </div>
+      </Modal>
+      <Modal
+        isOpen={Boolean(detailMentorship)}
+        onClose={() => setDetailMentorship(null)}
+        title="Mentorship Details"
+        size="lg"
+      >
+        {detailMentorship && (
+          <div className="space-y-6 text-sm text-gray-200">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500">Mentor</p>
+                <p className="text-base text-gray-100">
+                  {typeof detailMentorship.mentor === 'string'
+                    ? 'Mentor'
+                    : detailMentorship.mentor.username}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500">Mentee</p>
+                <p className="text-base text-gray-100">
+                  {typeof detailMentorship.mentee === 'string'
+                    ? 'You'
+                    : detailMentorship.mentee.username}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500">Status</p>
+                <Badge className="mt-1 capitalize">{detailMentorship.status}</Badge>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500">Started</p>
+                <p className="text-base text-gray-100">
+                  {formatDate(detailMentorship.startDate || detailMentorship.createdAt)}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wide text-gray-500">Recent Sessions</p>
+              {detailMentorship.sessions.length === 0 ? (
+                <p className="mt-2 text-gray-400">No sessions logged yet.</p>
+              ) : (
+                <div className="mt-2 space-y-2">
+                  {[...detailMentorship.sessions]
+                    .sort((a, b) => (a.date < b.date ? 1 : -1))
+                    .slice(0, 5)
+                    .map((session) => (
+                      <div
+                        key={session._id}
+                        className="rounded-md border border-gray-700 px-3 py-2 text-xs text-gray-300"
+                      >
+                        <p className="text-gray-100">
+                          {new Date(session.date).toLocaleDateString()} · {formatDuration(session.duration)}
+                        </p>
+                        {session.notes && <p className="mt-1 text-gray-400 line-clamp-2">{session.notes}</p>}
+                        {session.rating && (
+                          <p className="mt-1 text-gray-500">Rating: {session.rating.toFixed(1)}</p>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wide text-gray-500">Milestones</p>
+              {detailMentorship.milestones.length === 0 ? (
+                <p className="mt-2 text-gray-400">No milestones added.</p>
+              ) : (
+                <div className="mt-2 space-y-2">
+                  {detailMentorship.milestones.map((milestone) => (
+                    <div
+                      key={milestone._id}
+                      className="rounded-md border border-gray-700 px-3 py-2 text-xs text-gray-300"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-100">{milestone.title}</p>
+                        <Badge variant={milestone.completed ? 'success' : 'secondary'} size="sm">
+                          {milestone.completed ? 'Completed' : 'In Progress'}
+                        </Badge>
+                      </div>
+                      {milestone.description && (
+                        <p className="mt-1 text-gray-400">{milestone.description}</p>
+                      )}
+                      <p className="mt-1 text-gray-500">
+                        Target: {milestone.targetDate ? formatDate(milestone.targetDate) : 'Flexible'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </Modal>
     </>
   );
