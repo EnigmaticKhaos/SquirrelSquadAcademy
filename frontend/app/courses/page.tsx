@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useCourses } from '@/hooks/useCourses';
-import { Card, CardContent, Badge, LoadingSpinner, ErrorMessage, EmptyState, SearchBar, FilterPanel } from '@/components/ui';
+import { Card, CardContent, Badge, LoadingSpinner, ErrorMessage, EmptyState, SearchBar, FilterPanel, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 export default function CoursesPage() {
@@ -23,10 +23,17 @@ export default function CoursesPage() {
       <Header />
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <PageHeader
-            title="Courses"
-            description="Explore our collection of courses and start learning today."
-          />
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <PageHeader
+              title="Courses"
+              description="Explore our collection of courses and start learning today."
+            />
+            <Link href="/course-comparison">
+              <Button variant="outline">
+                Compare Courses
+              </Button>
+            </Link>
+          </div>
 
           {/* Search and Filters */}
           <div className="mb-8 space-y-4">

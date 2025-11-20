@@ -1,5 +1,6 @@
 export * from './useAuth';
 export * from './useCourses';
+export * from './useCourseComparison';
 export * from './useLearningPaths';
 export * from './useNotifications';
 export * from './useMessages';
