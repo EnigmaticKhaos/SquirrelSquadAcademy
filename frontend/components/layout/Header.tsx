@@ -46,6 +46,30 @@ export default function Header() {
                 >
                   Learning Paths
                 </Link>
+                <Link
+                  href="/learning-goals"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Learning Goals
+                </Link>
+                <Link
+                  href="/mentorship"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Mentorship
+                </Link>
+                <Link
+                  href="/live-sessions"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Live Sessions
+                </Link>
+                <Link
+                  href="/analytics"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Analytics
+                </Link>
                 <NotificationBell />
                 {user._id && (
                   <Link href={`/profile/${user._id}`}>

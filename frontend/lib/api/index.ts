@@ -28,6 +28,11 @@ export { uploadApi } from './upload';
 export { pomodoroApi } from './pomodoro';
 export { recommendationsApi } from './recommendations';
 export { codePlaygroundApi } from './codePlayground';
+export { analyticsApi } from './analytics';
+export { learningGoalsApi } from './learningGoals';
+export { mentorshipApi } from './mentorship';
+export { mentorApplicationsApi } from './mentorApplications';
+export { liveSessionsApi } from './liveSessions';
 
 // Also export everything from each module
 export * from './auth';
@@ -50,4 +55,9 @@ export * from './courseCompletion';
 export * from './assignments';
 export * from './submissions';
 export * from './codePlayground';
+export * from './analytics';
+export * from './learningGoals';
+export * from './mentorship';
+export * from './mentorApplications';
+export * from './liveSessions';
 

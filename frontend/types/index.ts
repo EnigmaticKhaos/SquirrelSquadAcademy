@@ -70,19 +70,24 @@ export interface User {
     currentPeriodEnd?: string;
   };
   
-  // Mentor status
-  mentorStatus?: {
-    isMentor: boolean;
-    isAvailable: boolean;
-    specialties?: string[];
-    mentorBio?: string;
-    stats?: {
-      totalMentees: number;
-      activeMentorships: number;
-      completedMentorships: number;
-      averageRating: number;
+    // Mentor status
+    mentorStatus?: {
+      isMentor: boolean;
+      isAvailable: boolean;
+      specialties?: string[];
+      mentorBio?: string;
+      maxMentees?: number;
+      applicationDate?: string;
+      approvedDate?: string;
+      preferredCommunicationMethod?: MentorshipCommunicationMethod;
+      meetingFrequency?: MentorshipMeetingFrequency;
+      stats?: {
+        totalMentees: number;
+        activeMentorships: number;
+        completedMentorships: number;
+        averageRating: number;
+      };
     };
-  };
   
   createdAt: string;
   updatedAt: string;
@@ -394,6 +399,117 @@ export interface Challenge {
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+// ============================================================================
+// Analytics Types
+// ============================================================================
+
+export interface LearningAnalyticsSummary {
+  totalTimeSpent: number;
+  totalSessions: number;
+  averageSessionDuration: number;
+  coursesCompleted: number;
+  coursesInProgress: number;
+  assignmentsCompleted: number;
+  averageScore: number;
+  currentStreaks: {
+    login: number;
+    activity: number;
+  };
+  longestStreaks: {
+    login: number;
+    activity: number;
+  };
+  timeByActivity: Record<string, number>;
+  timeByCourse: Array<{
+    courseId: string;
+    courseName: string;
+    timeSpent: number;
+  }>;
+  weeklyActivity: Array<{
+    date: string;
+    timeSpent: number;
+    sessions: number;
+  }>;
+  monthlyActivity: Array<{
+    month: string;
+    timeSpent: number;
+    sessions: number;
+  }>;
+}
+
+export interface CourseAnalytics {
+  timeSpent: number;
+  sessions: number;
+  progress: number;
+  assignmentsCompleted: number;
+  averageScore: number;
+  lastActivity: string | null;
+  streak: number;
+  completionDate?: string;
+}
+
+export interface LearningCalendarDay {
+  date: string;
+  timeSpent: number;
+  sessions: number;
+}
+
+export type PerformanceTrend = 'improving' | 'declining' | 'stable';
+
+export interface PerformanceMetrics {
+  overallAverageScore: number;
+  improvementTrend: PerformanceTrend;
+  strongAreas: string[];
+  weakAreas: string[];
+  completionRate: number;
+}
+
+export type LearningGoalType =
+  | 'complete_courses'
+  | 'earn_xp'
+  | 'reach_level'
+  | 'complete_assignments'
+  | 'complete_lessons'
+  | 'maintain_streak'
+  | 'share_projects'
+  | 'custom';
+
+export type LearningGoalStatus = 'active' | 'completed' | 'failed' | 'paused';
+
+export interface LearningGoal {
+  _id: string;
+  user: string | User;
+  title: string;
+  description?: string;
+  type: LearningGoalType;
+  targetValue: number;
+  currentValue: number;
+  customCriteria?: {
+    type?: string;
+    value?: any;
+    [key: string]: any;
+  };
+  hasDeadline: boolean;
+  deadline?: string;
+  xpReward?: number;
+  badgeReward?: string | Badge;
+  achievementReward?: string | Achievement;
+  status: LearningGoalStatus;
+  startedAt: string;
+  completedAt?: string;
+  progressPercentage: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LearningGoalStats {
+  total: number;
+  active: number;
+  completed: number;
+  failed: number;
+  byType: Record<string, number>;
 }
 
 export interface LeaderboardEntry {
@@ -754,28 +870,51 @@ export interface CodeSnippet {
 // Mentorship Types
 // ============================================================================
 
+export type MentorshipStatus = 'pending' | 'active' | 'completed' | 'cancelled';
+export type MentorshipRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+export type MentorshipCommunicationMethod = 'message' | 'video' | 'both';
+export type MentorshipMeetingFrequency = 'weekly' | 'biweekly' | 'monthly';
+export type MentorApplicationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type MentorApplicationPriority = 'auto_approve' | 'review' | 'auto_reject';
+
+export interface MentorshipSession {
+  _id: string;
+  date: string;
+  duration?: number;
+  notes?: string;
+  goalsDiscussed?: string[];
+  nextSteps?: string[];
+  rating?: number;
+  feedback?: string;
+}
+
+export interface MentorshipMilestone {
+  _id: string;
+  title: string;
+  description?: string;
+  targetDate?: string;
+  completed: boolean;
+  completedAt?: string;
+  notes?: string;
+}
+
 export interface Mentorship {
   _id: string;
   mentor: string | User;
   mentee: string | User;
-  status: 'pending' | 'active' | 'completed' | 'cancelled';
+  status: MentorshipStatus;
   goals: string[];
-  milestones: Array<{
-    _id: string;
-    title: string;
-    description?: string;
-    targetDate?: string;
-    completed: boolean;
-    completedAt?: string;
-  }>;
-  sessions: Array<{
-    _id: string;
-    scheduledAt: string;
-    duration: number;
-    notes?: string;
-    completed: boolean;
-  }>;
-  startedAt?: string;
+  startDate?: string;
+  endDate?: string;
+  expectedDuration?: number;
+  preferredCommunicationMethod: MentorshipCommunicationMethod;
+  meetingFrequency?: MentorshipMeetingFrequency;
+  milestones: MentorshipMilestone[];
+  sessions: MentorshipSession[];
+  menteeRating?: number;
+  menteeFeedback?: string;
+  mentorRating?: number;
+  mentorFeedback?: string;
   completedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -786,7 +925,51 @@ export interface MentorshipRequest {
   mentee: string | User;
   mentor: string | User;
   message?: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  goals?: string[];
+  preferredCommunicationMethod?: MentorshipCommunicationMethod;
+  expectedDuration?: number;
+  status: MentorshipRequestStatus;
+  respondedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MentorSuggestion {
+  user: User;
+  matchScore: number;
+  completedCourses: number;
+  experience: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+}
+
+export interface MentorApplication {
+  _id: string;
+  user: string | User;
+  status: MentorApplicationStatus;
+  priority: MentorApplicationPriority;
+  motivation: string;
+  specialties: string[];
+  experience?: string;
+  availability?: {
+    hoursPerWeek?: number;
+    timezone?: string;
+    preferredTimes?: string[];
+  };
+  maxMentees?: number;
+  autoEvaluation?: {
+    level: number;
+    coursesCompleted: number;
+    averageRating: number;
+    warningCount: number;
+    accountAge: number;
+    meetsAutoApproveCriteria: boolean;
+    meetsAutoRejectCriteria: boolean;
+    aiRecommendation?: 'approve' | 'review' | 'reject';
+    aiReason?: string;
+  };
+  reviewedBy?: string | User;
+  reviewedAt?: string;
+  reviewNotes?: string;
+  rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -795,21 +978,142 @@ export interface MentorshipRequest {
 // Live Session Types
 // ============================================================================
 
+export type LiveSessionType =
+  | 'webinar'
+  | 'workshop'
+  | 'qna'
+  | 'office_hours'
+  | 'course_completion_party'
+  | 'custom';
+
+export type LiveSessionStatus = 'scheduled' | 'live' | 'ended' | 'cancelled';
+export type LiveSessionProvider = 'webrtc' | 'zoom' | 'custom';
+
 export interface LiveSession {
   _id: string;
-  instructor: string | User;
+  host: string | User;
+  coHosts?: Array<string | User>;
   title: string;
   description?: string;
-  course?: string;
-  type: 'lecture' | 'workshop' | 'qna' | 'office_hours';
-  scheduledAt: string;
-  duration: number;
-  maxParticipants?: number;
-  registeredCount: number;
-  status: 'scheduled' | 'live' | 'ended' | 'cancelled';
+  sessionType: LiveSessionType;
+  status: LiveSessionStatus;
+  scheduledStartTime: string;
+  scheduledEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  duration?: number;
+  provider: LiveSessionProvider;
   meetingUrl?: string;
+  meetingId?: string;
+  meetingPassword?: string;
+  streamUrl?: string;
+  course?: string | Course;
+  lesson?: string | Lesson;
+  maxParticipants?: number;
+  allowRecording: boolean;
+  requireRegistration: boolean;
+  isPublic: boolean;
+  allowQuestions: boolean;
+  allowPolls: boolean;
+  allowScreenShare: boolean;
+  allowChat: boolean;
+  registrationDeadline?: string;
+  registeredUsers?: Array<string | User>;
+  totalParticipants: number;
+  peakParticipants: number;
+  totalViews: number;
+  averageWatchTime?: number;
   recordingUrl?: string;
-  tags: string[];
+  recordingAvailable: boolean;
+  remindersSent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionParticipantRole = 'host' | 'co_host' | 'participant' | 'viewer';
+export type LiveSessionParticipantStatus = 'registered' | 'joined' | 'left' | 'absent';
+
+export interface LiveSessionParticipant {
+  _id: string;
+  session: string;
+  user: string | User;
+  role: LiveSessionParticipantRole;
+  status: LiveSessionParticipantStatus;
+  registeredAt?: string;
+  joinedAt?: string;
+  leftAt?: string;
+  duration: number;
+  questionsAsked: number;
+  pollsAnswered: number;
+  chatMessages: number;
+  watchTime: number;
+  lastActiveAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LiveSessionPoll {
+  _id: string;
+  session: string;
+  createdBy: string | User;
+  question: string;
+  options: string[];
+  isMultipleChoice: boolean;
+  isAnonymous: boolean;
+  startedAt: string;
+  endedAt?: string;
+  duration?: number;
+  totalVotes: number;
+  results: Array<{
+    option: string;
+    votes: number;
+    percentage: number;
+  }>;
+  isActive: boolean;
+  isEnded: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionQuestionStatus = 'pending' | 'answered' | 'dismissed';
+export type LiveSessionQuestionPriority = 'low' | 'normal' | 'high';
+
+export interface LiveSessionQuestion {
+  _id: string;
+  session: string;
+  askedBy: string | User;
+  answeredBy?: string | User;
+  question: string;
+  status: LiveSessionQuestionStatus;
+  priority: LiveSessionQuestionPriority;
+  answer?: string;
+  answeredAt?: string;
+  upvotes?: string[];
+  upvoteCount: number;
+  isPinned: boolean;
+  isVisible: boolean;
+  askedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionRecordingStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface LiveSessionRecording {
+  _id: string;
+  session: string;
+  recordingUrl: string;
+  thumbnailUrl?: string;
+  duration: number;
+  format: string;
+  resolution?: string;
+  fileSize?: number;
+  isPublic: boolean;
+  viewCount: number;
+  lastViewedAt?: string;
+  processingStatus: LiveSessionRecordingStatus;
+  processingError?: string;
+  recordedAt: string;
   createdAt: string;
   updatedAt: string;
 }
