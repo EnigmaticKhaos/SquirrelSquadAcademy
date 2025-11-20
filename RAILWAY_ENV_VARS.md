@@ -96,6 +96,11 @@ JUDGE0_AUTH_TOKEN=your_auth_token  # Optional, only if auth is enabled
 # JUDGE0_API_KEY is NOT needed for self-hosted instances
 ```
 
+**Determining if you need `JUDGE0_AUTH_TOKEN`:**
+- **Default**: Judge0 does NOT require authentication - try without the token first
+- **Test**: If you get `401 Unauthorized` errors, authentication is enabled
+- **Find token**: Check your Judge0 `config.yml` or Docker env vars (`AUTH_TOKEN`)
+
 ### Message Encryption (Required for Direct Messaging)
 ```env
 ENCRYPTION_KEY=your_64_character_hex_key_here

@@ -209,8 +209,14 @@ const executeWithJudge0 = async (
       appError.statusCode = 502; // Bad Gateway
     } else if (error.response) {
       const status = error.response.status;
-      appError.message = `Code execution failed: ${status} ${error.response.statusText || ''}`;
-      appError.statusCode = status >= 400 && status < 500 ? 400 : 502;
+      // Handle 401 Unauthorized - indicates authentication is required
+      if (status === 401) {
+        appError.message = 'Authentication required for Judge0. Please set JUDGE0_AUTH_TOKEN environment variable.';
+        appError.statusCode = 401;
+      } else {
+        appError.message = `Code execution failed: ${status} ${error.response.statusText || ''}`;
+        appError.statusCode = status >= 400 && status < 500 ? 400 : 502;
+      }
     } else {
       appError.message = `Code execution failed: ${error.message || 'Unknown error'}`;
       appError.statusCode = 500;

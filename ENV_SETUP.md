@@ -99,6 +99,17 @@ Choose one option:
   - `JUDGE0_AUTH_TOKEN` (optional - only if your self-hosted instance requires authentication)
   - `JUDGE0_API_KEY` is NOT needed for self-hosted instances
 
+**How to know if you need `JUDGE0_AUTH_TOKEN`:**
+1. **By default, Judge0 does NOT require authentication** - try without the token first
+2. **Test your instance**: Make a request to `https://your-judge0-url.com/submissions` without auth
+   - If you get `401 Unauthorized`, authentication is enabled and you need a token
+   - If the request succeeds, no token is needed
+3. **Where to find the auth token** (if enabled):
+   - Check your Judge0 `config.yml` file for the `auth_token` field
+   - Or check your Docker environment variables if using Docker: `AUTH_TOKEN` or `JUDGE0_AUTH_TOKEN`
+   - If you set it up yourself, it's the value you configured when enabling authentication
+   - Check your Judge0 deployment configuration files
+
 **Note**: The code playground requires Judge0 to be configured. Set either `JUDGE0_API_KEY` (for RapidAPI) or `JUDGE0_API_URL` (for self-hosted).
 
 ### 12. Encryption Key (Required for Message Encryption)
