@@ -21,6 +21,8 @@ export { lessonsApi } from './lessons';
 export { modulesApi } from './modules';
 export { videosApi } from './videos';
 export { courseCompletionApi } from './courseCompletion';
+export { assignmentsApi } from './assignments';
+export { submissionsApi } from './submissions';
 
 // Also export everything from each module
 export * from './auth';
@@ -40,4 +42,6 @@ export * from './lessons';
 export * from './modules';
 export * from './videos';
 export * from './courseCompletion';
+export * from './assignments';
+export * from './submissions';
 

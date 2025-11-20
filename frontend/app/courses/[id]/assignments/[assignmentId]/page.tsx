@@ -4,9 +4,10 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import { useCourse } from '@/hooks/useCourses';
+import { useAssignment } from '@/hooks/useAssignments';
+import { useLatestSubmission, useSubmitAssignment } from '@/hooks/useSubmissions';
 import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { api } from '@/lib/apiClient';
 import type { Assignment, Submission } from '@/types';
 import { Textarea } from '@/components/ui';
 
@@ -15,68 +16,46 @@ export default function AssignmentDetailPage() {
   const courseId = params.id as string;
   const assignmentId = params.assignmentId as string;
   const { data: course } = useCourse(courseId);
-  const [assignment, setAssignment] = useState<Assignment | null>(null);
-  const [submission, setSubmission] = useState<Submission | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: assignment, isLoading: assignmentLoading, error: assignmentError } = useAssignment(assignmentId);
+  const { data: submission, isLoading: submissionLoading } = useLatestSubmission(assignmentId);
+  const submitAssignment = useSubmitAssignment();
   const [submissionContent, setSubmissionContent] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (assignmentId) {
-      fetchAssignment();
-      fetchSubmission();
+    if (assignment?.starterCode && !submission) {
+      setSubmissionContent(assignment.starterCode);
     }
-  }, [assignmentId]);
+  }, [assignment, submission]);
 
-  const fetchAssignment = async () => {
-    try {
-      const response = await api.get(`/courses/${courseId}/assignments/${assignmentId}`);
-      if (response.data.success) {
-        setAssignment(response.data.assignment);
-        if (response.data.assignment.starterCode) {
-          setSubmissionContent(response.data.assignment.starterCode);
-        }
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load assignment');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (submission?.content) {
+      setSubmissionContent(submission.content);
     }
-  };
-
-  const fetchSubmission = async () => {
-    try {
-      const response = await api.get(`/courses/${courseId}/assignments/${assignmentId}/submission`);
-      if (response.data.success && response.data.submission) {
-        setSubmission(response.data.submission);
-        setSubmissionContent(response.data.submission.content || '');
-      }
-    } catch (err: any) {
-      // Submission might not exist yet, which is fine
-      console.log('No submission found');
-    }
-  };
+  }, [submission]);
 
   const handleSubmit = async () => {
+    if (!submissionContent.trim()) {
+      setError('Submission content cannot be empty');
+      return;
+    }
+
     try {
-      setSubmitting(true);
       setError(null);
-      const response = await api.post(`/courses/${courseId}/assignments/${assignmentId}/submit`, {
-        content: submissionContent,
+      await submitAssignment.mutateAsync({
+        assignmentId,
+        data: { content: submissionContent },
       });
-      if (response.data.success) {
-        setSubmission(response.data.submission);
-        alert('Assignment submitted successfully!');
-      }
+      // Success message will be shown via toast or similar
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to submit assignment');
-    } finally {
-      setSubmitting(false);
     }
   };
 
-  if (loading) {
+  const isLoading = assignmentLoading || submissionLoading;
+  const displayError = assignmentError ? (typeof assignmentError === 'string' ? assignmentError : assignmentError.message) : error;
+
+  if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col bg-gray-900">
         <Header />
@@ -87,13 +66,13 @@ export default function AssignmentDetailPage() {
     );
   }
 
-  if (error && !assignment) {
+  if (displayError && !assignment) {
     return (
       <div className="flex min-h-screen flex-col bg-gray-900">
         <Header />
         <main className="flex-1">
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <ErrorMessage message={error} />
+            <ErrorMessage message={displayError || 'Failed to load assignment'} />
           </div>
         </main>
       </div>
@@ -211,8 +190,12 @@ export default function AssignmentDetailPage() {
 
                   <Button
                     onClick={handleSubmit}
-                    isLoading={submitting}
-                    disabled={!submissionContent.trim() || (submission?.status === 'graded' && !assignment.allowRetries)}
+                    isLoading={submitAssignment.isPending}
+                    disabled={
+                      !submissionContent.trim() ||
+                      (submission?.status === 'graded' && !assignment.allowRetries) ||
+                      submitAssignment.isPending
+                    }
                     className="w-full"
                   >
                     {submission ? 'Resubmit Assignment' : 'Submit Assignment'}
