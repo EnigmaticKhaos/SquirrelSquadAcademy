@@ -865,28 +865,49 @@ export interface CodeSnippet {
 // Mentorship Types
 // ============================================================================
 
+export type MentorshipStatus = 'pending' | 'active' | 'completed' | 'cancelled';
+export type MentorshipRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+export type MentorshipCommunicationMethod = 'message' | 'video' | 'both';
+export type MentorshipMeetingFrequency = 'weekly' | 'biweekly' | 'monthly';
+
+export interface MentorshipSession {
+  _id: string;
+  date: string;
+  duration?: number;
+  notes?: string;
+  goalsDiscussed?: string[];
+  nextSteps?: string[];
+  rating?: number;
+  feedback?: string;
+}
+
+export interface MentorshipMilestone {
+  _id: string;
+  title: string;
+  description?: string;
+  targetDate?: string;
+  completed: boolean;
+  completedAt?: string;
+  notes?: string;
+}
+
 export interface Mentorship {
   _id: string;
   mentor: string | User;
   mentee: string | User;
-  status: 'pending' | 'active' | 'completed' | 'cancelled';
+  status: MentorshipStatus;
   goals: string[];
-  milestones: Array<{
-    _id: string;
-    title: string;
-    description?: string;
-    targetDate?: string;
-    completed: boolean;
-    completedAt?: string;
-  }>;
-  sessions: Array<{
-    _id: string;
-    scheduledAt: string;
-    duration: number;
-    notes?: string;
-    completed: boolean;
-  }>;
-  startedAt?: string;
+  startDate?: string;
+  endDate?: string;
+  expectedDuration?: number;
+  preferredCommunicationMethod: MentorshipCommunicationMethod;
+  meetingFrequency?: MentorshipMeetingFrequency;
+  milestones: MentorshipMilestone[];
+  sessions: MentorshipSession[];
+  menteeRating?: number;
+  menteeFeedback?: string;
+  mentorRating?: number;
+  mentorFeedback?: string;
   completedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -897,9 +918,20 @@ export interface MentorshipRequest {
   mentee: string | User;
   mentor: string | User;
   message?: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  goals?: string[];
+  preferredCommunicationMethod?: MentorshipCommunicationMethod;
+  expectedDuration?: number;
+  status: MentorshipRequestStatus;
+  respondedAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MentorSuggestion {
+  user: User;
+  matchScore: number;
+  completedCourses: number;
+  experience: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
 }
 
 // ============================================================================

@@ -147,6 +147,12 @@ This document tracks the implementation status of features across the platform, 
   - Real-time forum posts from backend
   - Post voting, replies, and moderation ready (API hooks created)
 
+### Mentorship
+- ✅ Mentorship hub with role/status filters, stats, and active mentorship cards
+- ✅ Mentor discovery with match scores plus inline mentorship request workflow
+- ✅ Request management (incoming/outgoing) with accept/decline handling
+- ✅ Session logging, milestones tracking, and mentorship completion feedback
+
 - ✅ **Projects**
   - Listing page fully integrated with backend API
   - Detail page fully integrated with backend API
@@ -245,14 +251,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ **Live Sessions**
   - Backend: Complete live session system
   - **Missing**: Session creation, joining interface, recording playback
-
-- ❌ **Mentorship**
-  - Backend: Complete mentorship system
-  - **Missing**: Mentor application, mentor matching, session scheduling
-
-- ❌ **Learning Analytics**
-  - Backend: Complete analytics service
-  - **Missing**: Analytics dashboard, charts, insights
 
 - ❌ **Course Comparison**
   - Backend: Complete comparison service

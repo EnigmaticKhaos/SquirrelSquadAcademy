@@ -53,6 +53,12 @@ export default function Header() {
                     Learning Goals
                   </Link>
                   <Link
+                    href="/mentorship"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Mentorship
+                  </Link>
+                  <Link
                     href="/analytics"
                     className="text-sm font-medium text-gray-300 hover:text-gray-100"
                   >
