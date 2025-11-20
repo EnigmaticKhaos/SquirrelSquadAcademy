@@ -125,6 +125,9 @@ const executeWithJudge0 = async (
         },
         timeout: 30000, // 30 second timeout
         validateStatus: (status) => status < 500,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false, // Allow self-signed certificates for self-hosted instances
+        }),
       }
     );
 
@@ -149,6 +152,9 @@ const executeWithJudge0 = async (
         },
         timeout: 10000, // 10 second timeout
         validateStatus: (status) => status < 500,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false, // Allow self-signed certificates for self-hosted instances
+        }),
       }
     );
 
@@ -181,19 +187,36 @@ const executeWithJudge0 = async (
       status,
     };
   } catch (error: any) {
-    logger.error('Error executing code with Judge0:', error);
+    logger.error('Error executing code with Judge0:', {
+      message: error.message,
+      code: error.code,
+      response: error.response?.status,
+      url: JUDGE0_API_URL,
+      isRapidAPI: IS_RAPIDAPI,
+      isSelfHosted: IS_SELF_HOSTED,
+    });
+    
+    // Create error with status code for proper HTTP response
+    const appError: any = new Error();
+    appError.isOperational = true;
     
     // Provide more helpful error messages
     if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-      throw new Error('Code execution service is temporarily unavailable. Please try again later.');
+      appError.message = 'Code execution service is temporarily unavailable. Please try again later.';
+      appError.statusCode = 503; // Service Unavailable
+    } else if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO') || error.code === 'EPROTO') {
+      appError.message = 'Connection error with code execution service. Please check your JUDGE0_API_URL and ensure the service is accessible.';
+      appError.statusCode = 502; // Bad Gateway
+    } else if (error.response) {
+      const status = error.response.status;
+      appError.message = `Code execution failed: ${status} ${error.response.statusText || ''}`;
+      appError.statusCode = status >= 400 && status < 500 ? 400 : 502;
+    } else {
+      appError.message = `Code execution failed: ${error.message || 'Unknown error'}`;
+      appError.statusCode = 500;
     }
-    if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO')) {
-      throw new Error('Connection error with code execution service. Please try again or contact support.');
-    }
-    if (error.response) {
-      throw new Error(`Code execution failed: ${error.response.status} ${error.response.statusText}`);
-    }
-    throw new Error(`Code execution failed: ${error.message || 'Unknown error'}`);
+    
+    throw appError;
   }
 };
 
@@ -314,26 +337,38 @@ export const executeCode = async (
       ? 'Code execution service is not configured. Please set JUDGE0_API_URL to your self-hosted Judge0 instance URL.'
       : 'Code execution service is not configured. Please set JUDGE0_API_KEY environment variable for RapidAPI, or set JUDGE0_API_URL for self-hosted instance. ' +
         'Get your API key from https://rapidapi.com/judge0-official/api/judge0-ce';
-    throw new Error(errorMessage);
+    const err: any = new Error(errorMessage);
+    err.statusCode = 503; // Service Unavailable
+    err.isOperational = true;
+    throw err;
   }
 
   // Validate RapidAPI configuration
   if (IS_RAPIDAPI && !JUDGE0_API_KEY) {
-    throw new Error(
+    const err: any = new Error(
       'JUDGE0_API_KEY is required when using RapidAPI-hosted Judge0. ' +
       'Get your API key from https://rapidapi.com/judge0-official/api/judge0-ce'
     );
+    err.statusCode = 503; // Service Unavailable
+    err.isOperational = true;
+    throw err;
   }
 
   try {
     return await executeWithJudge0(code, language, stdin);
   } catch (error: any) {
     logger.error('Error executing code with Judge0:', error);
-    // Re-throw with a user-friendly message if it's not already formatted
-    if (error.message && !error.message.includes('temporarily unavailable') && !error.message.includes('Connection error')) {
-      throw new Error(`Code execution failed: ${error.message}`);
+    
+    // If error already has statusCode, re-throw as-is
+    if (error.statusCode && error.isOperational) {
+      throw error;
     }
-    throw error;
+    
+    // Otherwise, wrap in a proper error with status code
+    const appError: any = new Error(error.message || 'Code execution failed');
+    appError.statusCode = error.statusCode || 500;
+    appError.isOperational = true;
+    throw appError;
   }
 };
 
