@@ -375,12 +375,16 @@ export interface Challenge {
 }
 
 export interface LeaderboardEntry {
-  user: User;
   rank: number;
-  score: number;
-  xp?: number;
-  coursesCompleted?: number;
-  [key: string]: any;
+  user: {
+    _id: string;
+    username: string;
+    profilePhoto?: string;
+    level: number;
+    xp: number;
+  };
+  value: number;
+  metadata?: any;
 }
 
 // ============================================================================

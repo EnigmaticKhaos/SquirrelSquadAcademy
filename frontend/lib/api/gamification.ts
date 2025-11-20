@@ -33,7 +33,31 @@ export const challengesApi = {
 };
 
 export const leaderboardApi = {
-  getLeaderboard: (params?: { period?: 'daily' | 'weekly' | 'monthly' | 'all-time'; category?: string; page?: number; limit?: number }) =>
-    api.get<ApiResponse<PaginatedResponse<LeaderboardEntry>>>('/leaderboards', { params }),
+  getLeaderboard: (
+    type: 'global-xp' | 'global-level' | 'global-achievements' | 'global-badges' | 'course-xp' | 'course-completion' | 'friends-xp' | 'friends-achievements' | 'category' | 'learning_streak' | 'challenge',
+    params?: { courseId?: string; challengeId?: string; category?: string; limit?: number; offset?: number; userId?: string }
+  ) => {
+    const queryParams: any = {};
+    if (params?.courseId) queryParams.courseId = params.courseId;
+    if (params?.challengeId) queryParams.challengeId = params.challengeId;
+    if (params?.category) queryParams.category = params.category;
+    if (params?.limit) queryParams.limit = params.limit;
+    if (params?.offset) queryParams.offset = params.offset;
+    if (params?.userId) queryParams.userId = params.userId;
+    
+    return api.get<ApiResponse<{ type: string; count: number; leaderboard: LeaderboardEntry[]; userRank: number | null }>>(`/leaderboards/${type}`, { params: queryParams });
+  },
+  
+  getUserRank: (
+    type: 'global-xp' | 'global-level' | 'global-achievements' | 'global-badges' | 'course-xp' | 'course-completion' | 'friends-xp' | 'friends-achievements' | 'category' | 'learning_streak' | 'challenge',
+    params?: { courseId?: string; challengeId?: string; category?: string; userId: string }
+  ) => {
+    const queryParams: any = { userId: params?.userId };
+    if (params?.courseId) queryParams.courseId = params.courseId;
+    if (params?.challengeId) queryParams.challengeId = params.challengeId;
+    if (params?.category) queryParams.category = params.category;
+    
+    return api.get<ApiResponse<{ rank: number; value: number }>>(`/leaderboards/${type}/rank`, { params: queryParams });
+  },
 };
 
