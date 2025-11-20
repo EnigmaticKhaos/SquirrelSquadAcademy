@@ -40,9 +40,27 @@ app.use(preventNoSqlInjection);
 app.use(preventXSS);
 app.use(preventHPP);
 
-// CORS
+// CORS - Allow both www and non-www versions
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const allowedOrigins = [
+  frontendUrl,
+  frontendUrl.replace('https://', 'https://www.'),
+  frontendUrl.replace('https://www.', 'https://'),
+  'http://localhost:3000',
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
