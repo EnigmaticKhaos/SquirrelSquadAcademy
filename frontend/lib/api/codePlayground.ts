@@ -4,7 +4,7 @@ import { api } from '../apiClient';
 import type { ApiResponse, CodeExecutionResult, CodeLanguage, CodeSnippet } from '@/types';
 
 // Re-export types for convenience
-export type { CodeSnippet, CodeExecutionResult, CodeLanguage, CodeValidationResult } from '@/types';
+export type { CodeSnippet, CodeExecutionResult, CodeLanguage } from '@/types';
 
 export interface SaveSnippetPayload {
   code: string;

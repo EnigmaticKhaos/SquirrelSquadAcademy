@@ -38,18 +38,18 @@ export const useLearningGoals = (params?: LearningGoalQueryParams) => {
       const response = await learningGoalsApi.getGoals(params);
       const payload = response.data;
 
-      if (payload.data) {
-        return payload.data as PaginatedResponse<LearningGoal>;
+      if (payload.data && typeof payload.data === 'object' && 'data' in payload.data && 'pagination' in payload.data) {
+        return payload.data as unknown as PaginatedResponse<LearningGoal>;
       }
 
       const goals = (payload as any).goals || [];
-      const page = (payload as any).page || 1;
-      const total = (payload as any).total ?? goals.length;
-      const totalPages = (payload as any).pages;
+      const pageNum = (payload as any).page || 1;
+      const totalCount = (payload as any).total ?? goals.length;
+      const totalPagesCount = (payload as any).pages;
 
       return {
         data: goals,
-        pagination: buildPagination(page, limit, total, totalPages),
+        pagination: buildPagination(pageNum, limit, totalCount, totalPagesCount),
       };
     },
     placeholderData: {
@@ -165,8 +165,8 @@ export const useLearningGoalStats = () => {
     queryFn: async () => {
       const response = await learningGoalsApi.getGoalStats();
       const payload = response.data;
-      if (payload.data) {
-        return payload.data as LearningGoalStats;
+      if (payload.data && typeof payload.data === 'object' && 'total' in payload.data) {
+        return payload.data as unknown as LearningGoalStats;
       }
       return (payload as any).stats || defaultStats;
     },

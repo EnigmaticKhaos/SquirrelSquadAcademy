@@ -74,4 +74,4 @@ export const learningGoalsApi = {
   getGoalStats: () => api.get<ApiResponse<{ stats: LearningGoalStats }>>('/learning-goals/stats'),
 };
 
-export type { LearningGoalFilters as LearningGoalQueryParams, LearningGoalPayload, UpdateLearningGoalPayload };
+export type { LearningGoalFilters as LearningGoalQueryParams };

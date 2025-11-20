@@ -853,18 +853,6 @@ export interface Flashcard {
   updatedAt: string;
 }
 
-export interface CodeSnippet {
-  _id: string;
-  user: string;
-  title: string;
-  code: string;
-  language: string;
-  description?: string;
-  isPublic: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
 
 // ============================================================================
 // Mentorship Types
