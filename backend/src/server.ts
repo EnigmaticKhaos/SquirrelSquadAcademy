@@ -52,6 +52,7 @@ if (frontendUrl.startsWith('https://')) {
 }
 
 console.log('CORS allowed origins:', allowedOrigins);
+console.log('FRONTEND_URL from env:', process.env.FRONTEND_URL);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -65,7 +66,7 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin, 'Allowed:', allowedOrigins);
-      callback(null, false); // Return false instead of error to prevent crash
+      callback(null, false);
     }
   },
   credentials: true,
