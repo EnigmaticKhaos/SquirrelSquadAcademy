@@ -36,7 +36,7 @@ initializeSocket(httpServer);
 
 // CORS - Must be before other middleware to handle preflight requests
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-// Build allowed origins list
+// Build allowed origins list - always include both www and non-www for production
 const allowedOrigins: string[] = [
   frontendUrl,
   'http://localhost:3000',
@@ -44,14 +44,22 @@ const allowedOrigins: string[] = [
 
 // Add www and non-www versions if it's an https URL
 if (frontendUrl.startsWith('https://')) {
-  if (frontendUrl.startsWith('https://www.')) {
-    allowedOrigins.push(frontendUrl.replace('https://www.', 'https://'));
+  if (frontendUrl.includes('www.')) {
+    // If it has www, add non-www version
+    allowedOrigins.push(frontendUrl.replace('www.', ''));
   } else {
+    // If it doesn't have www, add www version
     allowedOrigins.push(frontendUrl.replace('https://', 'https://www.'));
   }
 }
 
-console.log('CORS allowed origins:', allowedOrigins);
+// Also explicitly add common variations
+if (frontendUrl.includes('squirrelsquadacademy.com')) {
+  allowedOrigins.push('https://squirrelsquadacademy.com');
+  allowedOrigins.push('https://www.squirrelsquadacademy.com');
+}
+
+console.log('CORS allowed origins:', JSON.stringify(allowedOrigins, null, 2));
 console.log('FRONTEND_URL from env:', process.env.FRONTEND_URL);
 
 app.use(cors({
