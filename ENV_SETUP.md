@@ -80,19 +80,15 @@ This guide will help you set up all the necessary environment variables for Squi
 - Get access keys
 - **Variables**: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`
 
-### 11. Code Execution Service
-Choose one:
-
-**Option A: Judge0 (Recommended)**
+### 11. Code Execution Service (Judge0 - Required for Code Playground)
 - Sign up at [RapidAPI](https://rapidapi.com)
 - Subscribe to [Judge0 API](https://rapidapi.com/judge0-official/api/judge0-ce)
-- Get API key
-- **Variables**: `JUDGE0_API_URL`, `JUDGE0_API_KEY`
+- Get API key from RapidAPI dashboard
+- **Variables**: 
+  - `JUDGE0_API_URL` (default: `https://judge0-ce.p.rapidapi.com`)
+  - `JUDGE0_API_KEY` (required - get from RapidAPI)
 
-**Option B: Piston API (Free/Open Source)**
-- Use public instance: `https://emkc.org/api/v2/piston`
-- Or self-host: [Piston GitHub](https://github.com/engineer-man/piston)
-- **Variable**: `PISTON_API_URL`
+**Note**: The code playground requires Judge0 to be configured. Without `JUDGE0_API_KEY`, code execution will fail with a clear error message.
 
 ### 12. Encryption Key (Required for Message Encryption)
 

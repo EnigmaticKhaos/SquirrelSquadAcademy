@@ -249,6 +249,10 @@ const executeWithPiston = async (
   }
 };
 
+// Note: Piston API is kept as a reference implementation but is not used by default.
+// To use Piston instead of Judge0, you would need to modify the executeCode function
+// and set PISTON_API_URL environment variable.
+
 /**
  * Execute code in browser (for JavaScript/TypeScript only)
  */
@@ -275,21 +279,18 @@ export const executeCode = async (
   language: SupportedLanguage,
   stdin?: string
 ): Promise<CodeExecutionResult> => {
+  // Check if Judge0 is configured
+  if (!USE_JUDGE0) {
+    throw new Error(
+      'Code execution service is not configured. Please set JUDGE0_API_KEY environment variable. ' +
+      'Get your API key from https://rapidapi.com/judge0-official/api/judge0-ce'
+    );
+  }
+
   try {
-    // Use Judge0 if available, otherwise fall back to Piston
-    if (USE_JUDGE0) {
-      try {
-        return await executeWithJudge0(code, language, stdin);
-      } catch (judge0Error: any) {
-        logger.warn('Judge0 execution failed, falling back to Piston:', judge0Error.message);
-        // Fall back to Piston if Judge0 fails
-        return await executeWithPiston(code, language, stdin);
-      }
-    } else {
-      return await executeWithPiston(code, language, stdin);
-    }
+    return await executeWithJudge0(code, language, stdin);
   } catch (error: any) {
-    logger.error('Error executing code:', error);
+    logger.error('Error executing code with Judge0:', error);
     // Re-throw with a user-friendly message if it's not already formatted
     if (error.message && !error.message.includes('temporarily unavailable') && !error.message.includes('Connection error')) {
       throw new Error(`Code execution failed: ${error.message}`);

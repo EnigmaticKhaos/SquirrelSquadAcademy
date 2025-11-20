@@ -80,14 +80,12 @@ AWS_REGION=us-east-1
 AWS_S3_BUCKET=your_s3_bucket_name
 ```
 
-### Code Execution (Optional)
+### Code Execution (Required for Code Playground)
 ```env
-# Judge0 API
+# Judge0 API - Required for code playground feature
 JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
 JUDGE0_API_KEY=your_judge0_api_key
-
-# OR Piston API (alternative)
-PISTON_API_URL=https://emkc.org/api/v2/piston
+# Get API key from: https://rapidapi.com/judge0-official/api/judge0-ce
 ```
 
 ### Message Encryption (Required for Direct Messaging)
