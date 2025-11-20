@@ -66,14 +66,19 @@ This document tracks the implementation status of features across the platform, 
   - **Remaining**: Review voting functionality, review editing
 
 ### Learning Paths
-- 🟡 **Learning Paths Listing**
-  - Page exists, basic structure
-  - Backend: Complete learning path system
-  - **Missing**: Full filtering, enrollment flow, progress tracking
+- ✅ **Learning Paths Listing**
+  - Page fully integrated with backend API
+  - Filtering by type, difficulty, and category
+  - Search functionality
+  - Pagination support
 
-- 🟡 **Learning Path Detail**
-  - Page exists
-  - **Missing**: Course progression UI, milestone tracking, enrollment
+- ✅ **Learning Path Detail**
+  - Page fully integrated with backend API
+  - Course progression UI with status indicators (completed, current, locked)
+  - Milestone tracking with completion status
+  - Progress bar and enrollment flow
+  - Check if user can start before enrollment
+  - Continue learning button for enrolled users
 
 - 🟡 **AI Path Generation**
   - Page exists (`/learning-paths/generate`)

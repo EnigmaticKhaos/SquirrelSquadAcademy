@@ -273,7 +273,7 @@ export interface LearningPath {
   description?: string;
   type: LearningPathType;
   courses: Array<{
-    course: string;
+    course: string | Course;
     order: number;
     isRequired: boolean;
   }>;

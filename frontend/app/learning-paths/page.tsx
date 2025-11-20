@@ -38,12 +38,53 @@ export default function LearningPathsPage() {
             }
           />
 
-          <div className="mb-6">
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SearchBar
               placeholder="Search learning paths..."
               value={search}
               onChange={setSearch}
               className="max-w-md"
+            />
+            <FilterPanel
+              filters={[
+                {
+                  key: 'type',
+                  label: 'Type',
+                  type: 'select',
+                  options: [
+                    { value: '', label: 'All Types' },
+                    { value: 'curated', label: 'Curated' },
+                    { value: 'ai-powered', label: 'AI-Powered' },
+                  ],
+                },
+                {
+                  key: 'difficulty',
+                  label: 'Difficulty',
+                  type: 'select',
+                  options: [
+                    { value: '', label: 'All Levels' },
+                    { value: 'beginner', label: 'Beginner' },
+                    { value: 'intermediate', label: 'Intermediate' },
+                    { value: 'advanced', label: 'Advanced' },
+                    { value: 'expert', label: 'Expert' },
+                  ],
+                },
+                {
+                  key: 'category',
+                  label: 'Category',
+                  type: 'select',
+                  options: [
+                    { value: '', label: 'All Categories' },
+                    { value: 'programming', label: 'Programming' },
+                    { value: 'design', label: 'Design' },
+                    { value: 'business', label: 'Business' },
+                    { value: 'data-science', label: 'Data Science' },
+                  ],
+                },
+              ]}
+              values={filters}
+              onChange={(key, value) => setFilters((prev) => ({ ...prev, [key]: value || undefined }))}
+              onReset={() => setFilters({})}
             />
           </div>
 

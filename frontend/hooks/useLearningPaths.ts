@@ -50,3 +50,25 @@ export const useGenerateLearningPath = () => {
   });
 };
 
+export const useLearningPathProgress = (id: string) => {
+  return useQuery({
+    queryKey: ['learning-paths', id, 'progress'],
+    queryFn: async () => {
+      const response = await learningPathsApi.getProgress(id);
+      return response.data.data || null;
+    },
+    enabled: !!id,
+  });
+};
+
+export const useCanStartLearningPath = (id: string) => {
+  return useQuery({
+    queryKey: ['learning-paths', id, 'can-start'],
+    queryFn: async () => {
+      const response = await learningPathsApi.checkCanStart(id);
+      return response.data.data || { canStart: false };
+    },
+    enabled: !!id,
+  });
+};
+
