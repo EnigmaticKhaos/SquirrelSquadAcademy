@@ -613,28 +613,54 @@ export interface Note {
 
 export interface FlashcardDeck {
   _id: string;
-  user: string;
+  user: string | User;
   title: string;
   description?: string;
-  course?: string;
-  tags: string[];
+  color?: string;
+  icon?: string;
+  tags?: string[];
+  category?: string;
+  course?: string | { _id: string; title: string };
+  lesson?: string | { _id: string; title: string };
   isPublic: boolean;
-  cardCount: number;
+  allowDuplicates: boolean;
+  totalCards: number;
+  activeCards: number;
+  cardsDue: number;
+  averageEaseFactor: number;
+  lastStudied?: string;
+  newCardsPerDay: number;
+  reviewCardsPerDay: number;
+  isArchived: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Flashcard {
   _id: string;
-  deck: string;
+  user: string | User;
+  deck: string | FlashcardDeck;
   front: string;
   back: string;
-  order: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  lastReviewed?: string;
-  nextReview?: string;
-  reviewCount: number;
-  correctCount: number;
+  hint?: string;
+  frontImage?: string;
+  backImage?: string;
+  frontAudio?: string;
+  backAudio?: string;
+  tags?: string[];
+  course?: string | { _id: string; title: string };
+  lesson?: string | { _id: string; title: string };
+  easeFactor: number;
+  interval: number;
+  repetitions: number;
+  nextReviewDate: string;
+  totalReviews: number;
+  correctReviews: number;
+  incorrectReviews: number;
+  lastReviewDate?: string;
+  lastReviewResult?: 'correct' | 'incorrect';
+  isActive: boolean;
+  isArchived: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -4,27 +4,30 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Button, SearchBar } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Button, SearchBar, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useFlashcardDecks } from '@/hooks/useFlashcards';
 
 export default function FlashcardsPage() {
   const { user } = useAuth();
-  const [decks, setDecks] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const { data: decks, isLoading, error } = useFlashcardDecks({ archived: false });
+
+  const filteredDecks = decks?.filter(deck => 
+    !search || deck.title.toLowerCase().includes(search.toLowerCase()) || 
+    deck.description?.toLowerCase().includes(search.toLowerCase())
+  ) || [];
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-gray-900">
         <Header />
-        <main className="flex-1 bg-gray-50 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center">
           <Card className="max-w-md">
             <CardContent className="p-6">
-              <p className="mb-4 text-center text-gray-600">Please log in to view your flashcard decks</p>
+              <p className="mb-4 text-center text-gray-400">Please log in to view your flashcard decks</p>
               <Link href="/login">
-                <button className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-                  Go to Login
-                </button>
+                <Button className="w-full">Go to Login</Button>
               </Link>
             </CardContent>
           </Card>
@@ -34,9 +37,9 @@ export default function FlashcardsPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-gray-900">
       <Header />
-      <main className="flex-1 bg-gray-50">
+      <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Flashcard Decks"
@@ -62,7 +65,15 @@ export default function FlashcardsPage() {
             </div>
           )}
 
-          {!isLoading && decks.length === 0 && (
+          {error && (
+            <Card>
+              <CardContent className="p-6">
+                <ErrorMessage message="Failed to load flashcard decks. Please try again later." />
+              </CardContent>
+            </Card>
+          )}
+
+          {!isLoading && !error && filteredDecks.length === 0 && (
             <EmptyState
               title="No flashcard decks yet"
               description="Create your first deck to start studying"
@@ -73,25 +84,25 @@ export default function FlashcardsPage() {
             />
           )}
 
-          {!isLoading && decks.length > 0 && (
+          {!isLoading && !error && filteredDecks.length > 0 && (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {decks.map((deck) => (
-                <Link key={deck._id} href={`/flashcards/decks/${deck._id}`}>
-                  <Card hover className="h-full">
+              {filteredDecks.map((deck) => (
+                <Link key={deck._id} href={'/flashcards/decks/' + deck._id}>
+                  <Card hover={true} className="h-full">
                     <CardHeader>
-                      <CardTitle className="text-lg">{deck.title}</CardTitle>
+                      <CardTitle className="text-lg text-gray-100">{deck.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {deck.description && (
-                        <p className="mb-4 text-sm text-gray-600 line-clamp-2">
+                        <p className="mb-4 text-sm text-gray-400 line-clamp-2">
                           {deck.description}
                         </p>
                       )}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>{deck.cardCount || 0} cards</span>
-                        <Button variant="outline" size="sm">
-                          Study
-                        </Button>
+                      <div className="flex items-center justify-between text-sm text-gray-400">
+                        <span>{deck.totalCards || 0} cards</span>
+                        {deck.cardsDue > 0 && (
+                          <Badge variant="info">{deck.cardsDue} due</Badge>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
