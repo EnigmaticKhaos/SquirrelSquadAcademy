@@ -1,5 +1,14 @@
 import { api } from '../apiClient';
-import type { ApiResponse, Course, PaginatedResponse, CourseReview, CourseBundle, BundlePurchase } from '@/types';
+import type { ApiResponse, Course, PaginatedResponse, CourseReview, CourseBundle } from '@/types';
+
+type BundlePurchaseResponse = {
+  _id: string;
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
+  price: number;
+  currency: string;
+  discountAmount?: number;
+  stripePaymentIntentId?: string;
+};
 
 export const coursesApi = {
   // Get all courses
@@ -65,7 +74,7 @@ export const courseBundlesApi = {
   purchaseBundle: (
     id: string,
     data?: { stripePaymentIntentId?: string; paymentStatus?: 'pending' | 'completed' | 'failed' }
-  ) => api.post<ApiResponse<{ purchase: BundlePurchase }>>(`/course-bundles/${id}/purchase`, data),
+  ) => api.post<ApiResponse<{ purchase: BundlePurchaseResponse }>>(`/course-bundles/${id}/purchase`, data),
 };
 
 export const courseWaitlistApi = {
