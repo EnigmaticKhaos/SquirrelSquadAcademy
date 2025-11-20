@@ -85,12 +85,10 @@ This document tracks the implementation status of features across the platform, 
   - Check if user can start before enrollment
   - Continue learning button for enrolled users
 
-- ✅ **AI Path Generation**
-  - Page fully integrated with backend API
-  - Form implementation with targetSkill, currentLevel, learningStyle, and timeCommitment fields
-  - Generation flow implemented with error handling
-  - Redirects to generated learning path detail page
-  - Dark theme styling applied
+  - ✅ **AI Path Generation**
+    - `/learning-paths/generate` offers a multi-step form with presets, focus areas, and constraint inputs
+    - AI generation flow surfaces real-time status and previews the resulting path/milestones
+    - Direct linking into the generated learning path once creation succeeds
 
 ### Gamification
 - ✅ **Achievements**
