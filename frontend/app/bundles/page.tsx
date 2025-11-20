@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, SearchBar, Pagination } from '@/components/ui';
@@ -10,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { CourseBundle, PaginatedResponse } from '@/types';
 
 export default function BundlesPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   
@@ -44,7 +46,7 @@ export default function BundlesPage() {
           )}
 
           {error && (
-            <ErrorMessage message="Failed to load bundles" onRetry={() => window.location.reload()} />
+            <ErrorMessage message="Failed to load bundles" onRetry={() => router.refresh()} />
           )}
 
           {data && (

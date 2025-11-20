@@ -1,11 +1,13 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import { useNotifications, useMarkAllNotificationsAsRead } from '@/hooks/useNotifications';
 import { Card, CardContent, LoadingSpinner, ErrorMessage, Button, EmptyState } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const { data, isLoading, error } = useNotifications({ limit: 50 });
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
@@ -36,7 +38,7 @@ export default function NotificationsPage() {
           )}
 
           {error && (
-            <ErrorMessage message="Failed to load notifications" onRetry={() => window.location.reload()} />
+            <ErrorMessage message="Failed to load notifications" onRetry={() => router.refresh()} />
           )}
 
           {data && data.data && data.data.length === 0 && (

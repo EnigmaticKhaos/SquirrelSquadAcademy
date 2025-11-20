@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +10,7 @@ import { PageHeader } from '@/components/layout';
 import { useNotes } from '@/hooks/useNotes';
 
 export default function NotesPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
   const { data, isLoading, error } = useNotes({
@@ -80,7 +82,7 @@ export default function NotesPage() {
               description="Create your first note to get started"
               action={{
                 label: 'Create Note',
-                onClick: () => window.location.href = '/notes/create',
+                onClick: () => router.push('/notes/create'),
               }}
             />
           )}

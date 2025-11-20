@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +10,7 @@ import { PageHeader } from '@/components/layout';
 import { useFlashcardDecks } from '@/hooks/useFlashcards';
 
 export default function FlashcardsPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
   const { data: decks, isLoading, error } = useFlashcardDecks({ archived: false });
@@ -79,7 +81,7 @@ export default function FlashcardsPage() {
               description="Create your first deck to start studying"
               action={{
                 label: 'Create Deck',
-                onClick: () => window.location.href = '/flashcards/create',
+                onClick: () => router.push('/flashcards/create'),
               }}
             />
           )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
@@ -11,6 +12,7 @@ import { PageHeader } from '@/components/layout';
 import type { LearningPath } from '@/types';
 
 export default function LearningPathsPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<{ type?: string; difficulty?: string; category?: string }>({});
@@ -52,7 +54,7 @@ export default function LearningPathsPage() {
           )}
 
           {error && (
-            <ErrorMessage message="Failed to load learning paths" onRetry={() => window.location.reload()} />
+            <ErrorMessage message="Failed to load learning paths" onRetry={() => router.refresh()} />
           )}
 
           {data && (

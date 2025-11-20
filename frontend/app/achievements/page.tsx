@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useQuery } from '@tanstack/react-query';
@@ -10,6 +11,7 @@ import { PageHeader } from '@/components/layout';
 import type { Achievement, PaginatedResponse } from '@/types';
 
 export default function AchievementsPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   
@@ -55,7 +57,7 @@ export default function AchievementsPage() {
           )}
 
           {error && (
-            <ErrorMessage message="Failed to load achievements" onRetry={() => window.location.reload()} />
+            <ErrorMessage message="Failed to load achievements" onRetry={() => router.refresh()} />
           )}
 
           {data && (
