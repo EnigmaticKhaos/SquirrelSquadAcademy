@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, LoadingSpinner, ErrorMessage, EmptyState } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useCourses } from '@/hooks/useCourses';
@@ -12,10 +12,8 @@ export default function ForumsPage() {
   const courses = data?.data || [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Forums"
             description="Join discussions and get help from the community"
@@ -67,8 +65,7 @@ export default function ForumsPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

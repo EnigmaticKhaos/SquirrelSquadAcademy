@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Button, SearchBar, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -22,9 +22,8 @@ export default function FlashcardsPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col bg-gray-900">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="max-w-md">
             <CardContent className="p-6">
               <p className="mb-4 text-center text-gray-400">Please log in to view your flashcard decks</p>
@@ -33,16 +32,14 @@ export default function FlashcardsPage() {
               </Link>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Flashcard Decks"
             description="Create and study flashcard decks to reinforce your learning"
@@ -113,8 +110,7 @@ export default function FlashcardsPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

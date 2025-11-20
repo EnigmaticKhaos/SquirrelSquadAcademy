@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Card,
@@ -154,12 +154,11 @@ export default function PlaygroundPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1 bg-gray-50 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="max-w-md">
             <CardContent className="p-6">
-              <p className="mb-4 text-center text-gray-600">Please log in to use the code playground</p>
+              <p className="mb-4 text-center text-gray-300">Please log in to use the code playground</p>
               <Link href="/login">
                 <button className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
                   Go to Login
@@ -167,16 +166,14 @@ export default function PlaygroundPage() {
               </Link>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Code Playground"
             description="Write, run, and save snippets across multiple programming languages."
@@ -363,8 +360,7 @@ export default function PlaygroundPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

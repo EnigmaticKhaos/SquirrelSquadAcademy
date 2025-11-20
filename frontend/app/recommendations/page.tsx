@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourseRecommendations, useLearningPathRecommendations } from '@/hooks/useRecommendations';
 import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Badge, Button, Tabs, TabsList, TabsTrigger, TabsContent, ProgressBar } from '@/components/ui';
@@ -18,9 +18,8 @@ export default function RecommendationsPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col bg-gray-900">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="max-w-md">
             <CardContent className="p-6">
               <p className="mb-4 text-center text-gray-300">Please log in to view personalized recommendations</p>
@@ -31,8 +30,8 @@ export default function RecommendationsPage() {
               </Link>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
@@ -41,10 +40,8 @@ export default function RecommendationsPage() {
   const hasPathRecommendations = pathRecommendations && pathRecommendations.length > 0;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Recommendations"
             description="Personalized course and learning path recommendations powered by AI"
@@ -201,8 +198,7 @@ export default function RecommendationsPage() {
             </Tabs>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

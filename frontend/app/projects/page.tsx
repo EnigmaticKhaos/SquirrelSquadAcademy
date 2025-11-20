@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useQuery } from '@tanstack/react-query';
 import { projectsApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, SearchBar, Pagination, Avatar, Button } from '@/components/ui';
@@ -21,10 +21,8 @@ export default function ProjectsPage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Projects"
             description="Browse projects shared by the community"
@@ -109,8 +107,7 @@ export default function ProjectsPage() {
             </>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

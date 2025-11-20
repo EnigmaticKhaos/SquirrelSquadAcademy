@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useConversations } from '@/hooks/useMessages';
 import { Card, CardContent, LoadingSpinner, ErrorMessage, EmptyState, Avatar, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -46,10 +46,8 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-100">Messages</h1>
@@ -132,8 +130,7 @@ export default function MessagesPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

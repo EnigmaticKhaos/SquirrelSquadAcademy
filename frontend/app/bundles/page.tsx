@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import {
   Card,
   CardContent,
@@ -75,7 +75,7 @@ export default function BundlesPage() {
   };
 
   const formatCurrency = (value?: number, currency = 'USD') => {
-    if (value === undefined || value === null || Number.isNaN(value)) return '—';
+    if (value === undefined || value === null || Number.isNaN(value)) return 'â€”';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
@@ -84,10 +84,8 @@ export default function BundlesPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Course Bundles"
             description="Save money by purchasing multiple courses together"
@@ -234,8 +232,7 @@ export default function BundlesPage() {
           formatCurrency={formatCurrency}
           onRemoveBundle={(id) => setCompareIds((prev) => prev.filter((bundleId) => bundleId !== id))}
         />
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 
@@ -293,14 +290,14 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({ isOpen, onClose, bund
               <ComparisonRow label="Original Price">
                 {bundles.map((bundle) => (
                   <span key={bundle._id}>
-                    {bundle.originalPrice ? formatCurrency(bundle.originalPrice, bundle.currency) : '—'}
+                    {bundle.originalPrice ? formatCurrency(bundle.originalPrice, bundle.currency) : 'â€”'}
                   </span>
                 ))}
               </ComparisonRow>
               <ComparisonRow label="Savings">
                 {bundles.map((bundle) => {
                   if (!bundle.originalPrice || !bundle.price || bundle.originalPrice <= bundle.price) {
-                    return <span key={bundle._id}>—</span>;
+                    return <span key={bundle._id}>â€”</span>;
                   }
                   return (
                     <span key={bundle._id} className="text-green-400">
@@ -352,7 +349,7 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({ isOpen, onClose, bund
                               {difficulty}
                             </Badge>
                           ))
-                        : <span className="text-gray-400">—</span>}
+                        : <span className="text-gray-400">â€”</span>}
                     </div>
                   );
                 })}
@@ -366,7 +363,7 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({ isOpen, onClose, bund
                             {tag}
                           </Badge>
                         ))
-                      : <span className="text-gray-400">—</span>}
+                      : <span className="text-gray-400">â€”</span>}
                   </div>
                 ))}
               </ComparisonRow>

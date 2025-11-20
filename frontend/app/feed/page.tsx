@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts, useCreatePost, useLikePost, useUnlikePost } from '@/hooks/usePosts';
 import { useComments, useCreateComment } from '@/hooks/useComments';
@@ -54,10 +54,8 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader title="Feed" description="See what's happening in the community" />
 
           {user && (
@@ -236,8 +234,7 @@ export default function FeedPage() {
             </Modal>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { useSavedContent, useUnsaveContent } from '@/hooks/useSavedContent';
 import { Card, CardContent, CardHeader, CardTitle, Tabs, TabsList, TabsTrigger, TabsContent, LoadingSpinner, EmptyState, Button, Badge } from '@/components/ui';
@@ -57,9 +57,8 @@ export default function SavedPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col bg-gray-900">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="max-w-md">
             <CardContent className="p-6">
               <p className="mb-4 text-center text-gray-400">Please log in to view your saved content</p>
@@ -68,16 +67,14 @@ export default function SavedPage() {
               </Link>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Saved Content"
             description="Your bookmarked courses, posts, and resources"
@@ -150,8 +147,7 @@ export default function SavedPage() {
             )}
           </Tabs>
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

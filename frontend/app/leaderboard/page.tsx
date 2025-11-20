@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { Card, CardContent, Select, LoadingSpinner, ErrorMessage, Badge, Avatar } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -37,10 +37,8 @@ export default function LeaderboardPage() {
   const displayLabel = category === 'xp' ? 'XP' : category === 'level' ? 'Level' : category === 'achievements' ? 'Achievements' : 'Badges';
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Leaderboard"
             description="Top performers on the platform"
@@ -126,8 +124,7 @@ export default function LeaderboardPage() {
             </Card>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

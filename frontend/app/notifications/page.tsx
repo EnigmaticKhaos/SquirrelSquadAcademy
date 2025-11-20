@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useNotifications, useMarkAllNotificationsAsRead } from '@/hooks/useNotifications';
 import { Card, CardContent, LoadingSpinner, ErrorMessage, Button, EmptyState } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -12,10 +12,8 @@ export default function NotificationsPage() {
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Notifications"
             actions={
@@ -82,8 +80,7 @@ export default function NotificationsPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

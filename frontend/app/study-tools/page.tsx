@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
@@ -22,10 +22,8 @@ export default function StudyToolsPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1 bg-gray-50">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Study Tools"
             description="Tools to help you study more effectively"
@@ -45,8 +43,7 @@ export default function StudyToolsPage() {
             ))}
           </div>
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

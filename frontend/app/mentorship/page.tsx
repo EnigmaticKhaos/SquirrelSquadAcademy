@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { PageHeader } from '@/components/layout';
 import {
   Badge,
@@ -555,10 +555,8 @@ const renderMentorshipCard = (
 
   return (
     <>
-      <div className="flex min-h-screen flex-col bg-gray-900">
-        <Header />
-        <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <AppLayout>
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <PageHeader
               title="Mentorship Hub"
               description="Manage your mentorships, respond to requests, and discover mentors aligned with your goals."
@@ -708,8 +706,7 @@ const renderMentorshipCard = (
               )}
             </section>
           </div>
-        </main>
-      </div>
+      </AppLayout>
       <Modal
         isOpen={sessionModal.open}
         onClose={closeSessionModal}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import https from 'https';
 import logger from '../utils/logger';
 import { SupportedLanguage } from '../models/CodeSnippet';
 
@@ -117,6 +118,8 @@ const executeWithJudge0 = async (
         params: {
           base64_encoded: 'false',
         },
+        timeout: 10000, // 10 second timeout
+        validateStatus: (status) => status < 500,
       }
     );
 
@@ -150,7 +153,18 @@ const executeWithJudge0 = async (
     };
   } catch (error: any) {
     logger.error('Error executing code with Judge0:', error);
-    throw new Error(`Code execution failed: ${error.message}`);
+    
+    // Provide more helpful error messages
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      throw new Error('Code execution service is temporarily unavailable. Please try again later.');
+    }
+    if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO')) {
+      throw new Error('Connection error with code execution service. Please try again or contact support.');
+    }
+    if (error.response) {
+      throw new Error(`Code execution failed: ${error.response.status} ${error.response.statusText}`);
+    }
+    throw new Error(`Code execution failed: ${error.message || 'Unknown error'}`);
   }
 };
 
@@ -168,23 +182,43 @@ const executeWithPiston = async (
       throw new Error(`Unsupported language: ${language}`);
     }
 
-    const response = await axios.post(`${PISTON_API_URL}/execute`, {
-      language: languageName,
-      version: '*', // Use latest version
-      files: [
-        {
-          content: code,
-        },
-      ],
-      stdin: stdin || '',
-      args: [],
-      compile_timeout: 10000, // 10 seconds
-      run_timeout: 5000, // 5 seconds
-      compile_memory_limit: -1,
-      run_memory_limit: -1,
-    });
+    const response = await axios.post(
+      `${PISTON_API_URL}/execute`,
+      {
+        language: languageName,
+        version: '*', // Use latest version
+        files: [
+          {
+            content: code,
+          },
+        ],
+        stdin: stdin || '',
+        args: [],
+        compile_timeout: 10000, // 10 seconds
+        run_timeout: 5000, // 5 seconds
+        compile_memory_limit: -1,
+        run_memory_limit: -1,
+      },
+      {
+        timeout: 15000, // 15 second timeout
+        validateStatus: (status) => status < 500, // Don't throw on 4xx
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false, // Allow self-signed certificates for external APIs
+        }),
+      }
+    );
+
+    // Check for HTTP errors
+    if (response.status >= 400) {
+      throw new Error(`Piston API returned error: ${response.status} ${response.statusText}`);
+    }
 
     const result = response.data;
+
+    // Check if result has the expected structure
+    if (!result || !result.run) {
+      throw new Error('Invalid response from Piston API');
+    }
 
     let status: CodeExecutionResult['status'] = 'success';
     if (result.run.code !== 0) {
@@ -194,13 +228,24 @@ const executeWithPiston = async (
     return {
       output: result.run.stdout || undefined,
       error: result.run.stderr || result.compile?.stderr || undefined,
-      executionTime: result.run.output ? undefined : undefined, // Piston doesn't provide execution time
+      executionTime: undefined, // Piston doesn't provide execution time
       memoryUsed: undefined, // Piston doesn't provide memory usage
       status,
     };
   } catch (error: any) {
     logger.error('Error executing code with Piston:', error);
-    throw new Error(`Code execution failed: ${error.message}`);
+    
+    // Provide more helpful error messages
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      throw new Error('Code execution service is temporarily unavailable. Please try again later.');
+    }
+    if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO')) {
+      throw new Error('Connection error with code execution service. Please try again or contact support.');
+    }
+    if (error.response) {
+      throw new Error(`Code execution failed: ${error.response.status} ${error.response.statusText}`);
+    }
+    throw new Error(`Code execution failed: ${error.message || 'Unknown error'}`);
   }
 };
 
@@ -233,12 +278,22 @@ export const executeCode = async (
   try {
     // Use Judge0 if available, otherwise fall back to Piston
     if (USE_JUDGE0) {
-      return await executeWithJudge0(code, language, stdin);
+      try {
+        return await executeWithJudge0(code, language, stdin);
+      } catch (judge0Error: any) {
+        logger.warn('Judge0 execution failed, falling back to Piston:', judge0Error.message);
+        // Fall back to Piston if Judge0 fails
+        return await executeWithPiston(code, language, stdin);
+      }
     } else {
       return await executeWithPiston(code, language, stdin);
     }
   } catch (error: any) {
     logger.error('Error executing code:', error);
+    // Re-throw with a user-friendly message if it's not already formatted
+    if (error.message && !error.message.includes('temporarily unavailable') && !error.message.includes('Connection error')) {
+      throw new Error(`Code execution failed: ${error.message}`);
+    }
     throw error;
   }
 };

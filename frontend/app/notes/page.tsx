@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Button, SearchBar, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -23,9 +23,8 @@ export default function NotesPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col bg-gray-900">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="max-w-md">
             <CardContent className="p-6">
               <p className="mb-4 text-center text-gray-400">Please log in to view your notes</p>
@@ -34,16 +33,14 @@ export default function NotesPage() {
               </Link>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="My Notes"
             description="Your personal notes and study materials"
@@ -125,8 +122,7 @@ export default function NotesPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 
