@@ -230,9 +230,12 @@ This document tracks the implementation status of features across the platform, 
   - Snippet saving/loading with recent history list and inline execution controls
   - API client + React Query mutations manage quick runs, snippet execution, and deletion
 
-- ❌ **Live Sessions**
-  - Backend: Complete live session system
-  - **Missing**: Session creation, joining interface, recording playback
+- ✅ **Live Sessions**
+  - Browse upcoming/past sessions with filtering by type and status
+  - Detail view shows host info, meeting links, recording access, and related resources
+  - Registration, join, and leave flows wired to backend with optimistic React Query updates
+  - Real-time chat and online presence powered by the shared SocketProvider
+  - Participant list pulls live data with status badges and online indicators
 
 - ❌ **Mentorship**
   - Backend: Complete mentorship system

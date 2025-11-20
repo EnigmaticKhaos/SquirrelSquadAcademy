@@ -522,6 +522,87 @@ export interface CodeSnippet {
   updatedAt: string;
 }
 
+export type LiveSessionType =
+  | 'webinar'
+  | 'workshop'
+  | 'qna'
+  | 'office_hours'
+  | 'course_completion_party'
+  | 'custom';
+
+export type LiveSessionStatus = 'scheduled' | 'live' | 'ended' | 'cancelled';
+export type LiveSessionProvider = 'webrtc' | 'zoom' | 'custom';
+
+export interface LiveSession {
+  _id: string;
+  title: string;
+  description?: string;
+  sessionType: LiveSessionType;
+  status: LiveSessionStatus;
+  host: User | string;
+  coHosts?: Array<User | string>;
+  scheduledStartTime: string;
+  scheduledEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  provider: LiveSessionProvider;
+  meetingUrl?: string;
+  meetingId?: string;
+  meetingPassword?: string;
+  streamUrl?: string;
+  course?: string | Course;
+  lesson?: string;
+  maxParticipants?: number;
+  allowRecording: boolean;
+  requireRegistration: boolean;
+  isPublic: boolean;
+  allowQuestions: boolean;
+  allowPolls: boolean;
+  allowScreenShare: boolean;
+  allowChat: boolean;
+  registrationDeadline?: string;
+  registeredUsers: Array<User | string>;
+  totalParticipants: number;
+  peakParticipants: number;
+  totalViews: number;
+  recordingUrl?: string;
+  recordingAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionParticipantRole = 'host' | 'co_host' | 'participant' | 'viewer';
+export type LiveSessionParticipantStatus = 'registered' | 'joined' | 'left' | 'absent';
+
+export interface LiveSessionParticipant {
+  _id: string;
+  session: string;
+  user: string | User;
+  role: LiveSessionParticipantRole;
+  status: LiveSessionParticipantStatus;
+  registeredAt?: string;
+  joinedAt?: string;
+  leftAt?: string;
+  duration: number;
+  questionsAsked: number;
+  pollsAnswered: number;
+  chatMessages: number;
+  watchTime: number;
+  lastActiveAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LiveSessionChatMessage {
+  user: {
+    _id: string;
+    username: string;
+    profilePhoto?: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
 export interface Project {
   _id: string;
   user: string | User;
