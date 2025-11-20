@@ -472,6 +472,56 @@ export interface Conversation {
   createdAt: string;
 }
 
+export type CodeLanguage =
+  | 'javascript'
+  | 'typescript'
+  | 'python'
+  | 'java'
+  | 'cpp'
+  | 'c'
+  | 'csharp'
+  | 'go'
+  | 'rust'
+  | 'ruby'
+  | 'php'
+  | 'swift'
+  | 'kotlin'
+  | 'dart'
+  | 'r'
+  | 'sql'
+  | 'html'
+  | 'css'
+  | 'bash'
+  | 'powershell';
+
+export type CodeExecutionStatus = 'success' | 'error' | 'timeout' | 'runtime_error';
+
+export interface CodeExecutionResult {
+  output?: string;
+  error?: string;
+  executionTime?: number;
+  memoryUsed?: number;
+  status: CodeExecutionStatus;
+}
+
+export interface CodeSnippet {
+  _id: string;
+  user: string | User;
+  course?: string | Course;
+  lesson?: string;
+  assignment?: string;
+  title?: string;
+  code: string;
+  language: CodeLanguage;
+  lastExecuted?: string;
+  executionResult?: CodeExecutionResult;
+  isPublic: boolean;
+  tags?: string[];
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Project {
   _id: string;
   user: string | User;

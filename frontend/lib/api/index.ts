@@ -27,6 +27,7 @@ export { submissionsApi } from './submissions';
 export { uploadApi } from './upload';
 export { pomodoroApi } from './pomodoro';
 export { recommendationsApi } from './recommendations';
+export { codePlaygroundApi } from './codePlayground';
 
 // Also export everything from each module
 export * from './auth';
@@ -48,4 +49,5 @@ export * from './videos';
 export * from './courseCompletion';
 export * from './assignments';
 export * from './submissions';
+export * from './codePlayground';
 
