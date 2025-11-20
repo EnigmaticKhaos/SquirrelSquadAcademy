@@ -140,7 +140,7 @@ export default function MentorshipPage() {
   const requestFilters = useMemo(() => {
     return {
       type: requestTab,
-      status: requestStatusFilter === 'all' ? undefined : requestStatusFilter,
+      status: requestStatusFilter === 'all' ? undefined : requestStatusFilter as 'pending' | 'accepted' | 'rejected' | 'cancelled' | undefined,
       limit: 30,
     };
   }, [requestTab, requestStatusFilter]);

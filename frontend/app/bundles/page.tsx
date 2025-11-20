@@ -53,7 +53,7 @@ export default function BundlesPage() {
   const totalPages = !data?.total || data.total <= 0 ? 1 : Math.max(1, Math.ceil(data.total / 12));
 
   const selectedBundles = useMemo(
-    () => bundles.filter((bundle) => compareIds.includes(bundle._id)),
+    () => bundles.filter((bundle: any) => compareIds.includes(bundle._id)),
     [bundles, compareIds]
   );
 
@@ -115,7 +115,7 @@ export default function BundlesPage() {
           {bundles.length > 0 && (
             <>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {bundles.map((bundle) => {
+                {bundles.map((bundle: CourseBundle) => {
                   const courseItems = (bundle.courses as Array<string | Course>) ?? [];
                   const courseCount = courseItems.length;
                   const isSelected = compareIds.includes(bundle._id);
@@ -362,7 +362,7 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({ isOpen, onClose, bund
                   <div key={bundle._id} className="flex flex-wrap gap-1">
                     {bundle.tags && bundle.tags.length > 0
                       ? bundle.tags.slice(0, 4).map((tag) => (
-                          <Badge key={tag} variant="outline" size="sm" className="text-xs capitalize">
+                          <Badge key={tag} variant="secondary" size="sm" className="text-xs capitalize">
                             {tag}
                           </Badge>
                         ))

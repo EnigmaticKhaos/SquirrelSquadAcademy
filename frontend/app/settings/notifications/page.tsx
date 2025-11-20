@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, Checkbox, Button, LoadingSpin
 import { Breadcrumbs } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { useUpdateUserSettings } from '@/hooks/useUserSettings';
+import { showToast, getErrorMessage } from '@/lib/toast';
 
 export default function NotificationSettingsPage() {
   const { user } = useAuth();
@@ -46,9 +47,9 @@ export default function NotificationSettingsPage() {
       await updateSettings.mutateAsync({
         notificationPreferences: settings,
       });
-      alert('Notification preferences saved successfully!');
+      showToast.success('Notification preferences saved successfully!');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to save preferences');
+      showToast.error('Failed to save preferences', getErrorMessage(error));
     }
   };
 

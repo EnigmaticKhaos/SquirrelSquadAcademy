@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import { useCourse, useEnrollCourse } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
 import { Button, Card, CardContent, Rating, Badge, LoadingSpinner, ErrorMessage } from '@/components/ui';
+import { showToast, getErrorMessage } from '@/lib/toast';
 import { PageHeader, Breadcrumbs } from '@/components/layout';
 import { ReviewSection } from '@/components/courses/ReviewSection';
 
@@ -25,9 +26,10 @@ export default function CourseDetailPage() {
 
     try {
       await enrollMutation.mutateAsync(id);
+      showToast.success('Successfully enrolled in course!');
       router.push(`/courses/${id}/learn`);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to enroll in course');
+      showToast.error('Failed to enroll in course', getErrorMessage(error));
     }
   };
 

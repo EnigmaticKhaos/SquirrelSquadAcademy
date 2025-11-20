@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button, Card, CardContent, Badge, LoadingSpinner, ErrorMessage, ProgressBar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/layout';
 import { CheckCircle2, Circle, Lock, BookOpen, Trophy, Clock } from 'lucide-react';
+import { showToast, getErrorMessage } from '@/lib/toast';
 import type { Course } from '@/types';
 
 export default function LearningPathDetailPage() {
@@ -28,9 +29,10 @@ export default function LearningPathDetailPage() {
 
     try {
       await startMutation.mutateAsync(id);
+      showToast.success('Learning path started!');
       router.refresh();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to start learning path');
+      showToast.error('Failed to start learning path', getErrorMessage(error));
     }
   };
 

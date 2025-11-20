@@ -407,43 +407,45 @@ export default function AnalyticsPage() {
                           <div>
                             <p className="text-sm text-gray-400">Average Score</p>
                             <p className="text-3xl font-semibold text-gray-100">
-                              {Math.round(performance.overallAverageScore)}%
+                              {performance ? Math.round(performance.overallAverageScore) : 0}%
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-gray-400">Completion Rate</p>
                             <p className="text-3xl font-semibold text-gray-100">
-                              {performance.completionRate.toFixed(0)}%
+                              {performance ? performance.completionRate.toFixed(0) : 0}%
                             </p>
                           </div>
                         </div>
                         <div>
                           <p className="text-sm text-gray-400">Trend</p>
                           <p className="text-lg font-medium text-gray-100 capitalize">
-                            {performance.improvementTrend}
+                            {performance?.improvementTrend || 'N/A'}
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <p className="text-sm font-medium text-green-400">Strong Areas</p>
                             <ul className="mt-2 space-y-1 text-sm text-gray-300">
-                              {performance.strongAreas.length === 0 && (
+                              {!performance || performance.strongAreas.length === 0 ? (
                                 <li className="text-gray-500">Not enough data</li>
+                              ) : (
+                                performance.strongAreas.map((course) => (
+                                  <li key={course}>{course}</li>
+                                ))
                               )}
-                              {performance.strongAreas.map((course) => (
-                                <li key={course}>{course}</li>
-                              ))}
                             </ul>
                           </div>
                           <div>
                             <p className="text-sm font-medium text-rose-400">Focus Areas</p>
                             <ul className="mt-2 space-y-1 text-sm text-gray-300">
-                              {performance.weakAreas.length === 0 && (
+                              {!performance || performance.weakAreas.length === 0 ? (
                                 <li className="text-gray-500">Not enough data</li>
+                              ) : (
+                                performance.weakAreas.map((course) => (
+                                  <li key={course}>{course}</li>
+                                ))
                               )}
-                              {performance.weakAreas.map((course) => (
-                                <li key={course}>{course}</li>
-                              ))}
                             </ul>
                           </div>
                         </div>

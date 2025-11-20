@@ -79,7 +79,8 @@ export default function PlaygroundPage() {
     mutationFn: (payload: { code: string; language: CodeLanguage; stdin?: string }) =>
       codePlaygroundApi.executeCode(payload),
     onSuccess: (response) => {
-      setResult(response.data?.data || response.data);
+      const result = response.data?.data || response.data;
+      setResult(result as CodeExecutionResult | null);
     },
     onError: (error) => {
       setFeedback({ type: 'error', message: getErrorMessage(error, 'Failed to execute code.') });
@@ -312,7 +313,7 @@ export default function PlaygroundPage() {
                     />
                   ) : (
                     <div className="space-y-3">
-                      {snippets.map((snippet) => (
+                      {snippets.map((snippet: any) => (
                         <div
                           key={snippet._id}
                           className="rounded-xl border border-gray-700 bg-gray-900/50 p-4"

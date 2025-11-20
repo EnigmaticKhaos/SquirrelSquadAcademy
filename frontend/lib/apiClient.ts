@@ -1,6 +1,7 @@
 'use client';
 
 import axios from 'axios';
+import { showToast, getErrorMessage } from './toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -52,6 +53,7 @@ api.interceptors.response.use(
         
         if (!isAuthPage) {
           localStorage.removeItem('token');
+          showToast.error('Session expired', 'Please log in again');
           // Redirect to home page instead of login on logout/401
           // Only redirect to login if we're not already there
           if (currentPath !== '/login') {
@@ -62,8 +64,17 @@ api.interceptors.response.use(
           localStorage.removeItem('token');
         }
       }
+    } else if (error.response?.status >= 500) {
+      // Show toast for server errors
+      showToast.error('Server error', getErrorMessage(error));
+    } else if (error.response?.status === 403) {
+      // Show toast for forbidden errors
+      showToast.error('Access denied', 'You don\'t have permission to perform this action');
+    } else if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      // Show toast for network errors
+      showToast.error('Connection error', 'Unable to connect to the server. Please check your connection.');
     }
-    // For network errors (no response), don't redirect - let the component handle it
+    // For other errors, let the component handle it
     return Promise.reject(error);
   }
 );

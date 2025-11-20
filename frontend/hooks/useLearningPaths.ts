@@ -42,8 +42,11 @@ export const useGenerateLearningPath = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: { targetSkill: string; currentLevel?: string; learningStyle?: string; timeCommitment?: string; interests?: string[] }) =>
-      learningPathsApi.generatePath(data),
+    mutationFn: (data: { targetSkill?: string; goal?: string; currentLevel?: string; learningStyle?: string; timeCommitment?: string; interests?: string[]; [key: string]: any }) => {
+      // Map goal to targetSkill if needed, or pass through all data
+      const payload = data.goal ? { ...data, targetSkill: data.goal } : data;
+      return learningPathsApi.generatePath(payload as any);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['learning-paths'] });
     },
