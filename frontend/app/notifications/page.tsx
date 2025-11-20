@@ -19,15 +19,23 @@ export default function NotificationsPage() {
           <PageHeader
             title="Notifications"
             actions={
-              data && data.data && data.data.length > 0 && (
+              <div className="flex gap-2">
+                {data && data.data && data.data.length > 0 && (
+                  <Button
+                    variant="outline"
+                    onClick={() => markAllAsRead.mutate()}
+                    disabled={markAllAsRead.isPending}
+                  >
+                    Mark all as read
+                  </Button>
+                )}
                 <Button
                   variant="outline"
-                  onClick={() => markAllAsRead.mutate()}
-                  disabled={markAllAsRead.isPending}
+                  onClick={() => router.push('/settings/notifications')}
                 >
-                  Mark all as read
+                  Preferences
                 </Button>
-              )
+              </div>
             }
           />
 

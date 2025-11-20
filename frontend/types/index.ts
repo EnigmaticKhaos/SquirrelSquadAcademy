@@ -57,6 +57,13 @@ export interface User {
     activityVisibility: 'public' | 'private' | 'friends';
   };
   
+  // Notification preferences
+  notificationPreferences?: {
+    email?: boolean;
+    inApp?: boolean;
+    [key: string]: boolean | undefined;
+  };
+  
   // Subscription
   subscription?: {
     tier: 'free' | 'premium';
