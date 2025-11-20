@@ -590,13 +590,23 @@ export interface Certificate {
 
 export interface Note {
   _id: string;
-  user: string;
-  title: string;
+  user: string | User;
+  lesson: string | { _id: string; title: string; order: number };
+  course: string | { _id: string; title: string; thumbnail?: string };
+  title?: string;
   content: string;
-  course?: string;
-  lesson?: string;
+  isHighlight: boolean;
+  highlightedText?: string;
+  highlightStart?: number;
+  highlightEnd?: number;
+  highlightColor?: string;
+  position?: {
+    section?: string;
+    timestamp?: number;
+    paragraphIndex?: number;
+  };
   tags: string[];
-  isPublic: boolean;
+  isPinned: boolean;
   createdAt: string;
   updatedAt: string;
 }

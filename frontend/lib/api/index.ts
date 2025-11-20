@@ -13,6 +13,7 @@ export { achievementsApi, badgesApi, challengesApi, leaderboardApi } from './gam
 export { searchApi } from './search';
 export { messagesApi } from './messages';
 export { collaborativeProjectsApi } from './collaborativeProjects';
+export { notesApi } from './notes';
 
 // Also export everything from each module
 export * from './auth';
@@ -24,4 +25,5 @@ export * from './social';
 export * from './gamification';
 export * from './search';
 export * from './messages';
+export * from './notes';
 
