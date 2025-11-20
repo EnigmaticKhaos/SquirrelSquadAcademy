@@ -108,10 +108,13 @@ This document tracks the implementation status of features across the platform, 
   - Post interactions (like, comment) implemented
   - Comments modal with full functionality
 
-- 🟡 **Direct Messaging**
-  - Listing and conversation pages exist
-  - Backend: Complete messaging system
-  - **Missing**: Real-time updates (Socket.io), message sending UI, file attachments
+- ✅ **Direct Messaging**
+  - Listing and conversation pages fully integrated with backend API
+  - Message sending UI implemented with file attachment support
+  - File attachments with preview and display functionality
+  - Conversation header with participant info
+  - "New Message" button for starting conversations
+  - **Remaining**: Real-time updates (Socket.io integration)
 
 - ✅ **Forums**
   - Listing page shows courses with forums

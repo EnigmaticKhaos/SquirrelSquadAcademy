@@ -3,12 +3,13 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
-import { useMessages, useSendMessage, useMarkAsRead } from '@/hooks/useMessages';
+import { useMessages, useSendMessage, useMarkAsRead, useConversations } from '@/hooks/useMessages';
 import { Card, CardContent, LoadingSpinner, ErrorMessage, Button, Avatar } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import { Textarea } from '@/components/ui';
-import type { Message } from '@/types';
+import type { Message, Conversation } from '@/types';
+import { Paperclip, X, File, Image as ImageIcon, FileText } from 'lucide-react';
 
 export default function ConversationPage() {
   const params = useParams();
@@ -16,11 +17,25 @@ export default function ConversationPage() {
   const conversationId = params.conversationId as string;
   const { user } = useAuth();
   const { data: messagesData, isLoading } = useMessages(conversationId);
+  const { data: conversations } = useConversations();
   const sendMessageMutation = useSendMessage();
   const markAsReadMutation = useMarkAsRead();
   const [messageContent, setMessageContent] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [attachmentPreviews, setAttachmentPreviews] = useState<Array<{ file: File; preview: string }>>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messages = messagesData?.data || [];
+
+  // Get conversation details to show participant info
+  const conversation = conversations?.find((c: Conversation) => c._id === conversationId);
+  const otherParticipant = conversation?.participants?.find((p: any) => {
+    const participantId = typeof p === 'string' ? p : p._id;
+    return participantId !== user?._id;
+  });
+  const participant = typeof otherParticipant === 'string' 
+    ? { _id: otherParticipant, username: 'Unknown', profilePhoto: undefined, onlineStatus: 'offline' as const }
+    : otherParticipant;
 
   useEffect(() => {
     if (conversationId) {
@@ -32,16 +47,86 @@ export default function ConversationPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      attachmentPreviews.forEach(({ preview }) => {
+        if (preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+    };
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const newFiles = [...attachments, ...files];
+    setAttachments(newFiles);
+
+    // Create previews for images
+    files.forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        const preview = URL.createObjectURL(file);
+        setAttachmentPreviews((prev) => [...prev, { file, preview }]);
+      }
+    });
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    const fileToRemove = attachments[index];
+    setAttachments(attachments.filter((_, i) => i !== index));
+    
+    // Remove preview if it exists
+    const previewIndex = attachmentPreviews.findIndex((p) => p.file === fileToRemove);
+    if (previewIndex !== -1) {
+      const preview = attachmentPreviews[previewIndex].preview;
+      if (preview.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
+      setAttachmentPreviews(attachmentPreviews.filter((_, i) => i !== previewIndex));
+    }
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return ImageIcon;
+    if (type.startsWith('text/') || type.includes('pdf') || type.includes('document')) return FileText;
+    return File;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageContent.trim()) return;
+    if (!messageContent.trim() && attachments.length === 0) return;
 
     try {
       await sendMessageMutation.mutateAsync({
         conversationId,
-        content: messageContent,
+        content: messageContent || '',
+        attachments: attachments.length > 0 ? attachments : undefined,
       });
       setMessageContent('');
+      setAttachments([]);
+      // Cleanup previews
+      attachmentPreviews.forEach(({ preview }) => {
+        if (preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+      setAttachmentPreviews([]);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
@@ -78,10 +163,22 @@ export default function ConversationPage() {
       <Header />
       <main className="flex-1 flex flex-col">
         <div className="mx-auto max-w-4xl w-full px-4 py-4 sm:px-6 lg:px-8 flex flex-col flex-1">
-          <PageHeader
-            title="Conversation"
-            description="Chat with your conversation partner"
-          />
+          {/* Conversation Header */}
+          {participant && (
+            <div className="mb-4 flex items-center gap-3 pb-4 border-b border-gray-700">
+              <Avatar
+                src={participant.profilePhoto}
+                name={participant.username}
+                size="md"
+              />
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-gray-100">{participant.username}</h2>
+                {participant.onlineStatus === 'online' && (
+                  <p className="text-xs text-green-400">Online</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto mb-4 space-y-4">
@@ -119,7 +216,58 @@ export default function ConversationPage() {
                             : 'bg-gray-800 text-gray-100'
                         }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        {message.content && (
+                          <p className="text-sm whitespace-pre-wrap mb-2">{message.content}</p>
+                        )}
+                        {message.attachments && message.attachments.length > 0 && (
+                          <div className="space-y-2 mt-2">
+                            {message.attachments.map((attachment, idx) => {
+                              const FileIcon = getFileIcon(attachment.type);
+                              const isImage = attachment.type.startsWith('image/');
+                              
+                              return (
+                                <div
+                                  key={idx}
+                                  className={`${
+                                    isOwnMessage
+                                      ? 'bg-blue-700/50 border-blue-500/50'
+                                      : 'bg-gray-700/50 border-gray-600/50'
+                                  } border rounded-lg p-2`}
+                                >
+                                  {isImage ? (
+                                    <a
+                                      href={attachment.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block"
+                                    >
+                                      <img
+                                        src={attachment.url}
+                                        alt={attachment.name}
+                                        className="max-w-xs rounded cursor-pointer hover:opacity-90"
+                                      />
+                                    </a>
+                                  ) : (
+                                    <a
+                                      href={attachment.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-2 hover:opacity-80"
+                                    >
+                                      <FileIcon className="w-4 h-4" />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs truncate">{attachment.name}</p>
+                                        <p className="text-xs opacity-75">
+                                          {formatFileSize(attachment.size)}
+                                        </p>
+                                      </div>
+                                    </a>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                       <span className="text-xs text-gray-500 mt-1">
                         {formatTime(message.createdAt)}
@@ -134,7 +282,64 @@ export default function ConversationPage() {
 
           {/* Message Input */}
           <form onSubmit={handleSend} className="border-t border-gray-700 pt-4">
+            {/* Attachment Previews */}
+            {attachments.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {attachments.map((file, index) => {
+                  const preview = attachmentPreviews.find((p) => p.file === file);
+                  const FileIcon = getFileIcon(file.type);
+                  const isImage = file.type.startsWith('image/');
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 bg-gray-800 rounded-lg p-2 border border-gray-700"
+                    >
+                      {isImage && preview ? (
+                        <img
+                          src={preview.preview}
+                          alt={file.name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center">
+                          <FileIcon className="w-6 h-6 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-100 truncate">{file.name}</p>
+                        <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(index)}
+                        className="p-1 hover:bg-gray-700 rounded"
+                      >
+                        <X className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*,application/pdf,.doc,.docx,.txt"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="self-end"
+              >
+                <Paperclip className="w-4 h-4" />
+              </Button>
               <Textarea
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
@@ -151,7 +356,7 @@ export default function ConversationPage() {
               <Button
                 type="submit"
                 isLoading={sendMessageMutation.isPending}
-                disabled={!messageContent.trim()}
+                disabled={!messageContent.trim() && attachments.length === 0}
                 className="self-end"
               >
                 Send
