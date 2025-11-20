@@ -1,19 +1,16 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Header from '@/components/layout/Header';
 import { useMessages, useSendMessage, useMarkAsRead, useConversations } from '@/hooks/useMessages';
-import { Card, CardContent, LoadingSpinner, ErrorMessage, Button, Avatar } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
+import { LoadingSpinner, Button, Avatar, Textarea } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
-import { Textarea } from '@/components/ui';
 import type { Message, Conversation } from '@/types';
 import { Paperclip, X, File, Image as ImageIcon, FileText } from 'lucide-react';
 
 export default function ConversationPage() {
   const params = useParams();
-  const router = useRouter();
   const conversationId = params.conversationId as string;
   const { user } = useAuth();
   const { data: messagesData, isLoading } = useMessages(conversationId);
@@ -25,12 +22,12 @@ export default function ConversationPage() {
   const [attachmentPreviews, setAttachmentPreviews] = useState<Array<{ file: File; preview: string }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messages = messagesData?.data || [];
+  const messages = useMemo(() => messagesData?.data ?? [], [messagesData]);
 
   // Get conversation details to show participant info
   const conversation = conversations?.find((c: Conversation) => c._id === conversationId);
-  const otherParticipant = conversation?.participants?.find((p: any) => {
-    const participantId = typeof p === 'string' ? p : p._id;
+  const otherParticipant = conversation?.participants?.find((participant) => {
+    const participantId = typeof participant === 'string' ? participant : participant._id;
     return participantId !== user?._id;
   });
   const participant = typeof otherParticipant === 'string' 
@@ -41,16 +38,31 @@ export default function ConversationPage() {
     if (conversationId) {
       markAsReadMutation.mutate(conversationId);
     }
-  }, [conversationId]);
+  }, [conversationId, markAsReadMutation]);
+
+  useEffect(() => {
+    if (!conversationId || messages.length === 0 || !user) {
+      return;
+    }
+    const latest = messages[messages.length - 1];
+    const senderId = typeof latest.sender === 'string' ? latest.sender : latest.sender?._id;
+    if (senderId !== user._id && !latest.isRead) {
+      markAsReadMutation.mutate(conversationId);
+    }
+  }, [conversationId, messages, markAsReadMutation, user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Cleanup preview URLs on unmount
+  const latestPreviewsRef = useRef<Array<{ file: File; preview: string }>>([]);
+  useEffect(() => {
+    latestPreviewsRef.current = attachmentPreviews;
+  }, [attachmentPreviews]);
+
   useEffect(() => {
     return () => {
-      attachmentPreviews.forEach(({ preview }) => {
+      latestPreviewsRef.current.forEach(({ preview }) => {
         if (preview.startsWith('blob:')) {
           URL.revokeObjectURL(preview);
         }

@@ -121,13 +121,13 @@ This document tracks the implementation status of features across the platform, 
   - Post interactions (like, comment) implemented
   - Comments modal with full functionality
 
-- ✅ **Direct Messaging**
-  - Listing and conversation pages fully integrated with backend API
-  - Message sending UI implemented with file attachment support
-  - File attachments with preview and display functionality
-  - Conversation header with participant info
-  - "New Message" button for starting conversations
-  - **Remaining**: Real-time updates (Socket.io integration)
+  - ✅ **Direct Messaging**
+    - Listing and conversation pages fully integrated with backend API
+    - Message sending UI implemented with file attachment support
+    - File attachments with preview and display functionality
+    - Conversation header with participant info
+    - "New Message" button for starting conversations
+    - Real-time updates powered by Socket.io (new messages, unread counts)
 
 - ✅ **Forums**
   - Listing page shows courses with forums
@@ -175,13 +175,13 @@ This document tracks the implementation status of features across the platform, 
   - Automatic session completion and XP rewards
 
 ### Other Features
-- ✅ **Notifications**
-  - Listing page fully integrated with backend API
-  - Notification preferences UI implemented
-  - Comprehensive preference settings for all notification types
-  - Organized by category (Learning, Gamification, Social)
-  - Preferences link from notifications page
-  - **Remaining**: Real-time updates (Socket.io integration)
+  - ✅ **Notifications**
+    - Listing page fully integrated with backend API
+    - Notification preferences UI implemented
+    - Comprehensive preference settings for all notification types
+    - Organized by category (Learning, Gamification, Social)
+    - Preferences link from notifications page
+    - Real-time in-app notifications delivered via Socket.io
 
 - ✅ **Search**
   - Search page fully integrated with backend API
@@ -308,18 +308,18 @@ This document tracks the implementation status of features across the platform, 
 
 ## 🔧 Infrastructure & Technical
 
-### Completed
-- ✅ TypeScript setup (frontend & backend)
-- ✅ API client with interceptors
-- ✅ React Query setup
-- ✅ Error handling
-- ✅ Loading states
-- ✅ Build configuration
-- ✅ Git repository setup
+  ### Completed
+  - ✅ TypeScript setup (frontend & backend)
+  - ✅ API client with interceptors
+  - ✅ React Query setup
+  - ✅ Error handling
+  - ✅ Loading states
+  - ✅ Build configuration
+  - ✅ Git repository setup
+  - ✅ Socket.io client integration (messaging + notifications)
 
-### Missing/Incomplete
-- ❌ Socket.io client integration (real-time features)
-- ❌ File upload UI components
+  ### Missing/Incomplete
+  - ❌ File upload UI components
 - ❌ Video player component integration
 - ❌ Code editor component (Monaco/CodeMirror)
 - ❌ Chart/analytics library integration
