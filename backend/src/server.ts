@@ -34,13 +34,7 @@ configureTrustProxy(app);
 // Initialize Socket.io
 initializeSocket(httpServer);
 
-// Security middleware (must be first)
-app.use(securityHeaders);
-app.use(preventNoSqlInjection);
-app.use(preventXSS);
-app.use(preventHPP);
-
-// CORS - Allow both www and non-www versions
+// CORS - Must be before other middleware to handle preflight requests
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 // Build allowed origins list
 const allowedOrigins: string[] = [
@@ -57,6 +51,8 @@ if (frontendUrl.startsWith('https://')) {
   }
 }
 
+console.log('CORS allowed origins:', allowedOrigins);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -69,13 +65,21 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin, 'Allowed:', allowedOrigins);
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false); // Return false instead of error to prevent crash
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
+
+// Security middleware (after CORS)
+app.use(securityHeaders);
+app.use(preventNoSqlInjection);
+app.use(preventXSS);
+app.use(preventHPP);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
