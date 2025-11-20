@@ -9,6 +9,7 @@ export interface VideoPlayerProps {
   autoplay?: boolean;
   controls?: boolean;
   className?: string;
+  startTime?: number;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
   onEnded?: () => void;
 }
@@ -19,6 +20,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   autoplay = false,
   controls = true,
   className,
+  startTime,
   onTimeUpdate,
   onEnded,
 }) => {
@@ -31,6 +33,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    
+    // Set start time if provided
+    if (startTime !== undefined && startTime > 0) {
+      video.currentTime = startTime;
+    }
     
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);

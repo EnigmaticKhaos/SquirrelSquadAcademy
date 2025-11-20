@@ -17,6 +17,10 @@ export { notesApi } from './notes';
 export { flashcardsApi } from './flashcards';
 export { certificatesApi } from './certificates';
 export { forumsApi } from './forums';
+export { lessonsApi } from './lessons';
+export { modulesApi } from './modules';
+export { videosApi } from './videos';
+export { courseCompletionApi } from './courseCompletion';
 
 // Also export everything from each module
 export * from './auth';
@@ -32,4 +36,8 @@ export * from './notes';
 export * from './flashcards';
 export * from './certificates';
 export * from './forums';
+export * from './lessons';
+export * from './modules';
+export * from './videos';
+export * from './courseCompletion';
 
