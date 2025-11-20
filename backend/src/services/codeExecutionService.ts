@@ -187,38 +187,57 @@ const executeWithJudge0 = async (
       status,
     };
   } catch (error: any) {
-    logger.error('Error executing code with Judge0:', {
+    // Enhanced error logging for debugging
+    const errorDetails = {
       message: error.message,
       code: error.code,
-      response: error.response?.status,
+      responseStatus: error.response?.status,
+      responseData: error.response?.data,
+      responseHeaders: error.response?.headers,
       url: JUDGE0_API_URL,
       isRapidAPI: IS_RAPIDAPI,
       isSelfHosted: IS_SELF_HOSTED,
-    });
+      hasAuthToken: !!JUDGE0_AUTH_TOKEN,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    };
+    
+    logger.error('Error executing code with Judge0:', JSON.stringify(errorDetails, null, 2));
     
     // Create error with status code for proper HTTP response
     const appError: any = new Error();
     appError.isOperational = true;
     
-    // Provide more helpful error messages
-    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-      appError.message = 'Code execution service is temporarily unavailable. Please try again later.';
+    // Provide more helpful error messages with specific guidance
+    if (error.code === 'ECONNREFUSED') {
+      appError.message = `Cannot connect to Judge0 at ${JUDGE0_API_URL}. Check if the service is running and the URL is correct.`;
       appError.statusCode = 503; // Service Unavailable
-    } else if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO') || error.code === 'EPROTO') {
-      appError.message = 'Connection error with code execution service. Please check your JUDGE0_API_URL and ensure the service is accessible.';
+    } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
+      appError.message = `Connection to Judge0 timed out. The service at ${JUDGE0_API_URL} may be slow or unreachable.`;
+      appError.statusCode = 504; // Gateway Timeout
+    } else if (error.message?.includes('SSL') || error.message?.includes('TLS') || error.message?.includes('EPROTO') || error.code === 'EPROTO' || error.code === 'CERT_HAS_EXPIRED') {
+      appError.message = `SSL/TLS error connecting to ${JUDGE0_API_URL}. If using self-signed certificates, ensure the service is accessible. Try HTTP instead of HTTPS if SSL is not configured.`;
+      appError.statusCode = 502; // Bad Gateway
+    } else if (error.code === 'ENOTFOUND' || error.code === 'EAI_AGAIN') {
+      appError.message = `Cannot resolve hostname for ${JUDGE0_API_URL}. Check the URL is correct.`;
       appError.statusCode = 502; // Bad Gateway
     } else if (error.response) {
       const status = error.response.status;
+      const responseData = error.response.data;
       // Handle 401 Unauthorized - indicates authentication is required
       if (status === 401) {
         appError.message = 'Authentication required for Judge0. Please set JUDGE0_AUTH_TOKEN environment variable.';
         appError.statusCode = 401;
+      } else if (status === 404) {
+        appError.message = `Judge0 endpoint not found at ${JUDGE0_API_URL}/submissions. Check the URL and ensure Judge0 is running.`;
+        appError.statusCode = 404;
       } else {
-        appError.message = `Code execution failed: ${status} ${error.response.statusText || ''}`;
+        appError.message = `Judge0 returned error ${status}: ${error.response.statusText || ''}. ${responseData ? JSON.stringify(responseData) : ''}`;
         appError.statusCode = status >= 400 && status < 500 ? 400 : 502;
       }
     } else {
-      appError.message = `Code execution failed: ${error.message || 'Unknown error'}`;
+      // Include the original error message for debugging
+      const errorMsg = error.message || 'Unknown error';
+      appError.message = `Code execution failed: ${errorMsg} (Error code: ${error.code || 'none'})`;
       appError.statusCode = 500;
     }
     
@@ -337,6 +356,18 @@ export const executeCode = async (
   language: SupportedLanguage,
   stdin?: string
 ): Promise<CodeExecutionResult> => {
+  // Log configuration for debugging (only in development or when explicitly enabled)
+  if (process.env.NODE_ENV === 'development' || process.env.LOG_JUDGE0_CONFIG === 'true') {
+    logger.info('Judge0 configuration:', {
+      url: JUDGE0_API_URL,
+      hasApiKey: !!JUDGE0_API_KEY,
+      hasAuthToken: !!JUDGE0_AUTH_TOKEN,
+      isRapidAPI: IS_RAPIDAPI,
+      isSelfHosted: IS_SELF_HOSTED,
+      useJudge0: USE_JUDGE0,
+    });
+  }
+
   // Check if Judge0 is configured
   if (!USE_JUDGE0) {
     const errorMessage = IS_SELF_HOSTED
