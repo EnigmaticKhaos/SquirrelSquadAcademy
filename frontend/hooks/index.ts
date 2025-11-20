@@ -5,4 +5,5 @@ export * from './useNotifications';
 export * from './useMessages';
 export * from './useCollaborativeProjects';
 export * from './useLearningGoals';
+export * from './useLearningAnalytics';
 

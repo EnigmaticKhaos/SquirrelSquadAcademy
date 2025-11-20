@@ -120,6 +120,12 @@ This document tracks the implementation status of features across the platform, 
 - ✅ Modal-driven creation & editing flow for all goal types plus rewards/deadlines
 - ✅ Inline actions for refresh progress, pause/resume, delete, and bulk "refresh all"
 
+### Learning Analytics
+- ✅ Dedicated analytics dashboard with filterable date/course inputs
+- ✅ Weekly + monthly trend charts and activity breakdowns powered by Recharts
+- ✅ Performance insights (scores, completion rate, trend, strong/weak areas)
+- ✅ Interactive learning calendar heatmap plus streak and top-course summaries
+
 ### Social Features
 - ✅ **Feed/Posts**
   - Page fully integrated with backend API
@@ -313,26 +319,26 @@ This document tracks the implementation status of features across the platform, 
 ## 🔧 Infrastructure & Technical
 
   ### Completed
-  - ✅ TypeScript setup (frontend & backend)
-  - ✅ API client with interceptors
-  - ✅ React Query setup
-  - ✅ Error handling
-  - ✅ Loading states
-  - ✅ Build configuration
-  - ✅ Git repository setup
-  - ✅ Socket.io client integration (messaging + notifications)
+    - ✅ TypeScript setup (frontend & backend)
+    - ✅ API client with interceptors
+    - ✅ React Query setup
+    - ✅ Error handling
+    - ✅ Loading states
+    - ✅ Build configuration
+    - ✅ Git repository setup
+    - ✅ Socket.io client integration (messaging + notifications)
+    - ✅ Chart/analytics library integration (Recharts-based dashboards)
 
   ### Missing/Incomplete
-  - ❌ File upload UI components
-- ❌ Video player component integration
-- ❌ Code editor component (Monaco/CodeMirror)
-- ❌ Chart/analytics library integration
-- ❌ Form validation library
-- ❌ Toast notifications
-- ❌ Loading skeletons
-- ❌ Error boundaries
-- ❌ PWA service worker
-- ❌ Offline support
+    - ❌ File upload UI components
+    - ❌ Video player component integration
+    - ❌ Code editor component (Monaco/CodeMirror)
+    - ❌ Form validation library
+    - ❌ Toast notifications
+    - ❌ Loading skeletons
+    - ❌ Error boundaries
+    - ❌ PWA service worker
+    - ❌ Offline support
 
 ---
 

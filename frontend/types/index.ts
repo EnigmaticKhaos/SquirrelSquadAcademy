@@ -396,6 +396,71 @@ export interface Challenge {
   updatedAt: string;
 }
 
+// ============================================================================
+// Analytics Types
+// ============================================================================
+
+export interface LearningAnalyticsSummary {
+  totalTimeSpent: number;
+  totalSessions: number;
+  averageSessionDuration: number;
+  coursesCompleted: number;
+  coursesInProgress: number;
+  assignmentsCompleted: number;
+  averageScore: number;
+  currentStreaks: {
+    login: number;
+    activity: number;
+  };
+  longestStreaks: {
+    login: number;
+    activity: number;
+  };
+  timeByActivity: Record<string, number>;
+  timeByCourse: Array<{
+    courseId: string;
+    courseName: string;
+    timeSpent: number;
+  }>;
+  weeklyActivity: Array<{
+    date: string;
+    timeSpent: number;
+    sessions: number;
+  }>;
+  monthlyActivity: Array<{
+    month: string;
+    timeSpent: number;
+    sessions: number;
+  }>;
+}
+
+export interface CourseAnalytics {
+  timeSpent: number;
+  sessions: number;
+  progress: number;
+  assignmentsCompleted: number;
+  averageScore: number;
+  lastActivity: string | null;
+  streak: number;
+  completionDate?: string;
+}
+
+export interface LearningCalendarDay {
+  date: string;
+  timeSpent: number;
+  sessions: number;
+}
+
+export type PerformanceTrend = 'improving' | 'declining' | 'stable';
+
+export interface PerformanceMetrics {
+  overallAverageScore: number;
+  improvementTrend: PerformanceTrend;
+  strongAreas: string[];
+  weakAreas: string[];
+  completionRate: number;
+}
+
 export type LearningGoalType =
   | 'complete_courses'
   | 'earn_xp'

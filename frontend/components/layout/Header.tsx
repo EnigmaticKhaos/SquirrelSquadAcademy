@@ -52,6 +52,12 @@ export default function Header() {
                   >
                     Learning Goals
                   </Link>
+                  <Link
+                    href="/analytics"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Analytics
+                  </Link>
                   <NotificationBell />
                   {user._id && (
                     <Link href={`/profile/${user._id}`}>
