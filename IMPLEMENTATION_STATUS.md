@@ -51,7 +51,9 @@ This document tracks the implementation status of features across the platform, 
   - Routes exist (`/courses/[id]/modules/[moduleId]`, `/courses/[id]/modules/[moduleId]/lessons/[lessonId]`)
   - Lesson page uses **MOCK DATA**
   - Backend: Complete module/lesson system
-  - **Missing**: API integration for lessons, lesson player, video player integration, progress tracking UI
+  - ✅ Lesson player fully integrated with backend API
+  - ✅ Video player integration with progress tracking
+  - ✅ Progress tracking UI implemented
 
 - 🟡 **Course Reviews**
   - Backend: Complete review system
@@ -309,8 +311,6 @@ This document tracks the implementation status of features across the platform, 
 
 ### Hooks Missing
 - ❌ `useAssignments` - Assignment hooks
-- ❌ `useModules` - Module hooks
-- ❌ `useLessons` - Lesson hooks
 - ❌ `useSubmissions` - Submission hooks
 - ❌ `useProjects` - Project hooks
 - ❌ `useBundles` - Bundle hooks
