@@ -16,33 +16,51 @@ export default function CertificateDetailPage() {
     if (!certificate) return;
     try {
       const response = await certificatesApi.downloadCertificate(certificate.certificateId);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      // Handle blob response
+      const blob = response.data instanceof Blob 
+        ? response.data 
+        : new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${certificate.title}.pdf`;
+      link.download = `${certificate.title || 'certificate'}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to download certificate:', error);
+      alert(error.response?.data?.message || 'Failed to download certificate. Please try again.');
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!certificate) return;
+    const shareUrl = certificate.shareableLink || `${window.location.origin}/certificates/verify/${certificate.certificateId}`;
+    
     if (navigator.share) {
-      navigator.share({
-        title: certificate.title,
-        text: `Check out my certificate: ${certificate.title}`,
-        url: certificate.shareableLink,
-      }).catch(() => {
-        // Fallback to copying link
-        navigator.clipboard.writeText(certificate.shareableLink);
-      });
+      try {
+        await navigator.share({
+          title: certificate.title,
+          text: `Check out my certificate: ${certificate.title}`,
+          url: shareUrl,
+        });
+      } catch (error) {
+        // User cancelled or error occurred, fallback to copying
+        if ((error as Error).name !== 'AbortError') {
+          await navigator.clipboard.writeText(shareUrl);
+          alert('Link copied to clipboard!');
+        }
+      }
     } else {
-      navigator.clipboard.writeText(certificate.shareableLink);
+      // Fallback to copying link
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Link copied to clipboard!');
+      } catch (error) {
+        console.error('Failed to copy link:', error);
+        alert('Please copy this link manually: ' + shareUrl);
+      }
     }
   };
 
@@ -120,15 +138,34 @@ export default function CertificateDetailPage() {
                 )}
 
                 <div className="flex justify-center gap-4">
-                  {certificate.pdfUrl && (
-                    <Button variant="primary" onClick={handleDownload}>
-                      Download PDF
-                    </Button>
-                  )}
+                  <Button variant="primary" onClick={handleDownload}>
+                    Download PDF
+                  </Button>
                   <Button variant="outline" onClick={handleShare}>
-                    Share
+                    Share Certificate
                   </Button>
                 </div>
+                
+                {certificate.verificationCode && (
+                  <div className="mt-8 pt-8 border-t border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-100 mb-4">Verification</h3>
+                    <div className="bg-gray-800 rounded-lg p-4">
+                      <p className="text-sm text-gray-400 mb-2">Verification Code:</p>
+                      <p className="text-lg font-mono text-gray-100 mb-4">{certificate.verificationCode}</p>
+                      <p className="text-xs text-gray-400">
+                        Use this code to verify the authenticity of this certificate at{' '}
+                        <a 
+                          href={`${window.location.origin}/certificates/verify/${certificate.certificateId}`}
+                          className="text-blue-400 hover:text-blue-300"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {window.location.origin}/certificates/verify/{certificate.certificateId}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

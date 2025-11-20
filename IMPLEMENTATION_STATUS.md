@@ -171,10 +171,12 @@ This document tracks the implementation status of features across the platform, 
   - Displays saved content with tags and folders
   - **Remaining**: Organization features (folders, tags management)
 
-- 🟡 **Certificates**
-  - Listing and detail pages exist (detail page uses **MOCK DATA**)
-  - Backend: Complete certificate system
-  - **Missing**: API integration for detail page, certificate download, sharing, verification
+- ✅ **Certificates**
+  - Listing page fully integrated with backend API
+  - Detail page fully integrated with backend API
+  - Certificate download functionality implemented
+  - Certificate sharing functionality implemented
+  - Verification code display and verification link
 
 - 🟡 **Course Bundles**
   - Listing and detail pages exist
