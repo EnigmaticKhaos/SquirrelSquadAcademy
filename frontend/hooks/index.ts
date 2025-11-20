@@ -4,4 +4,5 @@ export * from './useLearningPaths';
 export * from './useNotifications';
 export * from './useMessages';
 export * from './useCollaborativeProjects';
+export * from './useMentorship';
 

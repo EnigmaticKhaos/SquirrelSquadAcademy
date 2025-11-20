@@ -603,6 +603,111 @@ export interface LiveSessionChatMessage {
   timestamp: string;
 }
 
+export type MentorApplicationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type MentorApplicationPriority = 'auto_approve' | 'review' | 'auto_reject';
+
+export interface MentorApplication {
+  _id: string;
+  user: string | User;
+  status: MentorApplicationStatus;
+  priority: MentorApplicationPriority;
+  motivation: string;
+  specialties: string[];
+  experience: string;
+  availability?: {
+    hoursPerWeek?: number;
+    timezone?: string;
+    preferredTimes?: string[];
+  };
+  maxMentees?: number;
+  autoEvaluation?: {
+    level?: number;
+    coursesCompleted?: number;
+    averageRating?: number;
+    warningCount?: number;
+    accountAge?: number;
+    meetsAutoApproveCriteria?: boolean;
+    meetsAutoRejectCriteria?: boolean;
+    aiRecommendation?: 'approve' | 'review' | 'reject';
+    aiReason?: string;
+  };
+  reviewedBy?: string | User;
+  reviewedAt?: string;
+  reviewNotes?: string;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MentorshipStatus = 'pending' | 'active' | 'completed' | 'cancelled';
+export type MentorshipRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+export type MentorshipCommunicationPreference = 'message' | 'video' | 'both';
+export type MentorshipMeetingFrequency = 'weekly' | 'biweekly' | 'monthly';
+
+export interface MentorshipRequest {
+  _id: string;
+  mentee: string | User;
+  mentor: string | User;
+  status: MentorshipRequestStatus;
+  message?: string;
+  goals?: string[];
+  preferredCommunicationMethod?: MentorshipCommunicationPreference;
+  expectedDuration?: number;
+  respondedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MentorshipSession {
+  _id: string;
+  date: string;
+  duration?: number;
+  notes?: string;
+  goalsDiscussed?: string[];
+  nextSteps?: string[];
+  rating?: number;
+  feedback?: string;
+}
+
+export interface MentorshipMilestone {
+  _id: string;
+  title: string;
+  description?: string;
+  targetDate?: string;
+  completed: boolean;
+  completedAt?: string;
+  notes?: string;
+}
+
+export interface Mentorship {
+  _id: string;
+  mentee: string | User;
+  mentor: string | User;
+  status: MentorshipStatus;
+  goals: string[];
+  startDate: string;
+  endDate?: string;
+  expectedDuration?: number;
+  preferredCommunicationMethod: MentorshipCommunicationPreference;
+  meetingFrequency?: MentorshipMeetingFrequency;
+  sessions: MentorshipSession[];
+  milestones: MentorshipMilestone[];
+  menteeRating?: number;
+  menteeFeedback?: string;
+  mentorRating?: number;
+  mentorFeedback?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PotentialMentor {
+  user: User;
+  matchScore: number;
+  completedCourses: number;
+  experience: string;
+}
+
 export interface Project {
   _id: string;
   user: string | User;

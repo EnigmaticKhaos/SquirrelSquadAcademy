@@ -237,9 +237,11 @@ This document tracks the implementation status of features across the platform, 
   - Real-time chat and online presence powered by the shared SocketProvider
   - Participant list pulls live data with status badges and online indicators
 
-- ❌ **Mentorship**
-  - Backend: Complete mentorship system
-  - **Missing**: Mentor application, mentor matching, session scheduling
+- ✅ **Mentorship**
+  - Mentor dashboard to view application status, discover recommended mentors, and track active mentorships
+  - Request workflow with incoming/outgoing management plus inline approvals for mentors
+  - Mentor application form covering motivation, specialties, availability, and capacity
+  - Mentorship detail view with session logging, milestone visibility, and completion controls
 
 - ❌ **Learning Goals**
   - Backend: Complete learning goal system

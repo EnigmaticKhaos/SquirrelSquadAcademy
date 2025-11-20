@@ -40,6 +40,9 @@ export default function Header() {
                   <Link href="/live-sessions" className="text-sm font-medium text-gray-300 hover:text-gray-100">
                     Live Sessions
                   </Link>
+                  <Link href="/mentorship" className="text-sm font-medium text-gray-300 hover:text-gray-100">
+                    Mentorship
+                  </Link>
                   <NotificationBell />
                   {user._id && (
                     <Link href={`/profile/${user._id}`}>
