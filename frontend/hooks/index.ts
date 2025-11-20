@@ -8,4 +8,5 @@ export * from './useLearningGoals';
 export * from './useLearningAnalytics';
 export * from './useMentorship';
 export * from './useMentorApplication';
+export * from './useLiveSessions';
 

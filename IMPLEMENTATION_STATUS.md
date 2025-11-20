@@ -126,6 +126,11 @@ This document tracks the implementation status of features across the platform, 
 - ✅ Performance insights (scores, completion rate, trend, strong/weak areas)
 - ✅ Interactive learning calendar heatmap plus streak and top-course summaries
 
+### Live Sessions
+- ✅ Live session hub with status/type/timeframe filters plus quick join links
+- ✅ Session detail view with registration, joining, live polls, Q&A, and recording access
+- ✅ Host dashboard for creating sessions, controlling visibility/interactions, and tracking upcoming events
+
 ### Social Features
 - ✅ **Feed/Posts**
   - Page fully integrated with backend API
@@ -248,10 +253,6 @@ This document tracks the implementation status of features across the platform, 
   - Live output panel surfaces stdout/stderr, status, timing, and memory usage
   - Snippet saving/loading with recent history list and inline execution controls
   - API client + React Query mutations manage quick runs, snippet execution, and deletion
-
-- ❌ **Live Sessions**
-  - Backend: Complete live session system
-  - **Missing**: Session creation, joining interface, recording playback
 
 - ❌ **Course Comparison**
   - Backend: Complete comparison service

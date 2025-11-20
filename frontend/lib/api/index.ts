@@ -32,6 +32,7 @@ export { analyticsApi } from './analytics';
 export { learningGoalsApi } from './learningGoals';
 export { mentorshipApi } from './mentorship';
 export { mentorApplicationsApi } from './mentorApplications';
+export { liveSessionsApi } from './liveSessions';
 
 // Also export everything from each module
 export * from './auth';
@@ -58,4 +59,5 @@ export * from './analytics';
 export * from './learningGoals';
 export * from './mentorship';
 export * from './mentorApplications';
+export * from './liveSessions';
 

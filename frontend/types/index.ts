@@ -978,21 +978,142 @@ export interface MentorApplication {
 // Live Session Types
 // ============================================================================
 
+export type LiveSessionType =
+  | 'webinar'
+  | 'workshop'
+  | 'qna'
+  | 'office_hours'
+  | 'course_completion_party'
+  | 'custom';
+
+export type LiveSessionStatus = 'scheduled' | 'live' | 'ended' | 'cancelled';
+export type LiveSessionProvider = 'webrtc' | 'zoom' | 'custom';
+
 export interface LiveSession {
   _id: string;
-  instructor: string | User;
+  host: string | User;
+  coHosts?: Array<string | User>;
   title: string;
   description?: string;
-  course?: string;
-  type: 'lecture' | 'workshop' | 'qna' | 'office_hours';
-  scheduledAt: string;
-  duration: number;
-  maxParticipants?: number;
-  registeredCount: number;
-  status: 'scheduled' | 'live' | 'ended' | 'cancelled';
+  sessionType: LiveSessionType;
+  status: LiveSessionStatus;
+  scheduledStartTime: string;
+  scheduledEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  duration?: number;
+  provider: LiveSessionProvider;
   meetingUrl?: string;
+  meetingId?: string;
+  meetingPassword?: string;
+  streamUrl?: string;
+  course?: string | Course;
+  lesson?: string | Lesson;
+  maxParticipants?: number;
+  allowRecording: boolean;
+  requireRegistration: boolean;
+  isPublic: boolean;
+  allowQuestions: boolean;
+  allowPolls: boolean;
+  allowScreenShare: boolean;
+  allowChat: boolean;
+  registrationDeadline?: string;
+  registeredUsers?: Array<string | User>;
+  totalParticipants: number;
+  peakParticipants: number;
+  totalViews: number;
+  averageWatchTime?: number;
   recordingUrl?: string;
-  tags: string[];
+  recordingAvailable: boolean;
+  remindersSent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionParticipantRole = 'host' | 'co_host' | 'participant' | 'viewer';
+export type LiveSessionParticipantStatus = 'registered' | 'joined' | 'left' | 'absent';
+
+export interface LiveSessionParticipant {
+  _id: string;
+  session: string;
+  user: string | User;
+  role: LiveSessionParticipantRole;
+  status: LiveSessionParticipantStatus;
+  registeredAt?: string;
+  joinedAt?: string;
+  leftAt?: string;
+  duration: number;
+  questionsAsked: number;
+  pollsAnswered: number;
+  chatMessages: number;
+  watchTime: number;
+  lastActiveAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LiveSessionPoll {
+  _id: string;
+  session: string;
+  createdBy: string | User;
+  question: string;
+  options: string[];
+  isMultipleChoice: boolean;
+  isAnonymous: boolean;
+  startedAt: string;
+  endedAt?: string;
+  duration?: number;
+  totalVotes: number;
+  results: Array<{
+    option: string;
+    votes: number;
+    percentage: number;
+  }>;
+  isActive: boolean;
+  isEnded: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionQuestionStatus = 'pending' | 'answered' | 'dismissed';
+export type LiveSessionQuestionPriority = 'low' | 'normal' | 'high';
+
+export interface LiveSessionQuestion {
+  _id: string;
+  session: string;
+  askedBy: string | User;
+  answeredBy?: string | User;
+  question: string;
+  status: LiveSessionQuestionStatus;
+  priority: LiveSessionQuestionPriority;
+  answer?: string;
+  answeredAt?: string;
+  upvotes?: string[];
+  upvoteCount: number;
+  isPinned: boolean;
+  isVisible: boolean;
+  askedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type LiveSessionRecordingStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface LiveSessionRecording {
+  _id: string;
+  session: string;
+  recordingUrl: string;
+  thumbnailUrl?: string;
+  duration: number;
+  format: string;
+  resolution?: string;
+  fileSize?: number;
+  isPublic: boolean;
+  viewCount: number;
+  lastViewedAt?: string;
+  processingStatus: LiveSessionRecordingStatus;
+  processingError?: string;
+  recordedAt: string;
   createdAt: string;
   updatedAt: string;
 }
