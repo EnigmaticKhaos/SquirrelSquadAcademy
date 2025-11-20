@@ -26,6 +26,7 @@ export { assignmentsApi } from './assignments';
 export { submissionsApi } from './submissions';
 export { uploadApi } from './upload';
 export { pomodoroApi } from './pomodoro';
+export { recommendationsApi } from './recommendations';
 
 // Also export everything from each module
 export * from './auth';
