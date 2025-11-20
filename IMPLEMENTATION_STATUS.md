@@ -55,10 +55,10 @@ This document tracks the implementation status of features across the platform, 
   - Support for multiple file types (documents, code files)
   - File display in submissions
 
-- 🟡 **Course Modules & Lessons**
-  - Routes exist (`/courses/[id]/modules/[moduleId]`, `/courses/[id]/modules/[moduleId]/lessons/[lessonId]`)
-  - Lesson page uses **MOCK DATA**
-  - Backend: Complete module/lesson system
+- ✅ **Course Modules & Lessons**
+  - Module and lesson routes fully integrated with backend APIs
+  - Module page shows live lesson list, prerequisites, and module progress from enrollment data
+  - Lesson navigation is driven by real completion state with "continue" actions
   - ✅ Lesson player fully integrated with backend API
   - ✅ Video player integration with progress tracking
   - ✅ Progress tracking UI implemented
