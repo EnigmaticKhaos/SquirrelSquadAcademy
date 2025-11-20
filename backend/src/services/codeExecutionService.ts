@@ -3,11 +3,21 @@ import https from 'https';
 import logger from '../utils/logger';
 import { SupportedLanguage } from '../models/CodeSnippet';
 
-// Judge0 API configuration (free tier available)
-// Alternative: Piston API (open source, self-hostable)
+// Judge0 API configuration
+// Supports both RapidAPI-hosted and self-hosted instances
 const JUDGE0_API_URL = process.env.JUDGE0_API_URL || 'https://judge0-ce.p.rapidapi.com';
 const JUDGE0_API_KEY = process.env.JUDGE0_API_KEY;
-const USE_JUDGE0 = !!JUDGE0_API_KEY;
+const JUDGE0_AUTH_TOKEN = process.env.JUDGE0_AUTH_TOKEN; // For self-hosted instances
+
+// Determine if using RapidAPI or self-hosted
+// If JUDGE0_API_URL is explicitly set and not the default RapidAPI URL, it's self-hosted
+const IS_RAPIDAPI = JUDGE0_API_URL.includes('rapidapi.com');
+const IS_SELF_HOSTED = !!process.env.JUDGE0_API_URL && !IS_RAPIDAPI;
+
+// Judge0 is enabled if we have either:
+// 1. RapidAPI key (for RapidAPI-hosted)
+// 2. Custom URL set (for self-hosted)
+const USE_JUDGE0 = !!JUDGE0_API_KEY || IS_SELF_HOSTED;
 
 // Piston API configuration (alternative)
 const PISTON_API_URL = process.env.PISTON_API_URL || 'https://emkc.org/api/v2/piston';
@@ -82,6 +92,21 @@ const executeWithJudge0 = async (
       throw new Error(`Unsupported language: ${language}`);
     }
 
+    // Build headers based on whether using RapidAPI or self-hosted
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (IS_RAPIDAPI) {
+      // RapidAPI requires these specific headers
+      headers['X-RapidAPI-Key'] = JUDGE0_API_KEY || '';
+      headers['X-RapidAPI-Host'] = 'judge0-ce.p.rapidapi.com';
+    } else if (IS_SELF_HOSTED && JUDGE0_AUTH_TOKEN) {
+      // Self-hosted Judge0 with authentication
+      headers['X-Auth-Token'] = JUDGE0_AUTH_TOKEN;
+    }
+    // If self-hosted without auth token, no auth headers are sent
+
     // Submit code for execution
     const submitResponse = await axios.post(
       `${JUDGE0_API_URL}/submissions`,
@@ -93,28 +118,32 @@ const executeWithJudge0 = async (
         memory_limit: 128000, // 128 MB
       },
       {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RapidAPI-Key': JUDGE0_API_KEY,
-          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-        },
+        headers,
         params: {
           base64_encoded: 'false',
           wait: 'true', // Wait for execution to complete
         },
+        timeout: 30000, // 30 second timeout
+        validateStatus: (status) => status < 500,
       }
     );
 
     const token = submitResponse.data.token;
 
+    // Build headers for result request
+    const resultHeaders: Record<string, string> = {};
+    if (IS_RAPIDAPI) {
+      resultHeaders['X-RapidAPI-Key'] = JUDGE0_API_KEY || '';
+      resultHeaders['X-RapidAPI-Host'] = 'judge0-ce.p.rapidapi.com';
+    } else if (IS_SELF_HOSTED && JUDGE0_AUTH_TOKEN) {
+      resultHeaders['X-Auth-Token'] = JUDGE0_AUTH_TOKEN;
+    }
+
     // Get execution result
     const resultResponse = await axios.get(
       `${JUDGE0_API_URL}/submissions/${token}`,
       {
-        headers: {
-          'X-RapidAPI-Key': JUDGE0_API_KEY,
-          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-        },
+        headers: resultHeaders,
         params: {
           base64_encoded: 'false',
         },
@@ -281,8 +310,17 @@ export const executeCode = async (
 ): Promise<CodeExecutionResult> => {
   // Check if Judge0 is configured
   if (!USE_JUDGE0) {
+    const errorMessage = IS_SELF_HOSTED
+      ? 'Code execution service is not configured. Please set JUDGE0_API_URL to your self-hosted Judge0 instance URL.'
+      : 'Code execution service is not configured. Please set JUDGE0_API_KEY environment variable for RapidAPI, or set JUDGE0_API_URL for self-hosted instance. ' +
+        'Get your API key from https://rapidapi.com/judge0-official/api/judge0-ce';
+    throw new Error(errorMessage);
+  }
+
+  // Validate RapidAPI configuration
+  if (IS_RAPIDAPI && !JUDGE0_API_KEY) {
     throw new Error(
-      'Code execution service is not configured. Please set JUDGE0_API_KEY environment variable. ' +
+      'JUDGE0_API_KEY is required when using RapidAPI-hosted Judge0. ' +
       'Get your API key from https://rapidapi.com/judge0-official/api/judge0-ce'
     );
   }

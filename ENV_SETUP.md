@@ -81,14 +81,25 @@ This guide will help you set up all the necessary environment variables for Squi
 - **Variables**: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`
 
 ### 11. Code Execution Service (Judge0 - Required for Code Playground)
+
+Choose one option:
+
+**Option A: RapidAPI-Hosted Judge0 (Easiest)**
 - Sign up at [RapidAPI](https://rapidapi.com)
 - Subscribe to [Judge0 API](https://rapidapi.com/judge0-official/api/judge0-ce)
 - Get API key from RapidAPI dashboard
 - **Variables**: 
-  - `JUDGE0_API_URL` (default: `https://judge0-ce.p.rapidapi.com`)
   - `JUDGE0_API_KEY` (required - get from RapidAPI)
+  - `JUDGE0_API_URL` is optional (defaults to `https://judge0-ce.p.rapidapi.com`)
 
-**Note**: The code playground requires Judge0 to be configured. Without `JUDGE0_API_KEY`, code execution will fail with a clear error message.
+**Option B: Self-Hosted Judge0**
+- Deploy your own Judge0 instance (see [Judge0 GitHub](https://github.com/judge0/judge0))
+- **Variables**:
+  - `JUDGE0_API_URL` (required - set to your self-hosted instance URL, e.g., `https://judge0.yourdomain.com`)
+  - `JUDGE0_AUTH_TOKEN` (optional - only if your self-hosted instance requires authentication)
+  - `JUDGE0_API_KEY` is NOT needed for self-hosted instances
+
+**Note**: The code playground requires Judge0 to be configured. Set either `JUDGE0_API_KEY` (for RapidAPI) or `JUDGE0_API_URL` (for self-hosted).
 
 ### 12. Encryption Key (Required for Message Encryption)
 

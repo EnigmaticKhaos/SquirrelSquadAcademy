@@ -81,11 +81,19 @@ AWS_S3_BUCKET=your_s3_bucket_name
 ```
 
 ### Code Execution (Required for Code Playground)
+
+**Option A: RapidAPI-Hosted Judge0**
 ```env
-# Judge0 API - Required for code playground feature
-JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
 JUDGE0_API_KEY=your_judge0_api_key
 # Get API key from: https://rapidapi.com/judge0-official/api/judge0-ce
+# JUDGE0_API_URL is optional (defaults to RapidAPI URL)
+```
+
+**Option B: Self-Hosted Judge0**
+```env
+JUDGE0_API_URL=https://judge0.yourdomain.com
+JUDGE0_AUTH_TOKEN=your_auth_token  # Optional, only if auth is enabled
+# JUDGE0_API_KEY is NOT needed for self-hosted instances
 ```
 
 ### Message Encryption (Required for Direct Messaging)
