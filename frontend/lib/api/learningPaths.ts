@@ -31,8 +31,8 @@ export const learningPathsApi = {
   toggleStatus: (id: string) => api.post<ApiResponse<LearningPath>>(`/learning-paths/${id}/toggle-status`),
   
   // Generate AI learning path
-  generatePath: (data: { goal: string; learningStyle?: string; timeCommitment?: string; [key: string]: any }) =>
-    api.post<ApiResponse<LearningPath>>('/learning-paths/generate', data),
+  generatePath: (data: { targetSkill: string; currentLevel?: string; learningStyle?: string; timeCommitment?: string; interests?: string[] }) =>
+    api.post<ApiResponse<{ path: LearningPath }>>('/learning-paths/generate', data),
   
   // Create learning path (admin)
   createPath: (data: Partial<LearningPath>) => api.post<ApiResponse<LearningPath>>('/learning-paths', data),
