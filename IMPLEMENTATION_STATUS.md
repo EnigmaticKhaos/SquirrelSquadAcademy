@@ -297,7 +297,7 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `recommendations.ts` - Recommendations API
 
 ### API Files Existing (but hooks missing)
-- ✅ `social.ts` - Posts/Comments/Projects API (exists, needs hooks)
+- ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
 - ✅ `gamification.ts` - Achievements/Badges/Challenges/Leaderboard API (exists, needs hooks)
 - ✅ `notes.ts` - Notes API (exists, hooks created)
 - ✅ `flashcards.ts` - Flashcards API (exists, hooks created)
@@ -318,7 +318,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `useStudyTools` - Study Tools hooks
 - ❌ `useSavedContent` - Saved Content hooks
 - ❌ `useRecommendations` - Recommendations hooks
-- ❌ `useSocial` - Social/Post hooks (for feed) - API exists but no hooks
 - ❌ `useComments` - Comment hooks - API exists but no hooks
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
@@ -331,8 +330,8 @@ This document tracks the implementation status of features across the platform, 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
 ### Frontend API Files: 21 (need ~2 more, some APIs exist but need hooks)
-### Frontend Hooks: 20 (need ~8 more)
-### Implementation Coverage: ~88%
+### Frontend Hooks: 22 (need ~6 more)
+### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:
 1. **Course Learning Experience** (highest priority)
