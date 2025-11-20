@@ -290,7 +290,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `lessons.ts` - Lesson API
 - ❌ `submissions.ts` - Submission API
 - ❌ `forums.ts` - Forum API
-- ❌ `certificates.ts` - Certificate API
 - ❌ `bundles.ts` - Bundle API (partially in courses.ts)
 - ❌ `codePlayground.ts` - Code Playground API
 - ❌ `studyTools.ts` - Study Tools API
@@ -302,6 +301,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `gamification.ts` - Achievements/Badges/Challenges/Leaderboard API (exists, needs hooks)
 - ✅ `notes.ts` - Notes API (exists, hooks created)
 - ✅ `flashcards.ts` - Flashcards API (exists, hooks created)
+- ✅ `certificates.ts` - Certificates API (exists, hooks created)
 
 ### Hooks Missing
 - ❌ `useAssignments` - Assignment hooks
@@ -310,7 +310,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `useSubmissions` - Submission hooks
 - ❌ `useForums` - Forum hooks
 - ❌ `useProjects` - Project hooks
-- ❌ `useCertificates` - Certificate hooks
 - ❌ `useBundles` - Bundle hooks
 - ❌ `useLeaderboard` - Leaderboard hooks
 - ❌ `useCodePlayground` - Code Playground hooks
@@ -329,9 +328,9 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 13 (need ~10 more, some APIs exist but need hooks)
-### Frontend Hooks: 12 (need ~16 more)
-### Implementation Coverage: ~70%
+### Frontend API Files: 14 (need ~9 more, some APIs exist but need hooks)
+### Frontend Hooks: 13 (need ~15 more)
+### Implementation Coverage: ~75%
 
 ### Priority Areas for Next Phase:
 1. **Course Learning Experience** (highest priority)

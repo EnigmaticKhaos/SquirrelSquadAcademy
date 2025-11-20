@@ -551,7 +551,7 @@ export interface Notification {
 export interface Certificate {
   _id: string;
   user: string | User;
-  course?: string;
+  course?: string | { _id: string; title: string };
   courseCompletion?: string;
   title: string;
   description?: string;

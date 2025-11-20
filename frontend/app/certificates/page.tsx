@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, ErrorMessage, EmptyState, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
+import { useCertificates } from '@/hooks/useCertificates';
 
 export default function CertificatesPage() {
   const { user } = useAuth();
-  const [certificates, setCertificates] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, isLoading, error } = useCertificates({ limit: 50, offset: 0 });
+
+  const certificates = data?.certificates || [];
 
   if (!user) {
     return (
@@ -46,7 +47,15 @@ export default function CertificatesPage() {
             </div>
           )}
 
-          {!isLoading && certificates.length === 0 && (
+          {error && (
+            <Card>
+              <CardContent className="p-6">
+                <ErrorMessage message="Failed to load certificates. Please try again later." />
+              </CardContent>
+            </Card>
+          )}
+
+          {!isLoading && !error && certificates.length === 0 && (
             <EmptyState
               title="No certificates yet"
               description="Complete courses to earn certificates"
@@ -58,18 +67,23 @@ export default function CertificatesPage() {
             />
           )}
 
-          {!isLoading && certificates.length > 0 && (
+          {!isLoading && !error && certificates.length > 0 && (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {certificates.map((certificate) => (
-                <Card key={certificate._id} hover>
+                <Card key={certificate._id} hover={true}>
                   <CardHeader>
                     <CardTitle className="text-gray-100">{certificate.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
+                    {certificate.certificateData?.courseName && (
+                      <p className="mb-2 text-sm text-gray-400">
+                        {certificate.certificateData.courseName}
+                      </p>
+                    )}
                     <p className="mb-4 text-sm text-gray-400">
                       Issued: {new Date(certificate.issuedDate).toLocaleDateString()}
                     </p>
-                    <Link href={`/certificates/${certificate._id}`}>
+                    <Link href={'/certificates/' + certificate.certificateId}>
                       <Button className="w-full">View Certificate</Button>
                     </Link>
                   </CardContent>
