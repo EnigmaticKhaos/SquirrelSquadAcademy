@@ -252,7 +252,7 @@ export interface CourseBundle {
   _id: string;
   name: string;
   description: string;
-  courses: string[];
+  courses: Array<string | Course>;
   price: number;
   currency: string;
   originalPrice?: number;
@@ -266,6 +266,21 @@ export interface CourseBundle {
   endDate?: string;
   salesCount: number;
   enrollmentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BundlePurchase {
+  _id: string;
+  user: string | User;
+  bundle: string | CourseBundle;
+  price: number;
+  currency: string;
+  discountAmount?: number;
+  stripePaymentIntentId?: string;
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
+  coursesEnrolled: Array<string | Course>;
+  enrolledAt?: string;
   createdAt: string;
   updatedAt: string;
 }

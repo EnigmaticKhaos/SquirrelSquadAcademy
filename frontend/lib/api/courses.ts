@@ -1,5 +1,5 @@
 import { api } from '../apiClient';
-import type { ApiResponse, Course, PaginatedResponse, CourseReview, CourseBundle } from '@/types';
+import type { ApiResponse, Course, PaginatedResponse, CourseReview, CourseBundle, BundlePurchase } from '@/types';
 
 export const coursesApi = {
   // Get all courses
@@ -56,15 +56,16 @@ export const courseReviewsApi = {
 };
 
 export const courseBundlesApi = {
-  // Get all bundles
-  getBundles: (params?: { page?: number; limit?: number; category?: string }) =>
-    api.get<ApiResponse<PaginatedResponse<CourseBundle>>>('/course-bundles', { params }),
-  
-  // Get single bundle
-  getBundle: (id: string) => api.get<ApiResponse<CourseBundle>>(`/course-bundles/${id}`),
-  
-  // Purchase bundle
-  purchaseBundle: (id: string) => api.post<ApiResponse<{ sessionId: string }>>(`/course-bundles/${id}/purchase`),
+  getBundles: (params?: { page?: number; limit?: number; category?: string; tags?: string[]; search?: string }) =>
+    api.get<ApiResponse<{ bundles: CourseBundle[]; total: number; count: number }>>('/course-bundles', { params }),
+
+  getBundle: (id: string) =>
+    api.get<ApiResponse<{ bundle: CourseBundle; ownsBundle?: boolean }>>(`/course-bundles/${id}`),
+
+  purchaseBundle: (
+    id: string,
+    data?: { stripePaymentIntentId?: string; paymentStatus?: 'pending' | 'completed' | 'failed' }
+  ) => api.post<ApiResponse<{ purchase: BundlePurchase }>>(`/course-bundles/${id}/purchase`, data),
 };
 
 export const courseWaitlistApi = {
