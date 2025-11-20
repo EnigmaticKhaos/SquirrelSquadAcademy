@@ -124,6 +124,19 @@ export const useCreateFlashcard = () => {
   });
 };
 
+export const useDeleteFlashcard = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id: string) => flashcardsApi.deleteFlashcard(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['deck-cards'] });
+      queryClient.invalidateQueries({ queryKey: ['flashcard-deck'] });
+      queryClient.invalidateQueries({ queryKey: ['study-session'] });
+    },
+  });
+};
+
 export const useReviewFlashcard = () => {
   const queryClient = useQueryClient();
   

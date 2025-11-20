@@ -131,10 +131,13 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete note system
   - **Missing**: API integration for detail page, note editing, note organization, search
 
-- 🟡 **Flashcards**
-  - Listing and study pages exist (study page uses **MOCK DATA**)
-  - Backend: Complete flashcard system
-  - **Missing**: API integration for study page, deck creation, card creation, study session tracking
+- ✅ **Flashcards**
+  - Listing page fully integrated with backend API
+  - Study page fully integrated with backend API
+  - Deck creation page implemented
+  - Card creation UI implemented
+  - Study session tracking integrated
+  - Deck detail page with card management
 
 - 🟡 **Study Tools**
   - Pomodoro page exists
