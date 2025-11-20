@@ -41,11 +41,14 @@ This document tracks the implementation status of features across the platform, 
   - Page exists but needs full implementation
   - Backend: Full lesson/module system ready
   
-- 🟡 **Assignments**
-  - Listing page exists
-  - Detail page exists
-  - Backend: Full assignment/submission system ready
-  - **Missing**: Assignment submission interface, file uploads, code editor integration
+- ✅ **Assignments**
+  - Listing page fully integrated with backend API
+  - Detail page fully integrated with backend API
+  - Assignment submission interface implemented
+  - File upload support with preview and removal
+  - Code editor integration for coding assignments
+  - Support for multiple file types (documents, code files)
+  - File display in submissions
 
 - 🟡 **Course Modules & Lessons**
   - Routes exist (`/courses/[id]/modules/[moduleId]`, `/courses/[id]/modules/[moduleId]/lessons/[lessonId]`)

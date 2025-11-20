@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import { useCourse } from '@/hooks/useCourses';
 import { useAssignment } from '@/hooks/useAssignments';
@@ -9,7 +9,9 @@ import { useLatestSubmission, useSubmitAssignment } from '@/hooks/useSubmissions
 import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import type { Assignment, Submission } from '@/types';
-import { Textarea } from '@/components/ui';
+import { Textarea, CodeEditor } from '@/components/ui';
+import { uploadApi } from '@/lib/api';
+import { Paperclip, X, File, FileText, Code } from 'lucide-react';
 
 export default function AssignmentDetailPage() {
   const params = useParams();
@@ -21,6 +23,10 @@ export default function AssignmentDetailPage() {
   const submitAssignment = useSubmitAssignment();
   const [submissionContent, setSubmissionContent] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; url: string; type: string }>>([]);
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (assignment?.starterCode && !submission) {
@@ -32,23 +38,97 @@ export default function AssignmentDetailPage() {
     if (submission?.content) {
       setSubmissionContent(submission.content);
     }
+    if (submission?.files) {
+      setUploadedFiles(submission.files);
+    }
   }, [submission]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setFilesToUpload((prev) => [...prev, ...files]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFileToUpload = (index: number) => {
+    setFilesToUpload((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeUploadedFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('text/') || type.includes('code') || type.includes('javascript') || type.includes('python')) {
+      return Code;
+    }
+    if (type.includes('pdf') || type.includes('document')) return FileText;
+    return File;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
   const handleSubmit = async () => {
-    if (!submissionContent.trim()) {
-      setError('Submission content cannot be empty');
+    if (!submissionContent.trim() && filesToUpload.length === 0 && uploadedFiles.length === 0) {
+      setError('Submission content or files are required');
       return;
     }
 
     try {
       setError(null);
+      setUploading(true);
+
+      // Upload new files
+      const newFiles: Array<{ name: string; url: string; type: string }> = [...uploadedFiles];
+      
+      for (const file of filesToUpload) {
+        try {
+          let uploadResponse;
+          if (assignment?.assignmentType === 'coding' || file.type.includes('code') || file.type.includes('javascript') || file.type.includes('python')) {
+            uploadResponse = await uploadApi.uploadCode(file, `assignments/${assignmentId}`);
+          } else {
+            uploadResponse = await uploadApi.uploadDocument(file, `assignments/${assignmentId}`);
+          }
+          
+          if (uploadResponse.data.data) {
+            newFiles.push({
+              name: file.name,
+              url: uploadResponse.data.data.url,
+              type: file.type,
+            });
+          }
+        } catch (uploadError: any) {
+          console.error('Failed to upload file:', uploadError);
+          setError(`Failed to upload ${file.name}: ${uploadError.response?.data?.message || 'Upload failed'}`);
+          setUploading(false);
+          return;
+        }
+      }
+
+      // Submit assignment with content and files
       await submitAssignment.mutateAsync({
         assignmentId,
-        data: { content: submissionContent },
+        data: {
+          content: submissionContent || '',
+          files: newFiles.length > 0 ? newFiles : undefined,
+        },
       });
-      // Success message will be shown via toast or similar
+
+      // Clear files after successful submission
+      setFilesToUpload([]);
+      setUploadedFiles([]);
+      setUploading(false);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to submit assignment');
+      setUploading(false);
     }
   };
 
@@ -165,21 +245,128 @@ export default function AssignmentDetailPage() {
                     </div>
                   )}
 
+                  {/* Display existing submission files */}
+                  {submission?.files && submission.files.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">Submitted Files</h3>
+                      <div className="space-y-2">
+                        {submission.files.map((file, idx) => {
+                          const FileIcon = getFileIcon(file.type);
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-2 bg-gray-800 rounded-lg p-2 border border-gray-700"
+                            >
+                              <FileIcon className="w-4 h-4 text-gray-400" />
+                              <a
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 text-sm text-blue-400 hover:text-blue-300 truncate"
+                              >
+                                {file.name}
+                              </a>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Files to upload */}
+                  {(filesToUpload.length > 0 || uploadedFiles.length > 0) && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-300 mb-2">Files to Submit</h3>
+                      <div className="space-y-2">
+                        {uploadedFiles.map((file, idx) => {
+                          const FileIcon = getFileIcon(file.type);
+                          return (
+                            <div
+                              key={`uploaded-${idx}`}
+                              className="flex items-center gap-2 bg-gray-800 rounded-lg p-2 border border-gray-700"
+                            >
+                              <FileIcon className="w-4 h-4 text-gray-400" />
+                              <span className="flex-1 text-sm text-gray-300 truncate">{file.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeUploadedFile(idx)}
+                                className="p-1 hover:bg-gray-700 rounded"
+                              >
+                                <X className="w-4 h-4 text-gray-400" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                        {filesToUpload.map((file, idx) => {
+                          const FileIcon = getFileIcon(file.type);
+                          return (
+                            <div
+                              key={`to-upload-${idx}`}
+                              className="flex items-center gap-2 bg-gray-800 rounded-lg p-2 border border-gray-700"
+                            >
+                              <FileIcon className="w-4 h-4 text-gray-400" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-gray-300 truncate">{file.name}</p>
+                                <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeFileToUpload(idx)}
+                                className="p-1 hover:bg-gray-700 rounded"
+                              >
+                                <X className="w-4 h-4 text-gray-400" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      {assignment.assignmentType === 'coding' ? 'Your Code' : 'Your Answer'}
-                    </label>
-                    <Textarea
-                      value={submissionContent}
-                      onChange={(e) => setSubmissionContent(e.target.value)}
-                      rows={15}
-                      className="font-mono text-sm"
-                      placeholder={
-                        assignment.assignmentType === 'coding'
-                          ? 'Write your code here...'
-                          : 'Write your answer here...'
-                      }
-                    />
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-300">
+                        {assignment.assignmentType === 'coding' ? 'Your Code' : 'Your Answer'}
+                      </label>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        accept={
+                          assignment.assignmentType === 'coding'
+                            ? '.js,.ts,.py,.java,.cpp,.c,.cs,.html,.css,.json'
+                            : '.pdf,.doc,.docx,.txt,.csv'
+                        }
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Paperclip className="w-4 h-4 mr-2" />
+                        Attach Files
+                      </Button>
+                    </div>
+                    {assignment.assignmentType === 'coding' ? (
+                      <CodeEditor
+                        value={submissionContent}
+                        onChange={(value) => setSubmissionContent(value)}
+                        language={assignment.language || 'javascript'}
+                        placeholder="Write your code here..."
+                        className="bg-gray-800 border-gray-700 text-gray-100"
+                      />
+                    ) : (
+                      <Textarea
+                        value={submissionContent}
+                        onChange={(e) => setSubmissionContent(e.target.value)}
+                        rows={15}
+                        className="font-mono text-sm bg-gray-800 border-gray-700 text-gray-100"
+                        placeholder="Write your answer here..."
+                      />
+                    )}
                   </div>
 
                   {error && (
@@ -190,15 +377,20 @@ export default function AssignmentDetailPage() {
 
                   <Button
                     onClick={handleSubmit}
-                    isLoading={submitAssignment.isPending}
+                    isLoading={submitAssignment.isPending || uploading}
                     disabled={
-                      !submissionContent.trim() ||
+                      (!submissionContent.trim() && filesToUpload.length === 0 && uploadedFiles.length === 0) ||
                       (submission?.status === 'graded' && !assignment.allowRetries) ||
-                      submitAssignment.isPending
+                      submitAssignment.isPending ||
+                      uploading
                     }
                     className="w-full"
                   >
-                    {submission ? 'Resubmit Assignment' : 'Submit Assignment'}
+                    {uploading
+                      ? 'Uploading files...'
+                      : submission
+                      ? 'Resubmit Assignment'
+                      : 'Submit Assignment'}
                   </Button>
                 </CardContent>
               </Card>

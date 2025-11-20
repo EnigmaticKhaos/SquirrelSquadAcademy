@@ -24,6 +24,7 @@ export { videosApi } from './videos';
 export { courseCompletionApi } from './courseCompletion';
 export { assignmentsApi } from './assignments';
 export { submissionsApi } from './submissions';
+export { uploadApi } from './upload';
 
 // Also export everything from each module
 export * from './auth';

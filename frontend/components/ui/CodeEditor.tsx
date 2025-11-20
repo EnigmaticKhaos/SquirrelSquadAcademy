@@ -33,10 +33,21 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         readOnly={readOnly}
         placeholder={placeholder}
         className={cn(
-          'w-full rounded-md border border-gray-300 bg-gray-50 p-4 font-mono text-sm',
-          'focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500',
+          'w-full rounded-md border p-4 font-mono text-sm',
+          'focus:outline-none focus:ring-1',
           'resize-none',
-          readOnly && 'cursor-not-allowed bg-gray-100'
+          // Default light theme
+          !className?.includes('bg-gray-800') && !className?.includes('bg-gray-900') && [
+            'border-gray-300 bg-gray-50 text-gray-900',
+            'focus:border-blue-500 focus:ring-blue-500',
+            readOnly && 'cursor-not-allowed bg-gray-100'
+          ],
+          // Dark theme (when className includes dark colors)
+          (className?.includes('bg-gray-800') || className?.includes('bg-gray-900')) && [
+            'border-gray-700 bg-gray-800 text-gray-100',
+            'focus:border-blue-500 focus:ring-blue-500',
+            readOnly && 'cursor-not-allowed bg-gray-900'
+          ]
         )}
         style={{ minHeight: '300px' }}
         spellCheck={false}
