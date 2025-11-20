@@ -9,6 +9,7 @@ export { coursesApi, courseReviewsApi, courseBundlesApi, courseWaitlistApi } fro
 export { learningPathsApi } from './learningPaths';
 export { notificationsApi } from './notifications';
 export { postsApi, commentsApi, projectsApi } from './social';
+export { savedContentApi, type SavedContent, type SavedContentType } from './savedContent';
 export { achievementsApi, badgesApi, challengesApi, leaderboardApi } from './gamification';
 export { searchApi } from './search';
 export { messagesApi } from './messages';
