@@ -10,9 +10,17 @@ import logger from '../utils/logger';
 let io: SocketServer;
 
 export const initializeSocket = (httpServer: HTTPServer): SocketServer => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const allowedOrigins = [
+    frontendUrl,
+    frontendUrl.replace('https://', 'https://www.'),
+    frontendUrl.replace('https://www.', 'https://'),
+    'http://localhost:3000',
+  ];
+
   io = new SocketServer(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: allowedOrigins,
       credentials: true,
     },
   });
