@@ -780,11 +780,24 @@ export interface ForumThread {
 
 export interface ForumPost {
   _id: string;
-  thread: string | ForumThread;
+  course: string | { _id: string; title: string };
   author: string | User;
+  type: 'question' | 'discussion' | 'announcement';
+  title: string;
   content: string;
-  isEdited: boolean;
-  likesCount: number;
+  parentPost?: string | ForumPost;
+  isAnswer: boolean;
+  markedAsHelpful: boolean;
+  views: number;
+  upvotes: number;
+  downvotes: number;
+  repliesCount: number;
+  isPinned: boolean;
+  isLocked: boolean;
+  isResolved: boolean;
+  tags: string[];
+  mentions?: string[] | User[];
+  lastActivityAt: string;
   createdAt: string;
   updatedAt: string;
 }

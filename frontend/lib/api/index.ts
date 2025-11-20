@@ -16,6 +16,7 @@ export { collaborativeProjectsApi } from './collaborativeProjects';
 export { notesApi } from './notes';
 export { flashcardsApi } from './flashcards';
 export { certificatesApi } from './certificates';
+export { forumsApi } from './forums';
 
 // Also export everything from each module
 export * from './auth';
@@ -30,4 +31,5 @@ export * from './messages';
 export * from './notes';
 export * from './flashcards';
 export * from './certificates';
+export * from './forums';
 

@@ -106,10 +106,11 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete messaging system
   - **Missing**: Real-time updates (Socket.io), message sending UI, file attachments
 
-- 🟡 **Forums**
-  - Listing and category pages exist (category page uses **MOCK DATA**)
-  - Backend: Complete forum system
-  - **Missing**: API integration for category page, thread creation, post replies, moderation UI
+- ✅ **Forums**
+  - Listing page shows courses with forums
+  - Category (course) page fully integrated with backend API
+  - Real-time forum posts from backend
+  - Post voting, replies, and moderation ready (API hooks created)
 
 - 🟡 **Projects**
   - Listing and detail pages exist
@@ -289,7 +290,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `modules.ts` - Module API  
 - ❌ `lessons.ts` - Lesson API
 - ❌ `submissions.ts` - Submission API
-- ❌ `forums.ts` - Forum API
 - ❌ `bundles.ts` - Bundle API (partially in courses.ts)
 - ❌ `codePlayground.ts` - Code Playground API
 - ❌ `studyTools.ts` - Study Tools API
@@ -302,13 +302,13 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `notes.ts` - Notes API (exists, hooks created)
 - ✅ `flashcards.ts` - Flashcards API (exists, hooks created)
 - ✅ `certificates.ts` - Certificates API (exists, hooks created)
+- ✅ `forums.ts` - Forums API (exists, hooks created)
 
 ### Hooks Missing
 - ❌ `useAssignments` - Assignment hooks
 - ❌ `useModules` - Module hooks
 - ❌ `useLessons` - Lesson hooks
 - ❌ `useSubmissions` - Submission hooks
-- ❌ `useForums` - Forum hooks
 - ❌ `useProjects` - Project hooks
 - ❌ `useBundles` - Bundle hooks
 - ❌ `useLeaderboard` - Leaderboard hooks
@@ -328,9 +328,9 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 14 (need ~9 more, some APIs exist but need hooks)
-### Frontend Hooks: 13 (need ~15 more)
-### Implementation Coverage: ~75%
+### Frontend API Files: 15 (need ~8 more, some APIs exist but need hooks)
+### Frontend Hooks: 14 (need ~14 more)
+### Implementation Coverage: ~80%
 
 ### Priority Areas for Next Phase:
 1. **Course Learning Experience** (highest priority)

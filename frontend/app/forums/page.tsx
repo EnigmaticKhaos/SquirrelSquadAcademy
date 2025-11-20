@@ -1,19 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, LoadingSpinner, ErrorMessage, Badge } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, LoadingSpinner, ErrorMessage, EmptyState } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useCourses } from '@/hooks/useCourses';
 
 export default function ForumsPage() {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, isLoading, error } = useCourses({ limit: 50, page: 1 });
+
+  const courses = data?.data || [];
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-gray-900">
       <Header />
-      <main className="flex-1 bg-gray-50">
+      <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Forums"
@@ -26,38 +27,38 @@ export default function ForumsPage() {
             </div>
           )}
 
-          {!isLoading && categories.length === 0 && (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card hover>
-                <CardHeader>
-                  <CardTitle>General Discussion</CardTitle>
-                  <CardDescription>General topics and discussions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>0 threads</span>
-                    <span>0 posts</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {error && (
+            <Card>
+              <CardContent className="p-6">
+                <ErrorMessage message="Failed to load courses. Please try again later." />
+              </CardContent>
+            </Card>
           )}
 
-          {!isLoading && categories.length > 0 && (
+          {!isLoading && !error && courses.length === 0 && (
+            <EmptyState
+              title="No courses available"
+              description="Courses will appear here when they are published"
+            />
+          )}
+
+          {!isLoading && !error && courses.length > 0 && (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {categories.map((category) => (
-                <Link key={category._id} href={`/forums/${category._id}`}>
-                  <Card hover className="h-full">
+              {courses.map((course) => (
+                <Link key={course._id} href={'/forums/' + course._id}>
+                  <Card hover={true} className="h-full">
                     <CardHeader>
-                      <CardTitle>{category.name}</CardTitle>
-                      {category.description && (
-                        <CardDescription>{category.description}</CardDescription>
+                      <CardTitle className="text-gray-100">{course.title}</CardTitle>
+                      {course.description && (
+                        <CardDescription className="text-gray-400">
+                          {course.description.substring(0, 100)}...
+                        </CardDescription>
                       )}
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>{category.threadCount} threads</span>
-                        <span>{category.postCount} posts</span>
+                      <div className="flex items-center justify-between text-sm text-gray-400">
+                        <span>Course Forum</span>
+                        <span>Click to view discussions</span>
                       </div>
                     </CardContent>
                   </Card>
