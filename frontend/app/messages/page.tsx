@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import { useConversations } from '@/hooks/useMessages';
-import { Card, CardContent, LoadingSpinner, ErrorMessage, EmptyState, Avatar, Badge } from '@/components/ui';
+import { Card, CardContent, LoadingSpinner, ErrorMessage, EmptyState, Avatar, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useAuth } from '@/hooks/useAuth';
 import type { Conversation } from '@/types';
+import { MessageSquarePlus } from 'lucide-react';
 
 export default function MessagesPage() {
+  const router = useRouter();
   const { data: conversations, isLoading, error } = useConversations();
   const { user } = useAuth();
 
@@ -47,10 +50,19 @@ export default function MessagesPage() {
       <Header />
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <PageHeader
-            title="Messages"
-            description="Chat with other learners and mentors"
-          />
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-100">Messages</h1>
+              <p className="mt-1 text-sm text-gray-400">Chat with other learners and mentors</p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={() => router.push('/search?type=users')}
+            >
+              <MessageSquarePlus className="w-4 h-4 mr-2" />
+              New Message
+            </Button>
+          </div>
 
           {isLoading ? (
             <div className="flex justify-center py-12">
