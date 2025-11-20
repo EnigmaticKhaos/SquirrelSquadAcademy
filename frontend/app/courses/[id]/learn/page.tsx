@@ -5,10 +5,11 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useCourse } from '@/hooks/useCourses';
 import { useModules } from '@/hooks/useModules';
-import { useLessons } from '@/hooks/useLessons';
 import { useCourseEnrollment } from '@/hooks/useCourseCompletion';
-import { Card, CardContent, LoadingSpinner, ErrorMessage, ProgressBar, Badge } from '@/components/ui';
+import { Card, CardContent, LoadingSpinner, ErrorMessage, ProgressBar, Badge, Button } from '@/components/ui';
 import { Breadcrumbs } from '@/components/layout';
+import { CheckCircle2, Circle, Lock, BookOpen, Clock, Play } from 'lucide-react';
+import { useState } from 'react';
 
 export default function CourseLearnPage() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function CourseLearnPage() {
   const { data: course, isLoading: courseLoading, error: courseError } = useCourse(id);
   const { data: modules, isLoading: modulesLoading } = useModules(id);
   const { data: enrollment } = useCourseEnrollment(id);
+  const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
   const isLoading = courseLoading || modulesLoading;
   const error = courseError;
@@ -24,6 +26,23 @@ export default function CourseLearnPage() {
   const progress = enrollment?.progressPercentage || 0;
   const completedLessons = enrollment?.completedLessons || [];
   const completedModules = enrollment?.completedModules || [];
+
+  // Get next lesson to continue
+  const getNextLesson = () => {
+    if (!modules || modules.length === 0) return null;
+    
+    for (const module of modules) {
+      const moduleLessons = module.lessons || [];
+      for (const lessonId of moduleLessons) {
+        if (!completedLessons.includes(lessonId)) {
+          return { moduleId: module._id, lessonId };
+        }
+      }
+    }
+    return null;
+  };
+
+  const nextLesson = getNextLesson();
 
   if (isLoading) {
     return (
@@ -76,17 +95,52 @@ export default function CourseLearnPage() {
                     {modules && modules.length > 0 ? (
                       modules.map((module) => {
                         const isCompleted = completedModules.includes(module._id);
+                        const moduleLessons = module.lessons || [];
+                        const completedInModule = moduleLessons.filter((lid: string) => completedLessons.includes(lid)).length;
+                        const isExpanded = expandedModule === module._id;
+                        
                         return (
-                          <Link
-                            key={module._id}
-                            href={'/courses/' + id + '/modules/' + module._id}
-                            className="block rounded-md border border-gray-700 bg-gray-800 p-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span>{module.title}</span>
-                              {isCompleted && <Badge variant="success" size="sm">✓</Badge>}
-                            </div>
-                          </Link>
+                          <div key={module._id} className="rounded-md border border-gray-700 bg-gray-800 overflow-hidden">
+                            <button
+                              onClick={() => setExpandedModule(isExpanded ? null : module._id)}
+                              className="w-full p-3 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center justify-between"
+                            >
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  {isCompleted ? (
+                                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Circle className="h-4 w-4 text-gray-500" />
+                                  )}
+                                  <span className="font-medium">{module.title}</span>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                  {completedInModule} / {moduleLessons.length} lessons
+                                </p>
+                              </div>
+                            </button>
+                            {isExpanded && moduleLessons.length > 0 && (
+                              <div className="border-t border-gray-700 bg-gray-800/50">
+                                {moduleLessons.map((lessonId: string, idx: number) => {
+                                  const isLessonCompleted = completedLessons.includes(lessonId);
+                                  return (
+                                    <Link
+                                      key={lessonId}
+                                      href={`/courses/${id}/modules/${module._id}/lessons/${lessonId}`}
+                                      className="block px-4 py-2 text-xs text-gray-400 hover:bg-gray-700 transition-colors flex items-center gap-2"
+                                    >
+                                      {isLessonCompleted ? (
+                                        <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />
+                                      ) : (
+                                        <Circle className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                      )}
+                                      <span>Lesson {idx + 1}</span>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })
                     ) : (
@@ -135,16 +189,41 @@ export default function CourseLearnPage() {
                     </div>
                   )}
 
-                  <div className="rounded-lg border border-gray-700 bg-gray-800 p-6 text-center">
-                    <p className="text-gray-300 mb-4">Select a module from the sidebar to start learning</p>
-                    {modules && modules.length > 0 && (
-                      <Link href={'/courses/' + id + '/modules/' + modules[0]._id}>
-                        <button className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                          Start Learning
-                        </button>
+                  {nextLesson ? (
+                    <div className="rounded-lg border border-blue-500/50 bg-blue-500/10 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Play className="h-6 w-6 text-blue-400" />
+                        <div>
+                          <h3 className="font-semibold text-gray-100">Continue Learning</h3>
+                          <p className="text-sm text-gray-400">Pick up where you left off</p>
+                        </div>
+                      </div>
+                      <Link href={`/courses/${id}/modules/${nextLesson.moduleId}/lessons/${nextLesson.lessonId}`}>
+                        <Button variant="primary" className="w-full">
+                          Continue to Next Lesson
+                        </Button>
                       </Link>
-                    )}
-                  </div>
+                    </div>
+                  ) : progress === 100 ? (
+                    <div className="rounded-lg border border-green-500/50 bg-green-500/10 p-6 text-center">
+                      <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                      <h3 className="font-semibold text-gray-100 mb-2">Course Completed!</h3>
+                      <p className="text-sm text-gray-400 mb-4">Congratulations on completing this course</p>
+                      <Link href={`/courses/${id}`}>
+                        <Button variant="primary">View Certificate</Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-gray-700 bg-gray-800 p-6 text-center">
+                      <BookOpen className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-300 mb-4">Select a module from the sidebar to start learning</p>
+                      {modules && modules.length > 0 && (
+                        <Link href={`/courses/${id}/modules/${modules[0]._id}`}>
+                          <Button variant="primary">Start Learning</Button>
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
