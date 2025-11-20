@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useUserWaitlist, useLeaveWaitlist } from '@/hooks/useWaitlist';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -56,10 +56,8 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="My Waitlist"
             description="Manage your course waitlist entries and get notified when spots become available"
@@ -207,8 +205,7 @@ export default function WaitlistPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

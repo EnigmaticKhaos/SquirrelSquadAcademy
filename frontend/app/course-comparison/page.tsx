@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useCourses } from '@/hooks/useCourses';
 import { useCompareCourses, useComparisonSummary } from '@/hooks/useCourseComparison';
 import {
@@ -99,10 +99,8 @@ export default function CourseComparisonPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <Breadcrumbs
             items={[
               { label: 'Courses', href: '/courses' },
@@ -536,8 +534,7 @@ export default function CourseComparisonPage() {
             </>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { PageHeader } from '@/components/layout';
 import {
   Button,
@@ -168,10 +168,8 @@ export default function AnalyticsPage() {
   const isLoading = analyticsLoading || performanceLoading;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PageHeader
             title="Learning Analytics"
             description="Track your study habits, streaks, and performance trends across SquirrelSquad."
@@ -516,8 +514,7 @@ export default function AnalyticsPage() {
             </>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 

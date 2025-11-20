@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import { AppLayout } from '@/components/layout';
 import { useCourse, useEnrollCourse } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
 import { useWaitlistStatus, useJoinWaitlist, useLeaveWaitlist } from '@/hooks/useWaitlist';
@@ -68,34 +68,30 @@ export default function CourseDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1 bg-gray-50 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   if (error || !course) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1 bg-gray-50 flex items-center justify-center">
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <ErrorMessage
             message={error ? 'Failed to load course' : 'Course not found'}
             onRetry={() => router.refresh()}
           />
-        </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <Breadcrumbs
             items={[
               { label: 'Courses', href: '/courses' },
@@ -125,37 +121,37 @@ export default function CourseDetailPage() {
                   ))}
                 </div>
 
-                <h1 className="mb-4 text-3xl font-bold text-gray-900">
+                <h1 className="mb-4 text-3xl font-bold text-gray-100">
                   {course.title}
                 </h1>
 
-                <p className="mb-6 text-lg text-gray-600">
+                <p className="mb-6 text-lg text-gray-300">
                   {course.description}
                 </p>
 
                 {/* Course Details */}
-                <div className="mb-6 space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div className="mb-6 space-y-4 rounded-lg border border-gray-700 bg-gray-800/50 p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Category:</span>
-                    <span className="text-sm text-gray-600">{course.category}</span>
+                    <span className="text-sm font-medium text-gray-400">Category:</span>
+                    <span className="text-sm text-gray-300">{course.category}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Enrollments:</span>
-                    <span className="text-sm text-gray-600">{course.enrollmentCount} students</span>
+                    <span className="text-sm font-medium text-gray-400">Enrollments:</span>
+                    <span className="text-sm text-gray-300">{course.enrollmentCount} students</span>
                   </div>
                   {course.averageRating && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Rating:</span>
+                      <span className="text-sm font-medium text-gray-400">Rating:</span>
                       <div className="flex items-center gap-2">
                         <Rating value={course.averageRating} readonly showValue />
-                        <span className="text-sm text-gray-600">({course.reviewCount} reviews)</span>
+                        <span className="text-sm text-gray-300">({course.reviewCount} reviews)</span>
                       </div>
                     </div>
                   )}
                   {!course.isFree && course.price && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Price:</span>
-                      <span className="text-lg font-bold text-gray-900">${course.price}</span>
+                      <span className="text-sm font-medium text-gray-400">Price:</span>
+                      <span className="text-lg font-bold text-gray-100">${course.price}</span>
                     </div>
                   )}
                 </div>
@@ -172,11 +168,11 @@ export default function CourseDetailPage() {
                 <CardContent className="p-0">
                 {course.isFree ? (
                   <div className="mb-4">
-                    <span className="text-2xl font-bold text-green-600">Free</span>
+                    <span className="text-2xl font-bold text-green-400">Free</span>
                   </div>
                 ) : (
                   <div className="mb-4">
-                    <span className="text-2xl font-bold text-gray-900">
+                    <span className="text-2xl font-bold text-gray-100">
                       ${course.price}
                     </span>
                   </div>
@@ -240,7 +236,7 @@ export default function CourseDetailPage() {
                   </Button>
                 )}
 
-                <div className="mt-6 space-y-2 text-sm text-gray-600">
+                <div className="mt-6 space-y-2 text-sm text-gray-300">
                   <div className="flex items-center gap-2">
                     <span>✓</span>
                     <span>Lifetime access</span>
@@ -259,8 +255,7 @@ export default function CourseDetailPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }
 
