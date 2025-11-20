@@ -5,7 +5,8 @@ export const achievementsApi = {
   getAchievements: (params?: { page?: number; limit?: number; category?: string }) =>
     api.get<ApiResponse<PaginatedResponse<Achievement>>>('/achievements', { params }),
   
-  getAchievement: (id: string) => api.get<ApiResponse<Achievement>>(`/achievements/${id}`),
+  getAchievement: (id: string, params?: { userId?: string }) => 
+    api.get<ApiResponse<Achievement>>(`/achievements/${id}`, { params }),
   
   getUserAchievements: (userId: string) => api.get<ApiResponse<Achievement[]>>(`/achievements/user/${userId}`),
 };
@@ -14,7 +15,8 @@ export const badgesApi = {
   getBadges: (params?: { page?: number; limit?: number; category?: string }) =>
     api.get<ApiResponse<PaginatedResponse<Badge>>>('/badges', { params }),
   
-  getBadge: (id: string) => api.get<ApiResponse<Badge>>(`/badges/${id}`),
+  getBadge: (id: string, params?: { userId?: string }) => 
+    api.get<ApiResponse<Badge>>(`/badges/${id}`, { params }),
   
   getUserBadges: (userId: string) => api.get<ApiResponse<Badge[]>>(`/badges/user/${userId}`),
 };

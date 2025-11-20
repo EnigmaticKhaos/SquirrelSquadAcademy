@@ -76,15 +76,17 @@ This document tracks the implementation status of features across the platform, 
   - **Missing**: Form implementation, generation flow
 
 ### Gamification
-- 🟡 **Achievements**
-  - Listing page exists
-  - Backend: Complete achievement system
-  - **Missing**: Achievement detail pages, progress tracking UI
+- ✅ **Achievements**
+  - Listing page fully integrated with backend API
+  - Detail page with progress tracking implemented
+  - Shows unlock status and progress for logged-in users
+  - Links from listing to detail pages
 
-- 🟡 **Badges**
-  - Listing page exists
-  - Backend: Complete badge system
-  - **Missing**: Badge detail pages, badge showcase
+- ✅ **Badges**
+  - Listing page fully integrated with backend API
+  - Detail page with progress tracking implemented
+  - Shows unlock status and progress for logged-in users
+  - Links from listing to detail pages
 
 - ✅ **Leaderboard**
   - Page fully integrated with backend API

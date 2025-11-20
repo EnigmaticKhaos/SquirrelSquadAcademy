@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useQuery } from '@tanstack/react-query';
 import { badgesApi } from '@/lib/api';
@@ -50,18 +51,20 @@ export default function BadgesPage() {
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {data.data?.map((badge: BadgeType) => (
-                  <Card key={badge._id} hover className="text-center">
-                    <CardContent className="p-6">
-                      <div className="mb-4 flex justify-center">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800 text-4xl">
-                          {badge.icon || '🏅'}
+                  <Link key={badge._id} href={'/badges/' + badge._id}>
+                    <Card hover={true} className="text-center h-full">
+                      <CardContent className="p-6">
+                        <div className="mb-4 flex justify-center">
+                          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800 text-4xl">
+                            {badge.icon || '🏅'}
+                          </div>
                         </div>
-                      </div>
-                      <CardTitle className="mb-2 text-lg text-gray-100">{badge.name}</CardTitle>
-                      <p className="mb-4 text-sm text-gray-400">{badge.description}</p>
-                      <Badge variant="secondary">{badge.category}</Badge>
-                    </CardContent>
-                  </Card>
+                        <CardTitle className="mb-2 text-lg text-gray-100">{badge.name}</CardTitle>
+                        <p className="mb-4 text-sm text-gray-400 line-clamp-2">{badge.description}</p>
+                        <Badge variant="secondary">{badge.category}</Badge>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
 
