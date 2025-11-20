@@ -85,10 +85,10 @@ This document tracks the implementation status of features across the platform, 
   - Check if user can start before enrollment
   - Continue learning button for enrolled users
 
-- 🟡 **AI Path Generation**
-  - Page exists (`/learning-paths/generate`)
-  - Backend: AI generation service ready
-  - **Missing**: Form implementation, generation flow
+  - ✅ **AI Path Generation**
+    - `/learning-paths/generate` offers a multi-step form with presets, focus areas, and constraint inputs
+    - AI generation flow surfaces real-time status and previews the resulting path/milestones
+    - Direct linking into the generated learning path once creation succeeds
 
 ### Gamification
 - ✅ **Achievements**
@@ -210,10 +210,13 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete bundle system
   - **Missing**: Purchase flow, bundle comparison
 
-- 🟡 **Recommendations**
-  - Page exists
-  - Backend: AI recommendation service ready
-  - **Missing**: Recommendation display, personalization UI
+- ✅ **Recommendations**
+  - Page fully integrated with backend API
+  - Course recommendations with match scores and reasons
+  - Learning path recommendations with match scores and reasons
+  - Tabbed interface for courses and learning paths
+  - Personalized recommendations based on user learning history
+  - Empty states for when no recommendations are available
 
 ---
 
@@ -338,7 +341,7 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `codePlayground.ts` - Code Playground API
 - ❌ `studyTools.ts` - Study Tools API
 - ❌ `savedContent.ts` - Saved Content API
-- ❌ `recommendations.ts` - Recommendations API
+- ✅ `recommendations.ts` - Recommendations API (exists, hooks created)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -361,7 +364,7 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `useCodePlayground` - Code Playground hooks
 - ❌ `useStudyTools` - Study Tools hooks
 - ❌ `useSavedContent` - Saved Content hooks
-- ❌ `useRecommendations` - Recommendations hooks
+- ✅ `useRecommendations` - Recommendations hooks (created)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
