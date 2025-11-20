@@ -7,6 +7,7 @@ import { useCourse, useEnrollCourse } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
 import { Button, Card, CardContent, Rating, Badge, LoadingSpinner, ErrorMessage } from '@/components/ui';
 import { PageHeader, Breadcrumbs } from '@/components/layout';
+import { ReviewSection } from '@/components/courses/ReviewSection';
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -56,9 +57,9 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-gray-900">
       <Header />
-      <main className="flex-1 bg-gray-50">
+      <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <Breadcrumbs
             items={[
@@ -70,7 +71,8 @@ export default function CourseDetailPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+              <Card className="p-8">
+                <CardContent className="p-0">
                 {course.thumbnail && (
                   <img
                     src={course.thumbnail}
@@ -122,12 +124,17 @@ export default function CourseDetailPage() {
                     </div>
                   )}
                 </div>
-              </div>
+                </CardContent>
+              </Card>
+
+              {/* Reviews Section */}
+              <ReviewSection courseId={id} />
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="sticky top-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+              <Card className="sticky top-8 p-6">
+                <CardContent className="p-0">
                 {course.isFree ? (
                   <div className="mb-4">
                     <span className="text-2xl font-bold text-green-600">Free</span>
@@ -163,7 +170,8 @@ export default function CourseDetailPage() {
                     <span>Community support</span>
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

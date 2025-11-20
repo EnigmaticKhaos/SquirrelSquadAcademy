@@ -224,7 +224,7 @@ export interface Submission {
 export interface CourseReview {
   _id: string;
   course: string;
-  user: string;
+  user: string | User;
   rating: number;
   difficultyRating?: number;
   title?: string;
