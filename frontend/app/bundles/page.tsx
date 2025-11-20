@@ -17,7 +17,27 @@ export default function BundlesPage() {
   
   const { data, isLoading, error } = useQuery({
     queryKey: ['bundles', { page, search }],
-    queryFn: () => courseBundlesApi.getBundles({ page, limit: 12 }).then(res => res.data.data),
+    queryFn: async () => {
+      const response = await courseBundlesApi.getBundles({ 
+        page, 
+        limit: 12,
+        offset: (page - 1) * 12,
+        search: search || undefined,
+      });
+      const apiResponse = response.data;
+      // Transform to PaginatedResponse format for consistency
+      return {
+        data: apiResponse.bundles || [],
+        pagination: {
+          page,
+          limit: 12,
+          total: apiResponse.total || 0,
+          totalPages: Math.ceil((apiResponse.total || 0) / 12),
+          hasNext: page * 12 < (apiResponse.total || 0),
+          hasPrev: page > 1,
+        },
+      };
+    },
   });
 
   return (

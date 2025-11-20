@@ -57,14 +57,17 @@ export const courseReviewsApi = {
 
 export const courseBundlesApi = {
   // Get all bundles
-  getBundles: (params?: { page?: number; limit?: number; category?: string }) =>
-    api.get<ApiResponse<PaginatedResponse<CourseBundle>>>('/course-bundles', { params }),
+  getBundles: (params?: { page?: number; limit?: number; offset?: number; category?: string; search?: string; tags?: string[] }) =>
+    api.get<ApiResponse<{ bundles: CourseBundle[]; total: number; count: number }>>('/course-bundles', { params }),
   
   // Get single bundle
-  getBundle: (id: string) => api.get<ApiResponse<CourseBundle>>(`/course-bundles/${id}`),
+  getBundle: (id: string) => api.get<ApiResponse<{ bundle: CourseBundle; ownsBundle: boolean }>>(`/course-bundles/${id}`),
   
   // Purchase bundle
   purchaseBundle: (id: string) => api.post<ApiResponse<{ sessionId: string }>>(`/course-bundles/${id}/purchase`),
+  
+  // Check ownership
+  checkOwnership: (id: string) => api.get<ApiResponse<{ ownsBundle: boolean }>>(`/course-bundles/${id}/ownership`),
 };
 
 export const courseWaitlistApi = {
