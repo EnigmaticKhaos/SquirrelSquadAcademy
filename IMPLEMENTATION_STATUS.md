@@ -126,10 +126,13 @@ This document tracks the implementation status of features across the platform, 
   - **Missing**: Project creation, task management UI, member management
 
 ### Study Tools
-- 🟡 **Notes**
-  - Listing, detail (uses **MOCK DATA**), and create pages exist
-  - Backend: Complete note system
-  - **Missing**: API integration for detail page, note editing, note organization, search
+- ✅ **Notes**
+  - Listing page fully integrated with backend API
+  - Detail page fully integrated with backend API
+  - Create page fully integrated with backend API
+  - Edit page implemented
+  - Delete functionality implemented
+  - Search functionality available (API hooks created)
 
 - ✅ **Flashcards**
   - Listing page fully integrated with backend API
