@@ -98,10 +98,11 @@ This document tracks the implementation status of features across the platform, 
   - Real-time data from backend
 
 ### Social Features
-- 🟡 **Feed/Posts**
-  - Page exists (`/feed`)
-  - Backend: Complete post/comment system
-  - **Missing**: Post creation form, post interactions (like, comment), feed filtering
+- ✅ **Feed/Posts**
+  - Page fully integrated with backend API
+  - Post creation form implemented
+  - Post interactions (like, comment) implemented
+  - Comments modal with full functionality
 
 - 🟡 **Direct Messaging**
   - Listing and conversation pages exist
@@ -318,7 +319,6 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `useStudyTools` - Study Tools hooks
 - ❌ `useSavedContent` - Saved Content hooks
 - ❌ `useRecommendations` - Recommendations hooks
-- ❌ `useComments` - Comment hooks - API exists but no hooks
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
