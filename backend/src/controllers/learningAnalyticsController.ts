@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   startLearningSession,
   endLearningSession,
@@ -14,7 +16,14 @@ import {
 // @route   POST /api/analytics/sessions/start
 // @access  Private
 export const startSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, lessonId, moduleId, activityType } = req.body;
 
   if (!activityType) {
@@ -43,7 +52,14 @@ export const startSession = asyncHandler(async (req: Request, res: Response) => 
 // @access  Private
 export const endSession = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const session = await endLearningSession(id, userId);
 
@@ -65,7 +81,14 @@ export const endSession = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/analytics/learning
 // @access  Private
 export const getLearningAnalytics = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, startDate, endDate } = req.query;
 
   const analytics = await getUserLearningAnalytics(userId, {
@@ -85,7 +108,14 @@ export const getLearningAnalytics = asyncHandler(async (req: Request, res: Respo
 // @access  Private
 export const getCourseAnalyticsData = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const analytics = await getCourseAnalytics(userId, courseId);
 
@@ -99,7 +129,14 @@ export const getCourseAnalyticsData = asyncHandler(async (req: Request, res: Res
 // @route   GET /api/analytics/calendar
 // @access  Private
 export const getCalendar = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { year, month } = req.query;
 
   const currentDate = new Date();
@@ -120,7 +157,14 @@ export const getCalendar = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/analytics/performance
 // @access  Private
 export const getPerformance = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const metrics = await getPerformanceMetrics(userId);
 

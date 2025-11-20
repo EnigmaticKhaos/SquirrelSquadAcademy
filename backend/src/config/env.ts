@@ -32,6 +32,7 @@ export const config = {
   // Email (Resend)
   resendApiKey: process.env.RESEND_API_KEY || '',
   emailFrom: process.env.EMAIL_FROM || 'noreply@squirrelsquadacademy.com',
+  requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION !== 'false', // Default to true, set to 'false' to disable
   
   // OpenAI
   openaiApiKey: process.env.OPENAI_API_KEY || '',

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   getCourseBundles,
   getCourseBundle,
@@ -31,10 +33,20 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
     offset = 0,
   } = req.query;
 
+  // Convert tags to string array
+  let tagsArray: string[] | undefined;
+  if (tags) {
+    if (Array.isArray(tags)) {
+      tagsArray = tags.map((tag) => String(tag));
+    } else {
+      tagsArray = [String(tags)];
+    }
+  }
+
   const { bundles, total } = await getCourseBundles({
     isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
     category: category as string,
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     search: search as string,
     limit: Number(limit),
     offset: Number(offset),
@@ -53,7 +65,8 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 export const getOne = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user?._id?.toString();
+  const userDoc = req.user as unknown as (IUser & { _id: mongoose.Types.ObjectId }) | undefined;
+  const userId = userDoc?._id?.toString();
 
   const bundle = await getCourseBundle(id);
 
@@ -184,7 +197,14 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const purchase = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { stripePaymentIntentId, paymentStatus } = req.body;
 
   try {
@@ -211,7 +231,14 @@ export const purchase = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const checkOwnership = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const owns = await userOwnsBundle(userId, id);
 
@@ -225,7 +252,14 @@ export const checkOwnership = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/course-bundles/user/purchases
 // @access  Private
 export const getUserPurchases = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { limit = 50, offset = 0 } = req.query;
 
   const { purchases, total } = await getUserBundlePurchases(userId, {

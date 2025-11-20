@@ -1,4 +1,4 @@
-import CourseWaitlist from '../models/CourseWaitlist';
+import CourseWaitlist, { ICourseWaitlist } from '../models/CourseWaitlist';
 import Course from '../models/Course';
 import CourseEnrollment from '../models/CourseEnrollment';
 import User from '../models/User';
@@ -47,7 +47,7 @@ export const joinWaitlist = async (
   userId: string,
   courseId: string,
   expiresInDays?: number
-): Promise<CourseWaitlist> => {
+): Promise<ICourseWaitlist> => {
   try {
     const course = await Course.findById(courseId);
     if (!course) {
@@ -192,7 +192,7 @@ export const getCourseWaitlist = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ waitlist: CourseWaitlist[]; total: number }> => {
+): Promise<{ waitlist: ICourseWaitlist[]; total: number }> => {
   try {
     const query: any = { course: courseId };
 
@@ -227,7 +227,7 @@ export const getUserWaitlist = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ waitlist: CourseWaitlist[]; total: number }> => {
+): Promise<{ waitlist: ICourseWaitlist[]; total: number }> => {
   try {
     const query: any = { user: userId };
 

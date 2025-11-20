@@ -4,6 +4,7 @@ import { generateToken, JWTPayload } from '../utils/jwt';
 import { generateEmailVerificationToken, generatePasswordResetToken, hashToken } from '../utils/generateTokens';
 import { asyncHandler } from '../middleware/errorHandler';
 import logger from '../utils/logger';
+import { config } from '../config/env';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 
@@ -61,12 +62,29 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
   });
 
   // Send verification email
+  let emailSent = false;
   try {
     const { sendVerificationEmail } = await import('../services/email/emailService');
     await sendVerificationEmail(user.email, emailVerificationToken);
+    emailSent = true;
+    logger.info(`Verification email sent to ${user.email}`);
   } catch (error) {
     // Log error but don't fail registration
-    console.error('Error sending verification email:', error);
+    logger.error('Error sending verification email:', error);
+    
+    // In development mode, log the verification link to console
+    if (config.nodeEnv === 'development') {
+      const verificationUrl = `${config.frontendUrl}/verify-email/${emailVerificationToken}`;
+      logger.warn('='.repeat(80));
+      logger.warn('EMAIL SERVICE NOT CONFIGURED - Development Mode');
+      logger.warn('='.repeat(80));
+      logger.warn(`Verification link for ${user.email}:`);
+      logger.warn(verificationUrl);
+      logger.warn('='.repeat(80));
+      logger.warn('To enable email sending, set RESEND_API_KEY in your .env file');
+      logger.warn('See ENV_SETUP.md for instructions');
+      logger.warn('='.repeat(80));
+    }
   }
 
   // Generate token
@@ -78,7 +96,9 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 
   res.status(201).json({
     success: true,
-    message: 'User registered successfully. Please verify your email.',
+    message: emailSent 
+      ? 'User registered successfully. Please verify your email.' 
+      : 'User registered successfully. Please check your email for verification link (or check server logs in development mode).',
     token,
     user: {
       id: user._id,
@@ -86,6 +106,11 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
       username: user.username,
       isEmailVerified: user.isEmailVerified,
     },
+    // In development, include verification link if email wasn't sent
+    ...(config.nodeEnv === 'development' && !emailSent && {
+      verificationLink: `${config.frontendUrl}/verify-email/${emailVerificationToken}`,
+      note: 'Email service not configured. Use the verificationLink above to verify your email.',
+    }),
   });
 });
 
@@ -122,6 +147,16 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
     return res.status(401).json({
       success: false,
       message: 'Invalid credentials',
+    });
+  }
+
+  // Check if email is verified (if required)
+  if (config.requireEmailVerification && !user.isEmailVerified) {
+    return res.status(403).json({
+      success: false,
+      message: 'Please verify your email before logging in. Check your inbox for the verification link.',
+      requiresEmailVerification: true,
+      email: user.email,
     });
   }
 
@@ -212,6 +247,79 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response, next
   res.json({
     success: true,
     message: 'Email verified successfully',
+  });
+});
+
+// @desc    Resend verification email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+export const resendVerificationEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide an email',
+    });
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    // Don't reveal if user exists for security
+    return res.json({
+      success: true,
+      message: 'If an account exists and email is not verified, a verification email has been sent',
+    });
+  }
+
+  // Check if already verified
+  if (user.isEmailVerified) {
+    return res.json({
+      success: true,
+      message: 'Email is already verified',
+    });
+  }
+
+  // Generate new verification token
+  const emailVerificationToken = generateEmailVerificationToken();
+  const hashedToken = hashToken(emailVerificationToken);
+
+  user.emailVerificationToken = hashedToken;
+  await user.save();
+
+  // Send verification email
+  let emailSent = false;
+  try {
+    const { sendVerificationEmail } = await import('../services/email/emailService');
+    await sendVerificationEmail(user.email, emailVerificationToken);
+    emailSent = true;
+    logger.info(`Verification email resent to ${user.email}`);
+  } catch (error) {
+    logger.error('Error resending verification email:', error);
+    
+    // In development mode, log the verification link to console
+    if (config.nodeEnv === 'development') {
+      const verificationUrl = `${config.frontendUrl}/verify-email/${emailVerificationToken}`;
+      logger.warn('='.repeat(80));
+      logger.warn('EMAIL SERVICE NOT CONFIGURED - Development Mode');
+      logger.warn('='.repeat(80));
+      logger.warn(`Verification link for ${user.email}:`);
+      logger.warn(verificationUrl);
+      logger.warn('='.repeat(80));
+    }
+  }
+
+  res.json({
+    success: true,
+    message: emailSent 
+      ? 'Verification email sent. Please check your inbox.' 
+      : 'Verification email could not be sent. Check server logs in development mode.',
+    // In development, include verification link if email wasn't sent
+    ...(config.nodeEnv === 'development' && !emailSent && {
+      verificationLink: `${config.frontendUrl}/verify-email/${emailVerificationToken}`,
+      note: 'Email service not configured. Use the verificationLink above to verify your email.',
+    }),
   });
 });
 
@@ -326,11 +434,19 @@ export const getMe = asyncHandler(async (req: Request, res: Response, next: Next
     });
   }
 
-  const user = await User.findById(userDoc._id);
+  const user = await User.findById(userDoc._id)
+    .select('-password -emailVerificationToken -passwordResetToken -passwordResetExpires -twoFactorSecret -twoFactorBackupCodes');
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
 
   res.json({
     success: true,
-    user,
+    data: user, // Use 'data' to match ApiResponse format
   });
 });
 

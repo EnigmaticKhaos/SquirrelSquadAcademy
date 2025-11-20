@@ -1,5 +1,5 @@
 import LearningPath from '../models/LearningPath';
-import LearningPathProgress from '../models/LearningPathProgress';
+import LearningPathProgress, { ILearningPathProgress } from '../models/LearningPathProgress';
 import Course from '../models/Course';
 import CourseEnrollment from '../models/CourseEnrollment';
 import CourseCompletion from '../models/CourseCompletion';
@@ -66,7 +66,7 @@ export const canStartLearningPath = async (
 export const startLearningPath = async (
   userId: string,
   pathId: string
-): Promise<LearningPathProgress> => {
+): Promise<ILearningPathProgress> => {
   try {
     const canStart = await canStartLearningPath(userId, pathId);
     if (!canStart.canStart) {
@@ -121,7 +121,7 @@ export const startLearningPath = async (
 export const updateLearningPathProgress = async (
   userId: string,
   pathId: string
-): Promise<LearningPathProgress | null> => {
+): Promise<ILearningPathProgress | null> => {
   try {
     const path = await LearningPath.findById(pathId);
     if (!path) {
@@ -191,8 +191,8 @@ export const updateLearningPathProgress = async (
     }
 
     // Check if path is completed
-    if (progressPercentage === 100 && progress.status !== 'completed') {
-      progress.status = 'completed';
+    if (progressPercentage === 100 && (progress.status !== 'completed' as any)) {
+      progress.status = 'completed' as any;
       progress.completedAt = new Date();
       progress.currentCourseIndex = totalCourses;
 
@@ -255,7 +255,7 @@ export const updateLearningPathProgress = async (
 export const getLearningPathProgress = async (
   userId: string,
   pathId: string
-): Promise<LearningPathProgress | null> => {
+): Promise<ILearningPathProgress | null> => {
   try {
     return await LearningPathProgress.findOne({
       user: userId,
@@ -277,7 +277,7 @@ export const getUserLearningPaths = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ paths: LearningPathProgress[]; total: number }> => {
+): Promise<{ paths: ILearningPathProgress[]; total: number }> => {
   try {
     const query: any = { user: userId };
     if (options?.status) {
@@ -305,7 +305,7 @@ export const getUserLearningPaths = async (
 export const toggleLearningPathStatus = async (
   userId: string,
   pathId: string
-): Promise<LearningPathProgress | null> => {
+): Promise<ILearningPathProgress | null> => {
   try {
     const progress = await LearningPathProgress.findOne({
       user: userId,

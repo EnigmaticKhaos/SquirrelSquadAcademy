@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { config } from '../../config/env';
 import Course from '../../models/Course';
-import LearningPath from '../../models/LearningPath';
+import LearningPath, { ILearningPath } from '../../models/LearningPath';
 import logger from '../../utils/logger';
 
 const openai = new OpenAI({
@@ -17,7 +17,7 @@ export const generateLearningPath = async (data: {
   learningStyle?: string;
   timeCommitment?: string;
   interests?: string[];
-}): Promise<LearningPath | null> => {
+}): Promise<ILearningPath | null> => {
   try {
     // Find relevant courses
     const courseQuery: any = { status: 'published' };

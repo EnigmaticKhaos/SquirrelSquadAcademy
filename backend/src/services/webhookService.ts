@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import axios from 'axios';
-import Webhook from '../models/Webhook';
+import Webhook, { WebhookEventType } from '../models/Webhook';
 import logger from '../utils/logger';
 
 /**
@@ -190,7 +190,7 @@ export const updateWebhook = async (
     }
 
     if (updates.url) webhook.url = updates.url;
-    if (updates.eventTypes) webhook.eventTypes = updates.eventTypes;
+    if (updates.eventTypes) webhook.eventTypes = updates.eventTypes as WebhookEventType[];
     if (updates.status) webhook.status = updates.status as any;
     if (updates.retryOnFailure !== undefined) webhook.retryOnFailure = updates.retryOnFailure;
     if (updates.maxRetries !== undefined) webhook.maxRetries = updates.maxRetries;

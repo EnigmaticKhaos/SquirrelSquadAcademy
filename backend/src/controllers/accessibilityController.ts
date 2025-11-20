@@ -1,12 +1,21 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import User from '../models/User';
+import { IUser } from '../models/User';
 
 // @desc    Get user accessibility preferences
 // @route   GET /api/accessibility/preferences
 // @access  Private
 export const getAccessibilityPreferences = asyncHandler(async (req: Request, res: Response) => {
-  const user = await User.findById(req.user._id).select('accessibilityPreferences');
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const user = await User.findById(userDoc._id).select('accessibilityPreferences');
 
   if (!user) {
     return res.status(404).json({
@@ -25,7 +34,14 @@ export const getAccessibilityPreferences = asyncHandler(async (req: Request, res
 // @route   PUT /api/accessibility/preferences
 // @access  Private
 export const updateAccessibilityPreferences = asyncHandler(async (req: Request, res: Response) => {
-  const user = await User.findById(req.user._id);
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const user = await User.findById(userDoc._id);
 
   if (!user) {
     return res.status(404).json({
@@ -96,7 +112,14 @@ export const updateAccessibilityPreferences = asyncHandler(async (req: Request, 
 // @route   POST /api/accessibility/preferences/reset
 // @access  Private
 export const resetAccessibilityPreferences = asyncHandler(async (req: Request, res: Response) => {
-  const user = await User.findById(req.user._id);
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const user = await User.findById(userDoc._id);
 
   if (!user) {
     return res.status(404).json({

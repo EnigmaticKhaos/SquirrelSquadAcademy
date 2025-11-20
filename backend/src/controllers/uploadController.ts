@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import { uploadImage as uploadImageToCloudinary, deleteImage as deleteImageFromCloudinary } from '../services/cloudinaryService';
 import { uploadVideo as uploadVideoToCloudinary, deleteVideo as deleteVideoFromCloudinary } from '../services/cloudinaryService';
 import { uploadFile as uploadFileToS3, deleteFile as deleteFileFromS3, getSignedFileUrl } from '../services/s3Service';
@@ -126,6 +128,14 @@ export const uploadDocument = asyncHandler(async (req: Request, res: Response) =
   }
 
   try {
+    const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+    if (!userDoc || !userDoc._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized',
+      });
+    }
+
     const { folder, metadata } = req.body;
     const folderPath = folder ? `squirrelsquadacademy/documents/${folder}` : 'squirrelsquadacademy/documents';
 
@@ -137,7 +147,7 @@ export const uploadDocument = asyncHandler(async (req: Request, res: Response) =
       folder: folderPath,
       contentType: req.file.mimetype,
       metadata: {
-        uploadedBy: req.user._id.toString(),
+        uploadedBy: userDoc._id.toString(),
         ...parsedMetadata,
       },
     });
@@ -181,6 +191,14 @@ export const uploadCode = asyncHandler(async (req: Request, res: Response) => {
   }
 
   try {
+    const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+    if (!userDoc || !userDoc._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized',
+      });
+    }
+
     const { folder, metadata } = req.body;
     const folderPath = folder ? `squirrelsquadacademy/code/${folder}` : 'squirrelsquadacademy/code';
 
@@ -192,7 +210,7 @@ export const uploadCode = asyncHandler(async (req: Request, res: Response) => {
       folder: folderPath,
       contentType: req.file.mimetype,
       metadata: {
-        uploadedBy: req.user._id.toString(),
+        uploadedBy: userDoc._id.toString(),
         ...parsedMetadata,
       },
     });

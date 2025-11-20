@@ -1,4 +1,4 @@
-import CollaborativeProject, { ProjectStatus, ProjectRole } from '../models/CollaborativeProject';
+import CollaborativeProject, { ICollaborativeProject, ProjectStatus, ProjectRole } from '../models/CollaborativeProject';
 import User from '../models/User';
 import Course from '../models/Course';
 import Assignment from '../models/Assignment';
@@ -22,7 +22,7 @@ export const createProject = async (
       requireApprovalForJoining?: boolean;
     };
   }
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     // Verify course/assignment if provided
     if (data.courseId) {
@@ -106,7 +106,7 @@ export const inviteUser = async (
     }
 
     // Add member
-    project.members.push({
+    (project.members as any).push({
       user: userId as any,
       role,
       joinedAt: new Date(),
@@ -142,7 +142,7 @@ export const inviteUser = async (
 export const joinProject = async (
   projectId: string,
   userId: string
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -173,7 +173,7 @@ export const joinProject = async (
     }
 
     // Add member
-    project.members.push({
+    (project.members as any).push({
       user: userId as any,
       role: 'member',
       joinedAt: new Date(),
@@ -237,7 +237,7 @@ export const updateProject = async (
     maxMembers: number;
     settings: any;
   }>
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -287,7 +287,7 @@ export const addTask = async (
     priority?: 'low' | 'medium' | 'high';
     dueDate?: Date;
   }
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -346,7 +346,7 @@ export const updateTask = async (
     priority: 'low' | 'medium' | 'high';
     dueDate: Date;
   }>
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -359,7 +359,7 @@ export const updateTask = async (
       throw new Error('You do not have permission to update tasks');
     }
 
-    const task = project.tasks.id(taskId);
+    const task = (project.tasks as any).id(taskId);
     if (!task) {
       throw new Error('Task not found');
     }
@@ -396,7 +396,7 @@ export const addDiscussionMessage = async (
   userId: string,
   content: string,
   replyToId?: string
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -411,7 +411,7 @@ export const addDiscussionMessage = async (
 
     if (replyToId) {
       // Add reply
-      const parentMessage = project.discussion.id(replyToId);
+      const parentMessage = (project.discussion as any).id(replyToId);
       if (!parentMessage) {
         throw new Error('Parent message not found');
       }
@@ -471,7 +471,7 @@ export const addResource = async (
     fileKey?: string;
     description?: string;
   }
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -517,7 +517,7 @@ export const submitDeliverable = async (
     url?: string;
     fileKey?: string;
   }
-): Promise<CollaborativeProject> => {
+): Promise<ICollaborativeProject> => {
   try {
     const project = await CollaborativeProject.findById(projectId);
     if (!project) {
@@ -578,7 +578,7 @@ export const getUserProjects = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ projects: CollaborativeProject[]; total: number }> => {
+): Promise<{ projects: ICollaborativeProject[]; total: number }> => {
   try {
     const query: any = {
       $or: [
@@ -619,7 +619,7 @@ export const getUserProjects = async (
 export const getProject = async (
   projectId: string,
   userId?: string
-): Promise<CollaborativeProject | null> => {
+): Promise<ICollaborativeProject | null> => {
   try {
     const project = await CollaborativeProject.findById(projectId)
       .populate('owner', 'username profilePhoto')

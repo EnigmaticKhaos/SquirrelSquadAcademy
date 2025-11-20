@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   createWebhook,
   updateWebhook,
@@ -11,7 +13,14 @@ import {
 // @route   POST /api/webhooks
 // @access  Private
 export const createWebhookHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { url, eventTypes, retryOnFailure, maxRetries, retryDelay } = req.body;
 
   if (!url || !eventTypes || !Array.isArray(eventTypes)) {
@@ -38,7 +47,14 @@ export const createWebhookHandler = asyncHandler(async (req: Request, res: Respo
 // @route   GET /api/webhooks
 // @access  Private
 export const getUserWebhooksHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const webhooks = await getUserWebhooks(userId);
 
@@ -52,7 +68,14 @@ export const getUserWebhooksHandler = asyncHandler(async (req: Request, res: Res
 // @route   PUT /api/webhooks/:id
 // @access  Private
 export const updateWebhookHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { url, eventTypes, status, retryOnFailure, maxRetries, retryDelay } = req.body;
 
@@ -76,7 +99,14 @@ export const updateWebhookHandler = asyncHandler(async (req: Request, res: Respo
 // @route   DELETE /api/webhooks/:id
 // @access  Private
 export const deleteWebhookHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await deleteWebhook(id, userId);

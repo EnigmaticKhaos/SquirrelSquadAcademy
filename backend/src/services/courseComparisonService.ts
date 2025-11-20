@@ -4,6 +4,36 @@ import CourseEnrollment from '../models/CourseEnrollment';
 import CourseCompletion from '../models/CourseCompletion';
 import logger from '../utils/logger';
 
+interface CourseComparisonItem {
+  course: {
+    _id: any;
+    title: string;
+    description: string;
+    courseType: string;
+    difficulty: string;
+    estimatedDuration: number;
+    tags: string[];
+    category?: string;
+    thumbnail?: string;
+    isFree: boolean;
+    price?: number;
+    currency?: string;
+  };
+  statistics: {
+    enrollmentCount: number;
+    completionCount: number;
+    passCount: number;
+    reviewCount: number;
+    averageRating: number;
+    ratingDistribution: { [key: number]: number };
+    averageDifficulty: number | null;
+    completionRate: number;
+    totalModules: number;
+    totalLessons: number;
+    totalAssignments: number;
+  };
+}
+
 /**
  * Compare multiple courses
  */
@@ -166,40 +196,35 @@ export const getComparisonSummary = async (
   try {
     const comparison = await compareCourses(courseIds);
 
+    const paidCourses = comparison.courses.filter((c: CourseComparisonItem) => !c.course.isFree);
+    const paidPrices = paidCourses.map((c: CourseComparisonItem) => c.course.price || 0);
+
     const summary = {
       totalCourses: comparison.courses.length,
       priceRange: {
-        min: Math.min(
-          ...comparison.courses
-            .filter((c) => !c.course.isFree)
-            .map((c) => c.course.price || 0)
-        ),
-        max: Math.max(
-          ...comparison.courses
-            .filter((c) => !c.course.isFree)
-            .map((c) => c.course.price || 0)
-        ),
-        freeCount: comparison.courses.filter((c) => c.course.isFree).length,
+        min: paidPrices.length > 0 ? Math.min(...paidPrices) : 0,
+        max: paidPrices.length > 0 ? Math.max(...paidPrices) : 0,
+        freeCount: comparison.courses.filter((c: CourseComparisonItem) => c.course.isFree).length,
       },
       ratingRange: {
-        min: Math.min(...comparison.courses.map((c) => c.statistics.averageRating)),
-        max: Math.max(...comparison.courses.map((c) => c.statistics.averageRating)),
+        min: Math.min(...comparison.courses.map((c: CourseComparisonItem) => c.statistics.averageRating)),
+        max: Math.max(...comparison.courses.map((c: CourseComparisonItem) => c.statistics.averageRating)),
       },
       durationRange: {
-        min: Math.min(...comparison.courses.map((c) => c.course.estimatedDuration)),
-        max: Math.max(...comparison.courses.map((c) => c.course.estimatedDuration)),
+        min: Math.min(...comparison.courses.map((c: CourseComparisonItem) => c.course.estimatedDuration)),
+        max: Math.max(...comparison.courses.map((c: CourseComparisonItem) => c.course.estimatedDuration)),
       },
       totalEnrollments: comparison.courses.reduce(
-        (sum, c) => sum + c.statistics.enrollmentCount,
+        (sum: number, c: CourseComparisonItem) => sum + c.statistics.enrollmentCount,
         0
       ),
       totalReviews: comparison.courses.reduce(
-        (sum, c) => sum + c.statistics.reviewCount,
+        (sum: number, c: CourseComparisonItem) => sum + c.statistics.reviewCount,
         0
       ),
-      courseTypes: [...new Set(comparison.courses.map((c) => c.course.courseType))],
-      difficulties: [...new Set(comparison.courses.map((c) => c.course.difficulty))],
-      categories: [...new Set(comparison.courses.map((c) => c.course.category).filter(Boolean))],
+      courseTypes: [...new Set(comparison.courses.map((c: CourseComparisonItem) => c.course.courseType))],
+      difficulties: [...new Set(comparison.courses.map((c: CourseComparisonItem) => c.course.difficulty))],
+      categories: [...new Set(comparison.courses.map((c: CourseComparisonItem) => c.course.category).filter(Boolean))],
     };
 
     return {

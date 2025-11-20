@@ -1,4 +1,4 @@
-import Note from '../models/Note';
+import Note, { INote } from '../models/Note';
 import Lesson from '../models/Lesson';
 import Course from '../models/Course';
 import logger from '../utils/logger';
@@ -26,7 +26,7 @@ export const createNote = async (
     tags?: string[];
     isPinned?: boolean;
   }
-): Promise<Note> => {
+): Promise<INote> => {
   try {
     // Verify lesson and course exist
     const lesson = await Lesson.findById(data.lessonId);
@@ -76,7 +76,7 @@ export const updateNote = async (
     isPinned?: boolean;
     highlightColor?: string;
   }
-): Promise<Note | null> => {
+): Promise<INote | null> => {
   try {
     const note = await Note.findOneAndUpdate(
       { _id: noteId, user: userId },
@@ -127,7 +127,7 @@ export const deleteNote = async (
 export const getLessonNotes = async (
   userId: string,
   lessonId: string
-): Promise<Note[]> => {
+): Promise<INote[]> => {
   try {
     return await Note.find({
       user: userId,
@@ -153,7 +153,7 @@ export const getCourseNotes = async (
     isHighlight?: boolean;
     isPinned?: boolean;
   }
-): Promise<Note[]> => {
+): Promise<INote[]> => {
   try {
     const query: any = {
       user: userId,
@@ -195,7 +195,7 @@ export const getUserNotes = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ notes: Note[]; total: number }> => {
+): Promise<{ notes: INote[]; total: number }> => {
   try {
     const query: any = { user: userId };
 
@@ -237,7 +237,7 @@ export const getUserNotes = async (
 export const getNoteById = async (
   noteId: string,
   userId: string
-): Promise<Note | null> => {
+): Promise<INote | null> => {
   try {
     return await Note.findOne({
       _id: noteId,
@@ -279,7 +279,7 @@ export const searchNotes = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ notes: Note[]; total: number }> => {
+): Promise<{ notes: INote[]; total: number }> => {
   try {
     const query: any = {
       user: userId,
@@ -324,7 +324,7 @@ export const searchNotes = async (
 export const togglePinNote = async (
   noteId: string,
   userId: string
-): Promise<Note | null> => {
+): Promise<INote | null> => {
   try {
     const note = await Note.findOne({ _id: noteId, user: userId });
     if (!note) {

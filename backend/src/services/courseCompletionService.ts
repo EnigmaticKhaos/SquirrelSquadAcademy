@@ -1,5 +1,6 @@
+import mongoose from 'mongoose';
 import CourseEnrollment from '../models/CourseEnrollment';
-import CourseCompletion from '../models/CourseCompletion';
+import CourseCompletion, { ICourseCompletion } from '../models/CourseCompletion';
 import Course from '../models/Course';
 import Assignment from '../models/Assignment';
 import Submission from '../models/Submission';
@@ -133,7 +134,7 @@ export const calculateCourseProgress = async (
 export const completeCourse = async (
   userId: string,
   courseId: string
-): Promise<CourseCompletion | null> => {
+): Promise<ICourseCompletion | null> => {
   try {
     const enrollment = await CourseEnrollment.findOne({
       user: userId,
@@ -205,7 +206,7 @@ export const completeCourse = async (
     enrollment.progressPercentage = 100;
     enrollment.finalScore = finalScore;
     enrollment.passed = passed;
-    enrollment.completedAssignments = progress.completedAssignments;
+    enrollment.completedAssignments = progress.completedAssignments.map(id => new mongoose.Types.ObjectId(id)) as any;
     await enrollment.save();
 
     // Create completion record
@@ -350,7 +351,7 @@ export const completeCourse = async (
 export const getCourseCompletion = async (
   userId: string,
   courseId: string
-): Promise<CourseCompletion | null> => {
+): Promise<ICourseCompletion | null> => {
   try {
     const enrollment = await CourseEnrollment.findOne({
       user: userId,

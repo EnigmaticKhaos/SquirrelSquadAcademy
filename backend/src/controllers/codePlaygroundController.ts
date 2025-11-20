@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   saveCodeSnippet,
   updateCodeSnippet,
@@ -18,7 +20,14 @@ import Course from '../models/Course';
 // @route   POST /api/playground/snippets
 // @access  Private
 export const saveSnippet = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { code, language, title, courseId, lessonId, assignmentId, isPublic, tags, description } = req.body;
 
   if (!code || !language) {
@@ -68,7 +77,14 @@ export const saveSnippet = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const updateSnippet = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { code, language, title, isPublic, tags, description } = req.body;
 
   const snippet = await updateCodeSnippet(id, userId, {
@@ -91,7 +107,14 @@ export const updateSnippet = asyncHandler(async (req: Request, res: Response) =>
 // @access  Private
 export const deleteSnippet = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   await deleteCodeSnippet(id, userId);
 
@@ -105,7 +128,14 @@ export const deleteSnippet = asyncHandler(async (req: Request, res: Response) =>
 // @route   GET /api/playground/snippets
 // @access  Private
 export const getMySnippets = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, lessonId, assignmentId, language, limit = 50, offset = 0 } = req.query;
 
   const { snippets, total } = await getUserSnippets(userId, {
@@ -151,7 +181,8 @@ export const getPublicSnippetsHandler = asyncHandler(async (req: Request, res: R
 // @access  Private/Public (depending on snippet visibility)
 export const getSnippet = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user?._id?.toString();
+  const userDoc = req.user as unknown as (IUser & { _id: mongoose.Types.ObjectId }) | undefined;
+  const userId = userDoc?._id?.toString();
 
   const snippet = await getCodeSnippet(id, userId);
 
@@ -166,7 +197,14 @@ export const getSnippet = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const executeSnippet = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { stdin } = req.body;
 
   const snippet = await executeAndSave(id, userId, stdin);

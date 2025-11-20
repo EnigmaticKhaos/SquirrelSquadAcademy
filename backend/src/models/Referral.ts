@@ -59,14 +59,12 @@ const referralSchema = new Schema<IReferral>(
       type: String,
       required: true,
       unique: true,
-      index: true,
       uppercase: true,
       trim: true,
     },
     referredUser: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     status: {
       type: String,
@@ -125,7 +123,7 @@ const referralSchema = new Schema<IReferral>(
 // Indexes
 referralSchema.index({ referrer: 1, status: 1 });
 referralSchema.index({ referredUser: 1 });
-referralSchema.index({ code: 1 }, { unique: true });
+// code already has unique: true which creates an index automatically
 referralSchema.index({ expiresAt: 1, status: 1 });
 
 export default mongoose.model<IReferral>('Referral', referralSchema);

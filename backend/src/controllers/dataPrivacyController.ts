@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   exportUserData,
   deleteUserAccount,
@@ -18,7 +20,14 @@ import User from '../models/User';
 // @route   POST /api/privacy/export
 // @access  Private
 export const exportUserDataHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const {
     format,
     includeProfile,
@@ -51,7 +60,14 @@ export const exportUserDataHandler = asyncHandler(async (req: Request, res: Resp
 // @route   GET /api/privacy/export/:id
 // @access  Private
 export const getExportStatus = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const dataExport = await DataExport.findOne({
@@ -76,7 +92,14 @@ export const getExportStatus = asyncHandler(async (req: Request, res: Response) 
 // @route   GET /api/privacy/exports
 // @access  Private
 export const getExportHistory = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const exports = await DataExport.find({ user: userId })
     .sort({ requestedAt: -1 })
@@ -92,7 +115,14 @@ export const getExportHistory = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/privacy/account/deletion-request
 // @access  Private
 export const requestAccountDeletionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { password, deletionDelayDays } = req.body;
 
   if (!password) {
@@ -131,7 +161,14 @@ export const requestAccountDeletionHandler = asyncHandler(async (req: Request, r
 // @route   POST /api/privacy/account/cancel-deletion
 // @access  Private
 export const cancelAccountDeletionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   await cancelAccountDeletion(userId);
 
@@ -145,7 +182,14 @@ export const cancelAccountDeletionHandler = asyncHandler(async (req: Request, re
 // @route   DELETE /api/privacy/account
 // @access  Private
 export const deleteAccountHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { password, confirm } = req.body;
 
   // Require password and confirmation
@@ -185,8 +229,9 @@ export const deleteAccountHandler = asyncHandler(async (req: Request, res: Respo
 // @route   POST /api/privacy/cookie-consent
 // @access  Public
 export const saveCookieConsentHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user?._id?.toString();
-  const sessionId = req.body.sessionId || req.sessionID;
+  const userDoc = req.user as unknown as (IUser & { _id: mongoose.Types.ObjectId }) | undefined;
+  const userId = userDoc?._id?.toString();
+  const sessionId = req.body.sessionId || (req as any).sessionID;
   const { necessary, functional, analytics, marketing } = req.body;
 
   if (necessary === undefined) {
@@ -220,8 +265,9 @@ export const saveCookieConsentHandler = asyncHandler(async (req: Request, res: R
 // @route   GET /api/privacy/cookie-consent
 // @access  Public
 export const getCookieConsent = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user?._id?.toString();
-  const sessionId = req.query.sessionId as string || req.sessionID;
+  const userDoc = req.user as unknown as (IUser & { _id: mongoose.Types.ObjectId }) | undefined;
+  const userId = userDoc?._id?.toString();
+  const sessionId = req.query.sessionId as string || (req as any).sessionID;
 
   let consent = null;
 
@@ -248,7 +294,14 @@ export const getCookieConsent = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/privacy/privacy-policy/accept
 // @access  Private
 export const acceptPrivacyPolicyHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { version } = req.body;
 
   if (!version) {
@@ -270,7 +323,14 @@ export const acceptPrivacyPolicyHandler = asyncHandler(async (req: Request, res:
 // @route   PUT /api/privacy/data-processing-consent
 // @access  Private
 export const updateDataProcessingConsentHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { consented } = req.body;
 
   if (typeof consented !== 'boolean') {
@@ -292,7 +352,14 @@ export const updateDataProcessingConsentHandler = asyncHandler(async (req: Reque
 // @route   PUT /api/privacy/marketing-consent
 // @access  Private
 export const updateMarketingConsentHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { consented } = req.body;
 
   if (typeof consented !== 'boolean') {
@@ -314,7 +381,14 @@ export const updateMarketingConsentHandler = asyncHandler(async (req: Request, r
 // @route   GET /api/privacy/settings
 // @access  Private
 export const getPrivacySettings = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const user = await User.findById(userId).select(
     'privacyPolicyAccepted privacyPolicyAcceptedAt privacyPolicyVersion ' +

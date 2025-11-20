@@ -7,6 +7,7 @@ import {
   updateCourse,
   deleteCourse,
   enrollInCourse,
+  getEnrolledCourses,
   publishCourse,
   setComingSoon,
   startTestSession,
@@ -19,6 +20,7 @@ import lessonRoutes from './lessonRoutes';
 const router = express.Router();
 
 router.get('/', getCourses);
+router.get('/enrolled', protect, getEnrolledCourses);
 router.get('/:id', getCourse);
 router.post('/:id/enroll', protect, enrollInCourse);
 

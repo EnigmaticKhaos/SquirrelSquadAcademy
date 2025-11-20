@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createReferralCode,
   useReferralCode,
@@ -14,7 +16,14 @@ import {
 // @route   GET /api/referrals/code
 // @access  Private
 export const getReferralCode = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const referral = await getUserReferralCode(userId);
 
@@ -42,7 +51,14 @@ export const getReferralCode = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const useReferral = asyncHandler(async (req: Request, res: Response) => {
   const { code } = req.body;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   if (!code) {
     return res.status(400).json({
@@ -68,7 +84,14 @@ export const useReferral = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/referrals/stats
 // @access  Private
 export const getReferralStats = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const stats = await getUserReferralStats(userId);
 
@@ -82,7 +105,14 @@ export const getReferralStats = asyncHandler(async (req: Request, res: Response)
 // @route   GET /api/referrals
 // @access  Private
 export const getReferrals = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { status, limit = 50, offset = 0 } = req.query;
 
   const { referrals, total } = await getUserReferrals(userId, {
@@ -103,7 +133,14 @@ export const getReferrals = asyncHandler(async (req: Request, res: Response) => 
 // @route   POST /api/referrals/create
 // @access  Private
 export const createCustomReferral = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const {
     referrerReward,
     referredReward,

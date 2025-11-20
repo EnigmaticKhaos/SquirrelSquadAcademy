@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   joinWaitlist,
   leaveWaitlist,
@@ -19,7 +21,14 @@ import Course from '../models/Course';
 // @access  Private
 export const join = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { expiresInDays } = req.body;
 
   try {
@@ -43,7 +52,14 @@ export const join = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const leave = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   try {
     await leaveWaitlist(userId, courseId);
@@ -65,7 +81,14 @@ export const leave = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getPosition = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const position = await getWaitlistPosition(userId, courseId);
 
@@ -107,7 +130,14 @@ export const getWaitlist = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/course-waitlist/user/entries
 // @access  Private
 export const getUserEntries = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { status, limit = 50, offset = 0 } = req.query;
 
   const { waitlist, total } = await getUserWaitlist(userId, {
@@ -129,7 +159,8 @@ export const getUserEntries = asyncHandler(async (req: Request, res: Response) =
 // @access  Public
 export const getStatus = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user?._id?.toString();
+  const userDoc = req.user as unknown as (IUser & { _id: mongoose.Types.ObjectId }) | undefined;
+  const userId = userDoc?._id?.toString();
 
   const course = await Course.findById(courseId);
   if (!course) {

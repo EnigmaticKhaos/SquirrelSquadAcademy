@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createProject,
   inviteUser,
@@ -20,7 +22,14 @@ import {
 // @route   POST /api/projects/collaborative
 // @access  Private
 export const createCollaborativeProject = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, description, courseId, assignmentId, maxMembers, settings } = req.body;
 
   if (!title || !description) {
@@ -50,7 +59,14 @@ export const createCollaborativeProject = asyncHandler(async (req: Request, res:
 // @route   GET /api/projects/collaborative
 // @access  Private
 export const getProjects = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { status, courseId, limit = 50, offset = 0 } = req.query;
 
   const { projects, total } = await getUserProjects(userId, {
@@ -73,7 +89,14 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getProjectById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const project = await getProject(id, userId);
 
@@ -95,7 +118,14 @@ export const getProjectById = asyncHandler(async (req: Request, res: Response) =
 // @access  Private
 export const updateCollaborativeProject = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const updates = req.body;
 
   const project = await updateProject(id, userId, updates);
@@ -112,7 +142,14 @@ export const updateCollaborativeProject = asyncHandler(async (req: Request, res:
 // @access  Private
 export const inviteUserToProject = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const inviterId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const inviterId = userDoc._id.toString();
   const { userId, role } = req.body;
 
   if (!userId) {
@@ -135,7 +172,14 @@ export const inviteUserToProject = asyncHandler(async (req: Request, res: Respon
 // @access  Private
 export const joinCollaborativeProject = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const project = await joinProject(id, userId);
 
@@ -151,7 +195,14 @@ export const joinCollaborativeProject = asyncHandler(async (req: Request, res: R
 // @access  Private
 export const leaveCollaborativeProject = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   await leaveProject(id, userId);
 
@@ -166,7 +217,14 @@ export const leaveCollaborativeProject = asyncHandler(async (req: Request, res: 
 // @access  Private
 export const addProjectTask = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, description, assignedTo, priority, dueDate } = req.body;
 
   if (!title) {
@@ -196,7 +254,14 @@ export const addProjectTask = asyncHandler(async (req: Request, res: Response) =
 // @access  Private
 export const updateProjectTask = asyncHandler(async (req: Request, res: Response) => {
   const { id, taskId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const updates = req.body;
 
   const project = await updateTask(id, taskId, userId, {
@@ -216,7 +281,14 @@ export const updateProjectTask = asyncHandler(async (req: Request, res: Response
 // @access  Private
 export const addProjectDiscussion = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { content, replyToId } = req.body;
 
   if (!content) {
@@ -240,7 +312,14 @@ export const addProjectDiscussion = asyncHandler(async (req: Request, res: Respo
 // @access  Private
 export const addProjectResource = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { type, title, url, fileKey, description } = req.body;
 
   if (!type || !title) {
@@ -270,7 +349,14 @@ export const addProjectResource = asyncHandler(async (req: Request, res: Respons
 // @access  Private
 export const submitProjectDeliverable = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, description, type, url, fileKey } = req.body;
 
   if (!title || !type) {

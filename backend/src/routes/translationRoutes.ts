@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect, admin } from '../middleware/auth';
+import { protect, authorize } from '../middleware/auth';
 import {
   getLanguages,
   getDefaultLanguageHandler,
@@ -24,12 +24,12 @@ router.get('/translations/:contentType/:contentId/:language', getTranslationHand
 router.get('/translations/:contentType/:contentId', protect, getContentTranslationsHandler);
 
 // Admin routes
-router.post('/translate', protect, admin, translateContentHandler);
-router.post('/translations', protect, admin, createTranslationHandler);
-router.post('/translations/:id/review', protect, admin, reviewTranslationHandler);
-router.post('/translations/:id/publish', protect, admin, publishTranslation);
-router.get('/statistics', protect, admin, getTranslationStatistics);
-router.post('/initialize-languages', protect, admin, initializeLanguages);
+router.post('/translate', protect, authorize('admin'), translateContentHandler);
+router.post('/translations', protect, authorize('admin'), createTranslationHandler);
+router.post('/translations/:id/review', protect, authorize('admin'), reviewTranslationHandler);
+router.post('/translations/:id/publish', protect, authorize('admin'), publishTranslation);
+router.get('/statistics', protect, authorize('admin'), getTranslationStatistics);
+router.post('/initialize-languages', protect, authorize('admin'), initializeLanguages);
 
 export default router;
 

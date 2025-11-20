@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
 import {
@@ -20,7 +22,14 @@ import {
 // @access  Private
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { type, title, content, parentPostId, tags } = req.body;
 
   if (!title || !content) {
@@ -61,10 +70,12 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
     offset = 0,
   } = req.query;
 
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
+
   const { posts, total } = await getCourseForumPosts(courseId, {
     type: type as 'question' | 'discussion' | 'announcement',
     parentPostId: parentPostId === 'null' ? null : parentPostId as string,
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     search: search as string,
     sortBy: sortBy as any,
     limit: Number(limit),
@@ -133,7 +144,14 @@ export const getReplies = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, content, tags, isPinned, isLocked } = req.body;
 
   const post = await updateForumPost(id, userId, {
@@ -163,7 +181,14 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const deleted = await deleteForumPost(id, userId);
 
@@ -185,7 +210,14 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const vote = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { voteType } = req.body;
 
   if (!voteType || !['upvote', 'downvote'].includes(voteType)) {
@@ -215,7 +247,14 @@ export const vote = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const markAnswer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { isAnswer = true } = req.body;
 
   const result = await markAsAnswer(id, userId, isAnswer);
@@ -238,7 +277,14 @@ export const markAnswer = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const pin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const post = await togglePinPost(id, userId);
 
@@ -261,7 +307,14 @@ export const pin = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const lock = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const post = await toggleLockPost(id, userId);
 
@@ -283,7 +336,14 @@ export const lock = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/forums/activity
 // @access  Private
 export const getActivity = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId } = req.query;
 
   const activity = await getUserForumActivity(userId, courseId as string);

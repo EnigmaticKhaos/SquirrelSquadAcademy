@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   subscribeToPush,
   unsubscribeFromPush,
@@ -38,7 +40,14 @@ export const getVapidPublicKeyHandler = asyncHandler(async (req: Request, res: R
 // @route   POST /api/pwa/push/subscribe
 // @access  Private
 export const subscribeToPushHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { subscription, userAgent, deviceType, browser, os } = req.body;
 
   if (!subscription || !subscription.endpoint || !subscription.keys) {
@@ -68,7 +77,14 @@ export const subscribeToPushHandler = asyncHandler(async (req: Request, res: Res
 // @route   POST /api/pwa/push/unsubscribe
 // @access  Private
 export const unsubscribeFromPushHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { endpoint } = req.body;
 
   if (!endpoint) {
@@ -90,7 +106,14 @@ export const unsubscribeFromPushHandler = asyncHandler(async (req: Request, res:
 // @route   GET /api/pwa/push/subscriptions
 // @access  Private
 export const getUserPushSubscriptionsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const subscriptions = await getUserPushSubscriptions(userId);
 
@@ -104,7 +127,14 @@ export const getUserPushSubscriptionsHandler = asyncHandler(async (req: Request,
 // @route   POST /api/pwa/push/test
 // @access  Private
 export const testPushNotification = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, body, icon, badge, data } = req.body;
 
   const result = await sendPushNotification(userId, {
@@ -126,7 +156,14 @@ export const testPushNotification = asyncHandler(async (req: Request, res: Respo
 // @route   POST /api/pwa/sync/queue
 // @access  Private
 export const queueOfflineActionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { actionType, actionData } = req.body;
 
   if (!actionType || !actionData) {
@@ -149,7 +186,14 @@ export const queueOfflineActionHandler = asyncHandler(async (req: Request, res: 
 // @route   POST /api/pwa/sync
 // @access  Private
 export const syncOfflineActionsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const result = await syncOfflineActions(userId);
 
@@ -164,7 +208,14 @@ export const syncOfflineActionsHandler = asyncHandler(async (req: Request, res: 
 // @route   GET /api/pwa/sync/pending
 // @access  Private
 export const getPendingSyncActionsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const actions = await getPendingSyncActions(userId);
 
@@ -178,7 +229,14 @@ export const getPendingSyncActionsHandler = asyncHandler(async (req: Request, re
 // @route   POST /api/pwa/sync/conflict/:id/resolve
 // @access  Private
 export const resolveSyncConflictHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { resolution, clientData } = req.body;
 
@@ -202,7 +260,14 @@ export const resolveSyncConflictHandler = asyncHandler(async (req: Request, res:
 // @route   DELETE /api/pwa/sync/cleared
 // @access  Private
 export const clearSyncedActionsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { olderThanDays } = req.query;
 
   const days = olderThanDays ? parseInt(olderThanDays as string, 10) : 7;

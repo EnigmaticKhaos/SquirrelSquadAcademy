@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   createApiKey,
   getUserApiKeys,
@@ -11,7 +13,14 @@ import {
 // @route   POST /api/api-keys
 // @access  Private
 export const createApiKeyHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { name, permissions, expiresAt, rateLimit, allowedIPs } = req.body;
 
   if (!name || !permissions || !Array.isArray(permissions)) {
@@ -45,7 +54,14 @@ export const createApiKeyHandler = asyncHandler(async (req: Request, res: Respon
 // @route   GET /api/api-keys
 // @access  Private
 export const getUserApiKeysHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const apiKeys = await getUserApiKeys(userId);
 
@@ -59,7 +75,14 @@ export const getUserApiKeysHandler = asyncHandler(async (req: Request, res: Resp
 // @route   DELETE /api/api-keys/:id
 // @access  Private
 export const deleteApiKeyHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await deleteApiKey(id, userId);
@@ -74,7 +97,14 @@ export const deleteApiKeyHandler = asyncHandler(async (req: Request, res: Respon
 // @route   POST /api/api-keys/:id/revoke
 // @access  Private
 export const revokeApiKeyHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await revokeApiKey(id, userId);

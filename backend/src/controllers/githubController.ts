@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   hasGitHubConnected,
   createUserRepo,
@@ -21,7 +23,14 @@ import logger from '../utils/logger';
 // @route   GET /api/github/status
 // @access  Private
 export const checkGitHubStatus = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const connected = await hasGitHubConnected(userId);
   const username = connected ? await getGitHubUsername(userId) : null;
 
@@ -36,7 +45,14 @@ export const checkGitHubStatus = asyncHandler(async (req: Request, res: Response
 // @route   GET /api/github/repos
 // @access  Private
 export const getUserRepositories = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const repos = await getUserRepos(userId);
 
   res.json({
@@ -49,7 +65,14 @@ export const getUserRepositories = asyncHandler(async (req: Request, res: Respon
 // @route   POST /api/github/repos
 // @access  Private
 export const createRepository = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { name, description, isPrivate } = req.body;
 
   if (!name) {
@@ -71,7 +94,14 @@ export const createRepository = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/github/assignments/:id/repo
 // @access  Private
 export const createAssignmentRepository = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const assignment = await Assignment.findById(id).populate('course');
@@ -135,7 +165,14 @@ export const createAssignmentRepository = asyncHandler(async (req: Request, res:
 // @route   POST /api/github/assignments/:id/link
 // @access  Private
 export const linkRepository = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { repoUrl } = req.body;
 
@@ -179,7 +216,14 @@ export const linkRepository = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/github/repos/:owner/:repo/contents
 // @access  Private
 export const getRepositoryContents = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { owner, repo } = req.params;
   const { path } = req.query;
 
@@ -195,7 +239,14 @@ export const getRepositoryContents = asyncHandler(async (req: Request, res: Resp
 // @route   GET /api/github/repos/:owner/:repo/files/:path(*)
 // @access  Private
 export const getRepositoryFile = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { owner, repo } = req.params;
   const filePath = req.params[0]; // Catch-all parameter
   const { ref } = req.query;
@@ -213,7 +264,14 @@ export const getRepositoryFile = asyncHandler(async (req: Request, res: Response
 // @route   GET /api/github/repos/:owner/:repo/commits
 // @access  Private
 export const getRepositoryCommits = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { owner, repo } = req.params;
   const { sha, limit } = req.query;
 
@@ -235,7 +293,14 @@ export const getRepositoryCommits = asyncHandler(async (req: Request, res: Respo
 // @route   GET /api/github/repos/:owner/:repo/commits/:sha
 // @access  Private
 export const getRepositoryCommit = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { owner, repo, sha } = req.params;
 
   const commit = await getCommit(userId, owner, repo, sha);
@@ -250,7 +315,14 @@ export const getRepositoryCommit = asyncHandler(async (req: Request, res: Respon
 // @route   GET /api/github/repos/:owner/:repo/code
 // @access  Private
 export const getRepositoryCode = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { owner, repo } = req.params;
   const { ref } = req.query;
 

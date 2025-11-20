@@ -82,13 +82,11 @@ const certificateSchema = new Schema<ICertificate>(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     verificationCode: {
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     shareableLink: {
       type: String,
@@ -136,8 +134,7 @@ const certificateSchema = new Schema<ICertificate>(
 // Indexes
 certificateSchema.index({ user: 1, issuedDate: -1 });
 certificateSchema.index({ course: 1 });
-certificateSchema.index({ certificateId: 1 }, { unique: true });
-certificateSchema.index({ verificationCode: 1 }, { unique: true });
+// certificateId and verificationCode already have unique: true which creates indexes automatically
 
 export default mongoose.model<ICertificate>('Certificate', certificateSchema);
 

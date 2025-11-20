@@ -1,4 +1,4 @@
-import Referral, { ReferralStatus } from '../models/Referral';
+import Referral, { IReferral, ReferralStatus } from '../models/Referral';
 import User from '../models/User';
 import { awardXP } from './xpService';
 import { createNotification } from './notificationService';
@@ -35,7 +35,7 @@ export const createReferralCode = async (
     requiresSubscription?: boolean;
     expiresInDays?: number;
   }
-): Promise<Referral> => {
+): Promise<IReferral> => {
   try {
     // Check if user already has an active referral code
     const existingReferral = await Referral.findOne({
@@ -100,7 +100,7 @@ export const createReferralCode = async (
 export const useReferralCode = async (
   code: string,
   referredUserId: string
-): Promise<Referral> => {
+): Promise<IReferral> => {
   try {
     // Find referral
     const referral = await Referral.findOne({ code: code.toUpperCase() });
@@ -159,7 +159,7 @@ export const useReferralCode = async (
 /**
  * Complete referral (when conditions are met)
  */
-export const completeReferral = async (referralId: string): Promise<Referral> => {
+export const completeReferral = async (referralId: string): Promise<IReferral> => {
   try {
     const referral = await Referral.findById(referralId);
     if (!referral) {
@@ -190,7 +190,7 @@ export const completeReferral = async (referralId: string): Promise<Referral> =>
 /**
  * Grant referred user reward
  */
-const grantReferredReward = async (referral: Referral): Promise<void> => {
+const grantReferredReward = async (referral: IReferral): Promise<void> => {
   try {
     if (!referral.referredReward || referral.referredReward.granted || !referral.referredUser) {
       return;
@@ -251,7 +251,7 @@ const grantReferredReward = async (referral: Referral): Promise<void> => {
 /**
  * Grant referrer reward
  */
-const grantReferrerReward = async (referral: Referral): Promise<void> => {
+const grantReferrerReward = async (referral: IReferral): Promise<void> => {
   try {
     if (!referral.referrerReward || referral.referrerReward.granted) {
       return;
@@ -311,7 +311,7 @@ const grantReferrerReward = async (referral: Referral): Promise<void> => {
 /**
  * Get user's referral code
  */
-export const getUserReferralCode = async (userId: string): Promise<Referral | null> => {
+export const getUserReferralCode = async (userId: string): Promise<IReferral | null> => {
   try {
     let referral = await Referral.findOne({
       referrer: userId,
@@ -324,10 +324,10 @@ export const getUserReferralCode = async (userId: string): Promise<Referral | nu
 
     // Create one if doesn't exist
     if (!referral) {
-      referral = await createReferralCode(userId);
+      referral = await createReferralCode(userId) as any;
     }
 
-    return referral;
+    return referral as IReferral | null;
   } catch (error) {
     logger.error('Error getting user referral code:', error);
     return null;
@@ -398,7 +398,7 @@ export const getUserReferrals = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ referrals: Referral[]; total: number }> => {
+): Promise<{ referrals: IReferral[]; total: number }> => {
   try {
     const query: any = { referrer: userId };
 

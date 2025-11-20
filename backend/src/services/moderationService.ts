@@ -1,5 +1,5 @@
-import ContentReport, { ReportType, ReportReason, ReportStatus } from '../models/ContentReport';
-import UserWarning, { WarningType, WarningSeverity } from '../models/UserWarning';
+import ContentReport, { IContentReport, ReportType, ReportReason, ReportStatus } from '../models/ContentReport';
+import UserWarning, { IUserWarning, WarningType, WarningSeverity } from '../models/UserWarning';
 import User from '../models/User';
 import Post from '../models/Post';
 import Comment from '../models/Comment';
@@ -22,7 +22,7 @@ export const createReport = async (
     description?: string;
     evidence?: string[];
   }
-): Promise<ContentReport> => {
+): Promise<IContentReport> => {
   try {
     // Check if user already reported this content
     const existingReport = await ContentReport.findOne({
@@ -114,7 +114,7 @@ export const reviewReport = async (
     actionDetails?: string;
     moderationNotes?: string;
   }
-): Promise<ContentReport> => {
+): Promise<IContentReport> => {
   try {
     const report = await ContentReport.findById(reportId);
     if (!report) {
@@ -199,7 +199,7 @@ export const issueWarning = async (
     };
     expiresInDays?: number;
   }
-): Promise<UserWarning> => {
+): Promise<IUserWarning> => {
   try {
     const expiresAt = data.expiresInDays
       ? new Date(Date.now() + data.expiresInDays * 24 * 60 * 60 * 1000)
@@ -371,7 +371,7 @@ export const getReports = async (options?: {
   contentType?: ReportType;
   limit?: number;
   offset?: number;
-}): Promise<{ reports: ContentReport[]; total: number }> => {
+}): Promise<{ reports: IContentReport[]; total: number }> => {
   try {
     const query: any = {};
 
@@ -409,7 +409,7 @@ export const getReports = async (options?: {
 export const getUserWarnings = async (
   userId: string,
   includeExpired: boolean = false
-): Promise<UserWarning[]> => {
+): Promise<IUserWarning[]> => {
   try {
     const query: any = { user: userId };
 
@@ -482,7 +482,7 @@ const getAuthorIdFromContent = (contentType: ReportType, content: any): string |
   }
 };
 
-const getAuthorIdFromReport = async (report: ContentReport): Promise<string | null> => {
+const getAuthorIdFromReport = async (report: IContentReport): Promise<string | null> => {
   const content = await getContentById(report.contentType, report.contentId.toString());
   return getAuthorIdFromContent(report.contentType, content);
 };
@@ -507,7 +507,7 @@ const removeContent = async (contentType: ReportType, contentId: string): Promis
   }
 };
 
-const notifyAdminsOfReport = async (report: ContentReport): Promise<void> => {
+const notifyAdminsOfReport = async (report: IContentReport): Promise<void> => {
   try {
     const admins = await User.find({ role: 'admin' }).select('_id');
     for (const admin of admins) {

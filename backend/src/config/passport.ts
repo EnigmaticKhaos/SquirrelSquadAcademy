@@ -22,12 +22,16 @@ passport.deserializeUser(async (id: string, done) => {
 
 // Google OAuth Strategy
 if (config.googleClientId && config.googleClientSecret) {
+  // Build full callback URL
+  const backendUrl = process.env.BACKEND_URL || process.env.API_URL || `http://localhost:${config.port}`;
+  const googleCallbackURL = `${backendUrl}/api/auth/oauth/google/callback`;
+  
   passport.use(
     new GoogleStrategy(
       {
         clientID: config.googleClientId,
         clientSecret: config.googleClientSecret,
-        callbackURL: '/api/auth/oauth/google/callback',
+        callbackURL: googleCallbackURL,
       },
       async (accessToken: string, refreshToken: string, profile: any, done: any) => {
         try {
@@ -69,12 +73,16 @@ if (config.googleClientId && config.googleClientSecret) {
 
 // GitHub OAuth Strategy
 if (config.githubClientId && config.githubClientSecret) {
+  // Build full callback URL
+  const backendUrl = process.env.BACKEND_URL || process.env.API_URL || `http://localhost:${config.port}`;
+  const githubCallbackURL = `${backendUrl}/api/auth/oauth/github/callback`;
+  
   passport.use(
     new GitHubStrategy(
       {
         clientID: config.githubClientId,
         clientSecret: config.githubClientSecret,
-        callbackURL: '/api/auth/oauth/github/callback',
+        callbackURL: githubCallbackURL,
       },
       async (accessToken: string, refreshToken: string, profile: any, done: any) => {
         try {
@@ -137,12 +145,16 @@ if (config.githubClientId && config.githubClientSecret) {
 
 // Discord OAuth Strategy
 if (config.discordClientId && config.discordClientSecret) {
+  // Build full callback URL
+  const backendUrl = process.env.BACKEND_URL || process.env.API_URL || `http://localhost:${config.port}`;
+  const discordCallbackURL = `${backendUrl}/api/auth/oauth/discord/callback`;
+  
   passport.use(
     new DiscordStrategy(
       {
         clientID: config.discordClientId,
         clientSecret: config.discordClientSecret,
-        callbackURL: '/api/auth/oauth/discord/callback',
+        callbackURL: discordCallbackURL,
         scope: ['identify', 'email'],
       },
       async (accessToken: string, refreshToken: string, profile: any, done: any) => {

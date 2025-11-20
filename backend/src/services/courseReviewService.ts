@@ -1,7 +1,7 @@
-import CourseReview from '../models/CourseReview';
+import CourseReview, { ICourseReview } from '../models/CourseReview';
 import Course from '../models/Course';
 import CourseCompletion from '../models/CourseCompletion';
-import CourseWishlist from '../models/CourseWishlist';
+import CourseWishlist, { ICourseWishlist } from '../models/CourseWishlist';
 import { moderateContent } from './ai/moderationService';
 import logger from '../utils/logger';
 
@@ -17,7 +17,7 @@ export const createCourseReview = async (
     title?: string;
     content: string;
   }
-): Promise<CourseReview> => {
+): Promise<ICourseReview> => {
   try {
     const course = await Course.findById(data.courseId);
     if (!course) {
@@ -82,7 +82,7 @@ export const updateCourseReview = async (
     title?: string;
     content?: string;
   }
-): Promise<CourseReview | null> => {
+): Promise<ICourseReview | null> => {
   try {
     const review = await CourseReview.findOne({
       _id: reviewId,
@@ -99,7 +99,7 @@ export const updateCourseReview = async (
       if (moderationResult.isFlagged && moderationResult.severity === 'high') {
         throw new Error('Review contains inappropriate content');
       }
-      updates.isApproved = moderationResult.severity !== 'high';
+      review.isApproved = moderationResult.severity !== 'high';
     }
 
     Object.assign(review, updates);
@@ -158,7 +158,7 @@ export const getCourseReviews = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ reviews: CourseReview[]; total: number; averageRating: number; ratingDistribution: any }> => {
+): Promise<{ reviews: ICourseReview[]; total: number; averageRating: number; ratingDistribution: any }> => {
   try {
     const query: any = {
       course: courseId,
@@ -236,7 +236,7 @@ export const getCourseReviews = async (
 export const getUserCourseReview = async (
   userId: string,
   courseId: string
-): Promise<CourseReview | null> => {
+): Promise<ICourseReview | null> => {
   try {
     return await CourseReview.findOne({
       user: userId,
@@ -346,7 +346,7 @@ export const addToWishlist = async (
     notifyOnSale?: boolean;
     notifyOnRelease?: boolean;
   }
-): Promise<CourseWishlist> => {
+): Promise<ICourseWishlist> => {
   try {
     const course = await Course.findById(courseId);
     if (!course) {
@@ -433,7 +433,7 @@ export const getUserWishlist = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ wishlist: CourseWishlist[]; total: number }> => {
+): Promise<{ wishlist: ICourseWishlist[]; total: number }> => {
   try {
     const total = await CourseWishlist.countDocuments({ user: userId });
 

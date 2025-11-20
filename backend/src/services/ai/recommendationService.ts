@@ -58,7 +58,7 @@ export const getCourseRecommendations = async (
     }
 
     const availableCourses = await Course.find(query)
-      .select('title description tags difficulty level courseType price thumbnail')
+      .select('title description tags difficulty courseType price thumbnail')
       .limit(100); // Limit for AI processing
 
     if (availableCourses.length === 0) {
@@ -85,7 +85,6 @@ export const getCourseRecommendations = async (
       description: c.description,
       tags: c.tags || [],
       difficulty: c.difficulty,
-      level: c.level,
       courseType: c.courseType,
       price: c.price,
     }));
@@ -248,7 +247,7 @@ export const getLearningPathRecommendations = async (
     const enrolledCourseIds = enrollments.map(e => e.course.toString());
 
     // Get all learning paths
-    const learningPaths = await LearningPath.find({ isPublished: true })
+    const learningPaths = await LearningPath.find({ isActive: true, isPublic: true })
       .populate('courses')
       .limit(50);
 
@@ -265,7 +264,7 @@ export const getLearningPathRecommendations = async (
 
     const pathsContext = learningPaths.map(path => ({
       id: path._id.toString(),
-      title: path.title,
+      name: path.name,
       description: path.description,
       courseIds: (path.courses as any[]).map(c => c._id.toString()),
       courseTitles: (path.courses as any[]).map(c => c.title),
@@ -395,7 +394,7 @@ export const getPricingSuggestion = async (
       difficulty: course.difficulty,
       _id: { $ne: courseId },
     })
-      .select('title price duration difficulty level')
+      .select('title price estimatedDuration difficulty')
       .limit(20);
 
     // Get course statistics
@@ -411,9 +410,8 @@ export const getPricingSuggestion = async (
       course: {
         title: course.title,
         description: course.description,
-        duration: course.duration,
+        estimatedDuration: course.estimatedDuration,
         difficulty: course.difficulty,
-        level: course.level,
         courseType: course.courseType,
         currentPrice: course.price,
         modules: course.modules?.length || 0,
@@ -427,7 +425,7 @@ export const getPricingSuggestion = async (
       similarCourses: similarCourses.map(c => ({
         title: c.title,
         price: c.price,
-        duration: c.duration,
+        estimatedDuration: c.estimatedDuration,
         difficulty: c.difficulty,
       })),
     };

@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { checkUserModerationStatus } from '../services/moderationService';
 import { asyncHandler } from './errorHandler';
 
@@ -11,7 +13,12 @@ export const checkModerationStatus = asyncHandler(
       return next();
     }
 
-    const userId = req.user._id.toString();
+    const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+    if (!userDoc || !userDoc._id) {
+      return next();
+    }
+
+    const userId = userDoc._id.toString();
     const status = await checkUserModerationStatus(userId);
 
     if (!status.canAccess) {

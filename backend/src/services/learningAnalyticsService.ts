@@ -1,4 +1,4 @@
-import LearningSession from '../models/LearningSession';
+import LearningSession, { ILearningSession } from '../models/LearningSession';
 import LearningStreak, { StreakType } from '../models/LearningStreak';
 import CourseEnrollment from '../models/CourseEnrollment';
 import CourseCompletion from '../models/CourseCompletion';
@@ -18,7 +18,7 @@ export const startLearningSession = async (
     moduleId?: string;
     activityType: 'lesson' | 'quiz' | 'assignment' | 'video' | 'reading' | 'practice';
   }
-): Promise<LearningSession> => {
+): Promise<ILearningSession> => {
   try {
     // Get current progress
     let progressBefore = 0;
@@ -58,7 +58,7 @@ export const startLearningSession = async (
 export const endLearningSession = async (
   sessionId: string,
   userId: string
-): Promise<LearningSession | null> => {
+): Promise<ILearningSession | null> => {
   try {
     const session = await LearningSession.findOne({
       _id: sessionId,
@@ -412,7 +412,7 @@ export const getCourseAnalytics = async (
 /**
  * Calculate weekly activity
  */
-const calculateWeeklyActivity = (sessions: LearningSession[]): Array<{
+const calculateWeeklyActivity = (sessions: ILearningSession[]): Array<{
   date: string;
   timeSpent: number;
   sessions: number;
@@ -442,7 +442,7 @@ const calculateWeeklyActivity = (sessions: LearningSession[]): Array<{
 /**
  * Calculate monthly activity
  */
-const calculateMonthlyActivity = (sessions: LearningSession[]): Array<{
+const calculateMonthlyActivity = (sessions: ILearningSession[]): Array<{
   month: string;
   timeSpent: number;
   sessions: number;

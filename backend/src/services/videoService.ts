@@ -1,5 +1,5 @@
 import Lesson from '../models/Lesson';
-import VideoProgress from '../models/VideoProgress';
+import VideoProgress, { IVideoProgress } from '../models/VideoProgress';
 import { extractYouTubeVideoId, getYouTubeThumbnail, getYouTubeEmbedUrl } from '../utils/youtubeUtils';
 import { uploadVideo, generateVideoThumbnail } from './cloudinaryService';
 import logger from '../utils/logger';
@@ -20,7 +20,7 @@ export const updateVideoProgress = async (
     captionsEnabled?: boolean;
     captionsLanguage?: string;
   }
-): Promise<VideoProgress> => {
+): Promise<IVideoProgress> => {
   try {
     const progressPercentage = progress.duration > 0
       ? Math.round((progress.currentTime / progress.duration) * 100)
@@ -72,7 +72,7 @@ export const updateVideoProgress = async (
 export const getVideoProgress = async (
   userId: string,
   lessonId: string
-): Promise<VideoProgress | null> => {
+): Promise<IVideoProgress | null> => {
   try {
     return await VideoProgress.findOne({
       user: userId,

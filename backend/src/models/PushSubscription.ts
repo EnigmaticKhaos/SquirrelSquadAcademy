@@ -31,13 +31,11 @@ const pushSubscriptionSchema = new Schema<IPushSubscription>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     endpoint: {
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     keys: {
       p256dh: {
@@ -69,7 +67,7 @@ const pushSubscriptionSchema = new Schema<IPushSubscription>(
 );
 
 pushSubscriptionSchema.index({ user: 1, isActive: 1 });
-pushSubscriptionSchema.index({ endpoint: 1 }, { unique: true });
+// endpoint already has unique: true which creates an index automatically
 
 export default mongoose.model<IPushSubscription>('PushSubscription', pushSubscriptionSchema);
 

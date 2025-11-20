@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
 import {
@@ -67,7 +69,8 @@ export const getLearningPaths = asyncHandler(async (req: Request, res: Response)
 // @access  Public
 export const getLearningPath = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user?._id?.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId } | undefined;
+  const userId = userDoc?._id?.toString();
 
   const pathData = await getLearningPathWithProgress(id, userId);
 
@@ -148,7 +151,14 @@ export const deleteLearningPath = asyncHandler(async (req: Request, res: Respons
 // @access  Private
 export const start = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   try {
     const progress = await startLearningPath(userId, id);
@@ -171,7 +181,14 @@ export const start = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getProgress = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const progress = await getLearningPathProgress(userId, id);
 
@@ -193,7 +210,14 @@ export const getProgress = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const updateProgress = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const progress = await updateLearningPathProgress(userId, id);
 
@@ -214,7 +238,14 @@ export const updateProgress = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/learning-paths/user/paths
 // @access  Private
 export const getUserPaths = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { status, limit = 50, offset = 0 } = req.query;
 
   const { paths, total } = await getUserLearningPaths(userId, {
@@ -236,7 +267,14 @@ export const getUserPaths = asyncHandler(async (req: Request, res: Response) => 
 // @access  Private
 export const toggleStatus = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const progress = await toggleLearningPathStatus(userId, id);
 
@@ -259,7 +297,14 @@ export const toggleStatus = asyncHandler(async (req: Request, res: Response) => 
 // @access  Private
 export const getNext = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const nextCourse = await getNextCourse(userId, id);
 
@@ -316,7 +361,14 @@ export const generate = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const checkCanStart = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const result = await canStartLearningPath(userId, id);
 

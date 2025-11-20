@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createCourseReview,
   updateCourseReview,
@@ -18,7 +20,14 @@ import {
 // @route   POST /api/course-reviews
 // @access  Private
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, rating, difficultyRating, title, content } = req.body;
 
   if (!courseId || !rating || !content) {
@@ -62,7 +71,14 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { rating, difficultyRating, title, content } = req.body;
 
   const review = await updateCourseReview(id, userId, {
@@ -91,7 +107,14 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const deleted = await deleteCourseReview(id, userId);
 
@@ -144,7 +167,14 @@ export const getByCourse = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getByUser = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const review = await getUserCourseReview(userId, courseId);
 
@@ -159,7 +189,14 @@ export const getByUser = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const vote = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { isHelpful } = req.body;
 
   if (typeof isHelpful !== 'boolean') {
@@ -189,7 +226,14 @@ export const vote = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const addWishlist = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { notifyOnSale, notifyOnRelease } = req.body;
 
   try {
@@ -216,7 +260,14 @@ export const addWishlist = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const removeWishlist = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const removed = await removeFromWishlist(userId, courseId);
 
@@ -238,7 +289,14 @@ export const removeWishlist = asyncHandler(async (req: Request, res: Response) =
 // @access  Private
 export const checkWishlist = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const inWishlist = await isInWishlist(userId, courseId);
 
@@ -252,7 +310,14 @@ export const checkWishlist = asyncHandler(async (req: Request, res: Response) =>
 // @route   GET /api/course-reviews/wishlist
 // @access  Private
 export const getWishlist = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { limit = 50, offset = 0 } = req.query;
 
   const { wishlist, total } = await getUserWishlist(userId, {

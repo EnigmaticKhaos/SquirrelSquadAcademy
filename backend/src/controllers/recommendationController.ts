@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   getCourseRecommendations,
   getLearningPathRecommendations,
@@ -11,7 +13,14 @@ import {
 // @route   GET /api/recommendations/courses
 // @access  Private
 export const getCourseRecommendationsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { limit = 10, excludeEnrolled = 'true' } = req.query;
 
   const recommendations = await getCourseRecommendations(userId, {
@@ -30,7 +39,14 @@ export const getCourseRecommendationsHandler = asyncHandler(async (req: Request,
 // @route   GET /api/recommendations/learning-paths
 // @access  Private
 export const getLearningPathRecommendationsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { limit = 5 } = req.query;
 
   const recommendations = await getLearningPathRecommendations(userId, {

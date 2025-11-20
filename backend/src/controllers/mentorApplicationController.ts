@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   submitMentorApplication,
   approveMentorApplication,
@@ -17,7 +19,14 @@ import {
 // @route   POST /api/mentor-applications
 // @access  Private
 export const submitApplication = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { motivation, specialties, experience, availability, maxMentees } = req.body;
 
   if (!motivation || !specialties || specialties.length === 0) {
@@ -50,7 +59,14 @@ export const submitApplication = asyncHandler(async (req: Request, res: Response
 // @route   GET /api/mentor-applications/my-application
 // @access  Private
 export const getMyApplication = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const application = await getUserApplication(userId);
 
@@ -94,7 +110,14 @@ export const getApplications = asyncHandler(async (req: Request, res: Response) 
 // @access  Private/Admin
 export const approveApplication = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { notes } = req.body;
 
   await approveMentorApplication(id, adminId, { notes });
@@ -110,7 +133,14 @@ export const approveApplication = asyncHandler(async (req: Request, res: Respons
 // @access  Private/Admin
 export const rejectApplication = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { reason, notes } = req.body;
 
   if (!reason) {
@@ -132,7 +162,14 @@ export const rejectApplication = asyncHandler(async (req: Request, res: Response
 // @route   POST /api/mentor-applications/bulk-approve
 // @access  Private/Admin
 export const bulkApprove = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { applicationIds } = req.body;
 
   if (!applicationIds || !Array.isArray(applicationIds) || applicationIds.length === 0) {
@@ -156,7 +193,14 @@ export const bulkApprove = asyncHandler(async (req: Request, res: Response) => {
 // @route   POST /api/mentor-applications/bulk-reject
 // @access  Private/Admin
 export const bulkReject = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { applicationIds, reason } = req.body;
 
   if (!applicationIds || !Array.isArray(applicationIds) || applicationIds.length === 0) {
@@ -187,7 +231,14 @@ export const bulkReject = asyncHandler(async (req: Request, res: Response) => {
 // @route   PUT /api/mentor-applications/availability
 // @access  Private
 export const updateAvailability = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { isAvailable } = req.body;
 
   if (typeof isAvailable !== 'boolean') {

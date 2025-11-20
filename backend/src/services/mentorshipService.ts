@@ -1,5 +1,5 @@
-import Mentorship, { MentorshipStatus } from '../models/Mentorship';
-import { MentorshipRequest, MentorshipRequestStatus } from '../models/Mentorship';
+import Mentorship, { IMentorship, MentorshipStatus } from '../models/Mentorship';
+import { MentorshipRequest, IMentorshipRequest, MentorshipRequestStatus } from '../models/Mentorship';
 import User from '../models/User';
 import CourseCompletion from '../models/CourseCompletion';
 import { createNotification } from './notificationService';
@@ -84,8 +84,8 @@ export const findPotentialMentors = async (
     const topMentors = mentors.slice(0, options?.limit || 10);
 
     // Get user details
-    const mentorIds = topMentors.map(m => m.userId);
-    const users = await User.find({ _id: { $in: mentorIds } }).select('username profilePhoto bio level xp');
+    const topMentorIds = topMentors.map(m => m.userId);
+    const users = await User.find({ _id: { $in: topMentorIds } }).select('username profilePhoto bio level xp');
 
     // Check existing mentorships/requests
     const existingMentorships = await Mentorship.find({
@@ -143,7 +143,7 @@ export const sendMentorshipRequest = async (
     preferredCommunicationMethod?: 'message' | 'video' | 'both';
     expectedDuration?: number;
   }
-): Promise<MentorshipRequest> => {
+): Promise<IMentorshipRequest> => {
   try {
     // Check if request already exists
     const existingRequest = await MentorshipRequest.findOne({
@@ -203,7 +203,7 @@ export const respondToMentorshipRequest = async (
   requestId: string,
   mentorId: string,
   accept: boolean
-): Promise<Mentorship | MentorshipRequest> => {
+): Promise<IMentorship | IMentorshipRequest> => {
   try {
     const request = await MentorshipRequest.findById(requestId);
     if (!request) {
@@ -286,7 +286,7 @@ export const addMentorshipSession = async (
     rating?: number;
     feedback?: string;
   }
-): Promise<Mentorship> => {
+): Promise<IMentorship> => {
   try {
     const mentorship = await Mentorship.findById(mentorshipId);
     if (!mentorship) {
@@ -354,7 +354,7 @@ export const addMilestone = async (
     description?: string;
     targetDate?: Date;
   }
-): Promise<Mentorship> => {
+): Promise<IMentorship> => {
   try {
     const mentorship = await Mentorship.findById(mentorshipId);
     if (!mentorship) {
@@ -391,7 +391,7 @@ export const completeMilestone = async (
   milestoneId: string,
   userId: string,
   notes?: string
-): Promise<Mentorship> => {
+): Promise<IMentorship> => {
   try {
     const mentorship = await Mentorship.findById(mentorshipId);
     if (!mentorship) {
@@ -403,7 +403,7 @@ export const completeMilestone = async (
       throw new Error('Unauthorized to complete milestones');
     }
 
-    const milestone = mentorship.milestones.id(milestoneId);
+    const milestone = (mentorship.milestones as any).id(milestoneId);
     if (!milestone) {
       throw new Error('Milestone not found');
     }
@@ -446,7 +446,7 @@ export const completeMentorship = async (
     rating?: number;
     feedback?: string;
   }
-): Promise<Mentorship> => {
+): Promise<IMentorship> => {
   try {
     const mentorship = await Mentorship.findById(mentorshipId);
     if (!mentorship) {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect, admin } from '../middleware/auth';
+import { protect, authorize } from '../middleware/auth';
 import {
   // FAQs
   getFAQs,
@@ -40,9 +40,9 @@ router.get('/faqs/:id', getFAQ);
 router.post('/faqs/:id/rate', protect, rateFAQHandler);
 
 // Admin routes
-router.post('/faqs', protect, admin, createFAQHandler);
-router.put('/faqs/:id', protect, admin, updateFAQ);
-router.delete('/faqs/:id', protect, admin, deleteFAQ);
+router.post('/faqs', protect, authorize('admin'), createFAQHandler);
+router.put('/faqs/:id', protect, authorize('admin'), updateFAQ);
+router.delete('/faqs/:id', protect, authorize('admin'), deleteFAQ);
 
 // ========== Help Articles Routes ==========
 router.get('/articles', getHelpArticles);
@@ -50,9 +50,9 @@ router.get('/articles/:slug', getHelpArticle);
 router.post('/articles/:id/rate', protect, rateArticleHandler);
 
 // Admin routes
-router.post('/articles', protect, admin, createHelpArticleHandler);
-router.put('/articles/:id', protect, admin, updateHelpArticle);
-router.delete('/articles/:id', protect, admin, deleteHelpArticle);
+router.post('/articles', protect, authorize('admin'), createHelpArticleHandler);
+router.put('/articles/:id', protect, authorize('admin'), updateHelpArticle);
+router.delete('/articles/:id', protect, authorize('admin'), deleteHelpArticle);
 
 // ========== Support Tickets Routes ==========
 router.get('/tickets', protect, getUserTickets);
@@ -61,9 +61,9 @@ router.post('/tickets', protect, createSupportTicketHandler);
 router.post('/tickets/:id/messages', protect, addTicketMessageHandler);
 
 // Admin routes
-router.get('/tickets/all', protect, admin, getAllTickets);
-router.put('/tickets/:id/status', protect, admin, updateTicketStatusHandler);
-router.post('/tickets/:id/assign', protect, admin, assignTicketHandler);
+router.get('/tickets/all', protect, authorize('admin'), getAllTickets);
+router.put('/tickets/:id/status', protect, authorize('admin'), updateTicketStatusHandler);
+router.post('/tickets/:id/assign', protect, authorize('admin'), assignTicketHandler);
 
 // ========== Video Tutorials Routes ==========
 router.get('/tutorials', getVideoTutorials);
@@ -71,9 +71,9 @@ router.get('/tutorials/:id', getVideoTutorial);
 router.post('/tutorials/:id/rate', protect, rateTutorialHandler);
 
 // Admin routes
-router.post('/tutorials', protect, admin, createVideoTutorialHandler);
-router.put('/tutorials/:id', protect, admin, updateVideoTutorial);
-router.delete('/tutorials/:id', protect, admin, deleteVideoTutorial);
+router.post('/tutorials', protect, authorize('admin'), createVideoTutorialHandler);
+router.put('/tutorials/:id', protect, authorize('admin'), updateVideoTutorial);
+router.delete('/tutorials/:id', protect, authorize('admin'), deleteVideoTutorial);
 
 export default router;
 

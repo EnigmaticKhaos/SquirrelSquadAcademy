@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
 import {
@@ -18,7 +20,14 @@ import {
 // @route   POST /api/notes
 // @access  Private
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const {
     lessonId,
     courseId,
@@ -68,7 +77,14 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, content, tags, isPinned, highlightColor } = req.body;
 
   const note = await updateNote(id, userId, {
@@ -98,7 +114,14 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const deleted = await deleteNote(id, userId);
 
@@ -120,7 +143,14 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getByLesson = asyncHandler(async (req: Request, res: Response) => {
   const { lessonId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const notes = await getLessonNotes(userId, lessonId);
 
@@ -136,11 +166,20 @@ export const getByLesson = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getByCourse = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { tags, isHighlight, isPinned } = req.query;
 
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
+
   const notes = await getCourseNotes(userId, courseId, {
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     isHighlight: isHighlight === 'true' ? true : isHighlight === 'false' ? false : undefined,
     isPinned: isPinned === 'true' ? true : isPinned === 'false' ? false : undefined,
   });
@@ -156,11 +195,20 @@ export const getByCourse = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/notes
 // @access  Private
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { tags, isHighlight, isPinned, courseId, limit = 50, offset = 0 } = req.query;
 
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
+
   const { notes, total } = await getUserNotes(userId, {
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     isHighlight: isHighlight === 'true' ? true : isHighlight === 'false' ? false : undefined,
     isPinned: isPinned === 'true' ? true : isPinned === 'false' ? false : undefined,
     courseId: courseId as string,
@@ -181,7 +229,14 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const getOne = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const note = await getNoteById(id, userId);
 
@@ -202,7 +257,14 @@ export const getOne = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/notes/tags
 // @access  Private
 export const getTags = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const tags = await getUserNoteTags(userId);
 
@@ -216,7 +278,14 @@ export const getTags = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/notes/search
 // @access  Private
 export const search = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { q, courseId, lessonId, tags, limit = 50, offset = 0 } = req.query;
 
   if (!q) {
@@ -226,10 +295,12 @@ export const search = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
+
   const { notes, total } = await searchNotes(userId, q as string, {
     courseId: courseId as string,
     lessonId: lessonId as string,
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     limit: Number(limit),
     offset: Number(offset),
   });
@@ -247,7 +318,14 @@ export const search = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const togglePin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const note = await togglePinNote(id, userId);
 

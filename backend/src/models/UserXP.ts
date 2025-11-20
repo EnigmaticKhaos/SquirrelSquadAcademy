@@ -18,7 +18,16 @@ export type XPSource =
   | 'mentorship_completed'
   | 'mentorship_completed_mentor'
   | 'referral'
-  | 'goal_completed';
+  | 'goal_completed'
+  | 'challenge_completed'
+  | 'course_completed'
+  | 'video_watched'
+  | 'learning_path_milestone'
+  | 'learning_path_completed'
+  | 'flashcard_created'
+  | 'flashcard_reviewed'
+  | 'pomodoro_completed'
+  | 'live_session_attended';
 
 export interface IUserXP extends Document {
   user: mongoose.Types.ObjectId;
@@ -62,6 +71,15 @@ const userXPSchema = new Schema<IUserXP>(
         'mentorship_completed_mentor',
         'referral',
         'goal_completed',
+        'challenge_completed',
+        'course_completed',
+        'video_watched',
+        'learning_path_milestone',
+        'learning_path_completed',
+        'flashcard_created',
+        'flashcard_reviewed',
+        'pomodoro_completed',
+        'live_session_attended',
       ],
       required: true,
     },

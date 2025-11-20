@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   getUserNotifications,
   markAsRead,
@@ -14,7 +16,14 @@ import {
 // @route   GET /api/notifications
 // @access  Private
 export const getNotifications = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { read, type, limit = 50, offset = 0 } = req.query;
 
   const { notifications, total, unreadCount } = await getUserNotifications(userId, {
@@ -37,7 +46,14 @@ export const getNotifications = asyncHandler(async (req: Request, res: Response)
 // @route   GET /api/notifications/unread-count
 // @access  Private
 export const getUnreadNotificationCount = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const count = await getUnreadCount(userId);
 
@@ -52,7 +68,14 @@ export const getUnreadNotificationCount = asyncHandler(async (req: Request, res:
 // @access  Private
 export const markNotificationAsRead = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const notification = await markAsRead(id, userId);
 
@@ -74,7 +97,14 @@ export const markNotificationAsRead = asyncHandler(async (req: Request, res: Res
 // @route   PUT /api/notifications/read-all
 // @access  Private
 export const markAllNotificationsAsRead = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const count = await markAllAsRead(userId);
 
@@ -90,7 +120,14 @@ export const markAllNotificationsAsRead = asyncHandler(async (req: Request, res:
 // @access  Private
 export const deleteNotificationById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const deleted = await deleteNotification(id, userId);
 
@@ -111,7 +148,14 @@ export const deleteNotificationById = asyncHandler(async (req: Request, res: Res
 // @route   DELETE /api/notifications/read
 // @access  Private
 export const deleteReadNotifications = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const count = await deleteAllRead(userId);
 

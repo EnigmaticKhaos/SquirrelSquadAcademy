@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   createLiveSession,
   registerForSession,
@@ -24,7 +26,14 @@ import LiveSessionRecording from '../models/LiveSessionRecording';
 // @access  Private
 export const getLiveSessions = asyncHandler(async (req: Request, res: Response) => {
   const { status, type, courseId, upcoming, past } = req.query;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const query: any = {};
 
@@ -69,7 +78,14 @@ export const getLiveSessions = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const getLiveSession = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const session = await LiveSession.findById(id)
     .populate('host', 'username profilePhoto')
@@ -110,7 +126,14 @@ export const getLiveSession = asyncHandler(async (req: Request, res: Response) =
 // @route   POST /api/live-sessions
 // @access  Private
 export const createLiveSessionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const session = await createLiveSession(userId, req.body);
 
   res.status(201).json({
@@ -123,7 +146,14 @@ export const createLiveSessionHandler = asyncHandler(async (req: Request, res: R
 // @route   PUT /api/live-sessions/:id
 // @access  Private
 export const updateLiveSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await LiveSession.findById(id);
@@ -162,7 +192,14 @@ export const updateLiveSession = asyncHandler(async (req: Request, res: Response
 // @route   POST /api/live-sessions/:id/register
 // @access  Private
 export const registerForLiveSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await registerForSession(id, userId);
@@ -178,7 +215,14 @@ export const registerForLiveSession = asyncHandler(async (req: Request, res: Res
 // @route   POST /api/live-sessions/:id/join
 // @access  Private
 export const joinLiveSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const { session, participant } = await joinSession(id, userId);
@@ -195,7 +239,14 @@ export const joinLiveSession = asyncHandler(async (req: Request, res: Response) 
 // @route   POST /api/live-sessions/:id/leave
 // @access  Private
 export const leaveLiveSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await leaveSession(id, userId);
@@ -210,7 +261,14 @@ export const leaveLiveSession = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/live-sessions/:id/end
 // @access  Private
 export const endLiveSession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await endSession(id, userId);
@@ -265,7 +323,14 @@ export const getSessionPolls = asyncHandler(async (req: Request, res: Response) 
 // @route   POST /api/live-sessions/:id/polls
 // @access  Private
 export const createPollHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const poll = await createPoll(id, userId, req.body);
@@ -280,7 +345,14 @@ export const createPollHandler = asyncHandler(async (req: Request, res: Response
 // @route   POST /api/live-sessions/polls/:pollId/vote
 // @access  Private
 export const voteOnPollHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { pollId } = req.params;
   const { selectedOptions } = req.body;
 
@@ -331,7 +403,14 @@ export const getSessionQuestions = asyncHandler(async (req: Request, res: Respon
 // @route   POST /api/live-sessions/:id/questions
 // @access  Private
 export const askQuestionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { question } = req.body;
 
@@ -354,7 +433,14 @@ export const askQuestionHandler = asyncHandler(async (req: Request, res: Respons
 // @route   POST /api/live-sessions/questions/:questionId/answer
 // @access  Private
 export const answerQuestionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { questionId } = req.params;
   const { answer } = req.body;
 
@@ -378,7 +464,14 @@ export const answerQuestionHandler = asyncHandler(async (req: Request, res: Resp
 // @route   POST /api/live-sessions/questions/:questionId/upvote
 // @access  Private
 export const upvoteQuestionHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { questionId } = req.params;
 
   const qa = await upvoteQuestion(questionId, userId);
@@ -419,7 +512,14 @@ export const getSessionRecording = asyncHandler(async (req: Request, res: Respon
 // @route   POST /api/live-sessions/:id/recording
 // @access  Private
 export const saveRecordingHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await LiveSession.findById(id);

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createCertificateFromCompletion,
   getCertificate,
@@ -28,7 +30,14 @@ export const createCertificate = asyncHandler(async (req: Request, res: Response
 // @route   GET /api/certificates
 // @access  Private
 export const getCertificates = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, limit = 50, offset = 0 } = req.query;
 
   const { certificates, total } = await getUserCertificates(userId, {
@@ -50,7 +59,14 @@ export const getCertificates = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const getCertificateById = asyncHandler(async (req: Request, res: Response) => {
   const { certificateId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId; role?: string };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const certificate = await getCertificate(certificateId);
 
@@ -62,7 +78,7 @@ export const getCertificateById = asyncHandler(async (req: Request, res: Respons
   }
 
   // Check if user owns the certificate
-  if (certificate.user.toString() !== userId && req.user.role !== 'admin') {
+  if (certificate.user.toString() !== userId && userDoc.role !== 'admin') {
     return res.status(403).json({
       success: false,
       message: 'Not authorized to view this certificate',
@@ -103,7 +119,14 @@ export const verifyCertificatePublic = asyncHandler(async (req: Request, res: Re
 // @access  Private
 export const downloadCertificate = asyncHandler(async (req: Request, res: Response) => {
   const { certificateId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId; role?: string };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const certificate = await getCertificate(certificateId);
 
@@ -115,7 +138,7 @@ export const downloadCertificate = asyncHandler(async (req: Request, res: Respon
   }
 
   // Check if user owns the certificate
-  if (certificate.user.toString() !== userId && req.user.role !== 'admin') {
+  if (certificate.user.toString() !== userId && userDoc.role !== 'admin') {
     return res.status(403).json({
       success: false,
       message: 'Not authorized to download this certificate',

@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   createDeck,
   updateDeck,
@@ -19,7 +21,14 @@ import FlashcardReview from '../models/FlashcardReview';
 // @route   GET /api/flashcards/decks
 // @access  Private
 export const getDecks = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { archived, courseId } = req.query;
 
   const query: any = { user: userId };
@@ -45,7 +54,14 @@ export const getDecks = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/flashcards/decks/:id
 // @access  Private
 export const getDeck = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const deck = await FlashcardDeck.findOne({
@@ -75,7 +91,14 @@ export const getDeck = asyncHandler(async (req: Request, res: Response) => {
 // @route   POST /api/flashcards/decks
 // @access  Private
 export const createDeckHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const {
     title,
     description,
@@ -121,7 +144,14 @@ export const createDeckHandler = asyncHandler(async (req: Request, res: Response
 // @route   PUT /api/flashcards/decks/:id
 // @access  Private
 export const updateDeckHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const deck = await updateDeck(id, userId, req.body);
@@ -136,7 +166,14 @@ export const updateDeckHandler = asyncHandler(async (req: Request, res: Response
 // @route   DELETE /api/flashcards/decks/:id
 // @access  Private
 export const deleteDeckHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await deleteDeck(id, userId);
@@ -151,7 +188,14 @@ export const deleteDeckHandler = asyncHandler(async (req: Request, res: Response
 // @route   GET /api/flashcards/decks/:id/cards
 // @access  Private
 export const getDeckCards = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { archived, active } = req.query;
 
@@ -195,7 +239,14 @@ export const getDeckCards = asyncHandler(async (req: Request, res: Response) => 
 // @route   POST /api/flashcards/decks/:id/cards
 // @access  Private
 export const createFlashcardHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const {
     front,
@@ -240,7 +291,14 @@ export const createFlashcardHandler = asyncHandler(async (req: Request, res: Res
 // @route   GET /api/flashcards/cards/:id
 // @access  Private
 export const getFlashcard = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const flashcard = await Flashcard.findOne({
@@ -268,7 +326,14 @@ export const getFlashcard = asyncHandler(async (req: Request, res: Response) => 
 // @route   PUT /api/flashcards/cards/:id
 // @access  Private
 export const updateFlashcardHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const flashcard = await updateFlashcard(id, userId, req.body);
@@ -283,7 +348,14 @@ export const updateFlashcardHandler = asyncHandler(async (req: Request, res: Res
 // @route   DELETE /api/flashcards/cards/:id
 // @access  Private
 export const deleteFlashcardHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await deleteFlashcard(id, userId);
@@ -298,7 +370,14 @@ export const deleteFlashcardHandler = asyncHandler(async (req: Request, res: Res
 // @route   POST /api/flashcards/cards/:id/review
 // @access  Private
 export const reviewFlashcardHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { quality, timeSpent } = req.body;
 
@@ -322,7 +401,14 @@ export const reviewFlashcardHandler = asyncHandler(async (req: Request, res: Res
 // @route   GET /api/flashcards/study
 // @access  Private
 export const getStudySession = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { deckId, newCardsLimit, reviewCardsLimit } = req.query;
 
   const session = await getStudySessionCards(
@@ -342,7 +428,14 @@ export const getStudySession = asyncHandler(async (req: Request, res: Response) 
 // @route   GET /api/flashcards/cards/:id/reviews
 // @access  Private
 export const getFlashcardReviews = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { limit } = req.query;
 
@@ -376,7 +469,14 @@ export const getFlashcardReviews = asyncHandler(async (req: Request, res: Respon
 // @route   PATCH /api/flashcards/cards/:id/archive
 // @access  Private
 export const archiveFlashcard = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { isArchived } = req.body;
 
@@ -408,7 +508,14 @@ export const archiveFlashcard = asyncHandler(async (req: Request, res: Response)
 // @route   PATCH /api/flashcards/decks/:id/archive
 // @access  Private
 export const archiveDeck = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { isArchived } = req.body;
 

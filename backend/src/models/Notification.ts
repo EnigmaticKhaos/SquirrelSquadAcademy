@@ -24,7 +24,15 @@ export type NotificationType =
   | 'goal_completed'
   | 'waitlist_notification'
   | 'referral_success'
-  | 'system_announcement';
+  | 'system_announcement'
+  | 'study_reminder'
+  | 'live_session_registered'
+  | 'question_answered'
+  | 'live_session_reminder'
+  | 'support_ticket_created'
+  | 'ticket_message'
+  | 'ticket_resolved'
+  | 'ticket_assigned';
 
 export interface INotification extends Document {
   user: mongoose.Types.ObjectId; // Recipient
@@ -98,6 +106,14 @@ const notificationSchema = new Schema<INotification>(
         'waitlist_notification',
         'referral_success',
         'system_announcement',
+        'study_reminder',
+        'live_session_registered',
+        'question_answered',
+        'live_session_reminder',
+        'support_ticket_created',
+        'ticket_message',
+        'ticket_resolved',
+        'ticket_assigned',
       ],
       required: true,
     },

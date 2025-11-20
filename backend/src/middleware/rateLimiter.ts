@@ -2,12 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import logger from '../utils/logger';
 
+// More lenient limits in development
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 /**
  * General API rate limiter
  */
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: isDevelopment ? 1000 : 100, // Much higher limit in development (1000 vs 100)
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
@@ -28,7 +31,7 @@ export const apiLimiter = rateLimit({
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  max: isDevelopment ? 50 : 5, // More lenient in development (50 vs 5)
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later.',
@@ -67,7 +70,7 @@ export const passwordResetLimiter = rateLimit({
  */
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // Limit each IP to 20 uploads per hour
+  max: isDevelopment ? 200 : 20, // More lenient in development (200 vs 20)
   message: {
     success: false,
     message: 'Too many file uploads, please try again later.',
@@ -86,7 +89,7 @@ export const uploadLimiter = rateLimit({
  */
 export const aiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // Limit each IP to 50 AI requests per hour
+  max: isDevelopment ? 500 : 50, // More lenient in development (500 vs 50)
   message: {
     success: false,
     message: 'Too many AI requests, please try again later.',

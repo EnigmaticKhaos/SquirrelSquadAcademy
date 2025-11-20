@@ -62,7 +62,6 @@ const dataExportSchema = new Schema<IDataExport>(
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
     },
     fileUrl: String,
     fileSize: Number,

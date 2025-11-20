@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
 import {
@@ -17,7 +19,14 @@ import {
 // @route   POST /api/saved-content
 // @access  Private
 export const save = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { contentType, contentId, folder, tags, notes } = req.body;
 
   if (!contentType || !contentId) {
@@ -46,7 +55,14 @@ export const save = asyncHandler(async (req: Request, res: Response) => {
 // @route   DELETE /api/saved-content/:contentType/:contentId
 // @access  Private
 export const unsave = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { contentType, contentId } = req.params;
 
   const deleted = await unsaveContent(userId, contentType, contentId);
@@ -68,7 +84,14 @@ export const unsave = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content/check/:contentType/:contentId
 // @access  Private
 export const check = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { contentType, contentId } = req.params;
 
   const isSaved = await isContentSaved(userId, contentType, contentId);
@@ -83,13 +106,22 @@ export const check = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content
 // @access  Private
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { contentType, folder, tags, limit = 50, offset = 0 } = req.query;
+
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
 
   const { savedContent, total } = await getUserSavedContent(userId, {
     contentType: contentType as any,
     folder: folder as string,
-    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+    tags: tagsArray,
     limit: Number(limit),
     offset: Number(offset),
   });
@@ -106,16 +138,25 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content/:contentType
 // @access  Private
 export const getByType = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { contentType } = req.params;
   const { folder, tags, limit = 50, offset = 0 } = req.query;
+
+  const tagsArray = tags ? (Array.isArray(tags) ? tags.map(t => String(t)) : [String(tags)]) : undefined;
 
   const { savedContent, total } = await getSavedContentByType(
     userId,
     contentType as any,
     {
       folder: folder as string,
-      tags: tags ? (Array.isArray(tags) ? tags : [tags]) : undefined,
+      tags: tagsArray,
       limit: Number(limit),
       offset: Number(offset),
     }
@@ -133,7 +174,14 @@ export const getByType = asyncHandler(async (req: Request, res: Response) => {
 // @route   PUT /api/saved-content/:id
 // @access  Private
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { folder, tags, notes } = req.body;
 
@@ -161,7 +209,14 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content/folders
 // @access  Private
 export const getFolders = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const folders = await getUserFolders(userId);
 
@@ -175,7 +230,14 @@ export const getFolders = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content/tags
 // @access  Private
 export const getTags = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const tags = await getUserSavedContentTags(userId);
 
@@ -189,7 +251,14 @@ export const getTags = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/saved-content/stats
 // @access  Private
 export const getStats = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const stats = await getSavedContentStats(userId);
 

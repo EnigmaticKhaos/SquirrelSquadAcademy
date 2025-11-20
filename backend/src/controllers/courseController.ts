@@ -320,6 +320,35 @@ export const deleteCourse = asyncHandler(async (req: Request, res: Response) => 
   });
 });
 
+// @desc    Get user's enrolled courses
+// @route   GET /api/courses/enrolled
+// @access  Private
+export const getEnrolledCourses = asyncHandler(async (req: Request, res: Response) => {
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id;
+
+  const CourseEnrollment = (await import('../models/CourseEnrollment')).default;
+  const enrollments = await CourseEnrollment.find({ user: userId })
+    .populate('course')
+    .sort({ enrolledAt: -1 });
+
+  const courses = enrollments
+    .map((enrollment) => enrollment.course)
+    .filter((course) => course !== null);
+
+  res.json({
+    success: true,
+    courses,
+    count: courses.length,
+  });
+});
+
 // @desc    Enroll in course
 // @route   POST /api/courses/:id/enroll
 // @access  Private

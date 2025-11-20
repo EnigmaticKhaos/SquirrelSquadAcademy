@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createAnnouncement,
   publishAnnouncement,
@@ -16,7 +18,14 @@ import {
 // @route   GET /api/announcements
 // @access  Private
 export const getAnnouncements = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { type, courseId, includeRead, limit = 50, offset = 0 } = req.query;
 
   const { announcements, total, unreadCount } = await getUserAnnouncements(userId, {
@@ -41,7 +50,14 @@ export const getAnnouncements = asyncHandler(async (req: Request, res: Response)
 // @access  Private
 export const getAnnouncement = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const { getUserAnnouncements } = await import('../services/announcementService');
   const { announcements } = await getUserAnnouncements(userId, {
@@ -72,7 +88,14 @@ export const getAnnouncement = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const markAnnouncementAsRead = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const announcement = await markAsRead(id, userId);
 
@@ -94,7 +117,14 @@ export const markAnnouncementAsRead = asyncHandler(async (req: Request, res: Res
 // @route   POST /api/announcements
 // @access  Private/Admin
 export const createAnnouncementHandler = asyncHandler(async (req: Request, res: Response) => {
-  const authorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const authorId = userDoc._id.toString();
   const {
     title,
     content,
@@ -142,7 +172,14 @@ export const createAnnouncementHandler = asyncHandler(async (req: Request, res: 
 // @access  Private/Admin
 export const publishAnnouncementHandler = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const announcement = await publishAnnouncement(id, userId);
 
@@ -158,7 +195,14 @@ export const publishAnnouncementHandler = asyncHandler(async (req: Request, res:
 // @access  Private/Admin
 export const updateAnnouncementHandler = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const updates = req.body;
 
   // Convert date strings to Date objects
@@ -190,7 +234,14 @@ export const updateAnnouncementHandler = asyncHandler(async (req: Request, res: 
 // @access  Private/Admin
 export const deleteAnnouncementHandler = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const deleted = await deleteAnnouncement(id, userId);
 

@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   getSupportedLanguages,
   getDefaultLanguage,
@@ -61,13 +63,20 @@ export const translateContentHandler = asyncHandler(async (req: Request, res: Re
   );
 
   // Save translation
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
   const translation = await createOrUpdateTranslation(
     contentType,
     contentId,
     targetLanguage,
     translatedContent,
     {
-      translatedBy: req.user._id.toString(),
+      translatedBy: userDoc._id.toString(),
       translationMethod: 'ai',
       aiModel,
       aiConfidence,
@@ -138,13 +147,20 @@ export const createTranslationHandler = asyncHandler(async (req: Request, res: R
     });
   }
 
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
   const translation = await createOrUpdateTranslation(
     contentType,
     contentId,
     language,
     translatedFields,
     {
-      translatedBy: req.user._id.toString(),
+      translatedBy: userDoc._id.toString(),
       translationMethod: translationMethod || 'manual',
       status: isPublished ? 'published' : 'completed',
       isPublished: isPublished || false,
@@ -171,7 +187,14 @@ export const reviewTranslationHandler = asyncHandler(async (req: Request, res: R
     });
   }
 
-  const translation = await reviewTranslation(id, req.user._id.toString(), {
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const translation = await reviewTranslation(id, userDoc._id.toString(), {
     approve,
     qualityScore,
     reviewNotes,

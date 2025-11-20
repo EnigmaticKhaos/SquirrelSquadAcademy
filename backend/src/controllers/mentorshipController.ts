@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   findPotentialMentors,
   sendMentorshipRequest,
@@ -17,7 +19,14 @@ import {
 // @route   GET /api/mentorship/find-mentors
 // @access  Private
 export const findMentors = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { courseId, limit = 10 } = req.query;
 
   const mentors = await findPotentialMentors(userId, {
@@ -36,7 +45,14 @@ export const findMentors = asyncHandler(async (req: Request, res: Response) => {
 // @route   POST /api/mentorship/requests
 // @access  Private
 export const createMentorshipRequest = asyncHandler(async (req: Request, res: Response) => {
-  const menteeId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const menteeId = userDoc._id.toString();
   const { mentorId, message, goals, preferredCommunicationMethod, expectedDuration } = req.body;
 
   if (!mentorId) {
@@ -65,7 +81,14 @@ export const createMentorshipRequest = asyncHandler(async (req: Request, res: Re
 // @access  Private
 export const respondToRequest = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const mentorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const mentorId = userDoc._id.toString();
   const { accept } = req.body;
 
   if (typeof accept !== 'boolean') {
@@ -88,7 +111,14 @@ export const respondToRequest = asyncHandler(async (req: Request, res: Response)
 // @route   GET /api/mentorship/requests
 // @access  Private
 export const getRequests = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { type, status, limit = 50, offset = 0 } = req.query;
 
   const { requests, total } = await getMentorshipRequests(userId, {
@@ -110,7 +140,14 @@ export const getRequests = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/mentorship
 // @access  Private
 export const getMentorships = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { role, status, limit = 50, offset = 0 } = req.query;
 
   const { mentorships, total } = await getUserMentorships(userId, {
@@ -133,7 +170,14 @@ export const getMentorships = asyncHandler(async (req: Request, res: Response) =
 // @access  Private
 export const getMentorship = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const Mentorship = (await import('../models/Mentorship')).default;
   const mentorship = await Mentorship.findById(id)
@@ -166,7 +210,14 @@ export const getMentorship = asyncHandler(async (req: Request, res: Response) =>
 // @access  Private
 export const addSession = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { date, duration, notes, goalsDiscussed, nextSteps, rating, feedback } = req.body;
 
   if (!date) {
@@ -198,7 +249,14 @@ export const addSession = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private
 export const createMilestone = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { title, description, targetDate } = req.body;
 
   if (!title) {
@@ -226,7 +284,14 @@ export const createMilestone = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const completeMilestoneHandler = asyncHandler(async (req: Request, res: Response) => {
   const { id, milestoneId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { notes } = req.body;
 
   const mentorship = await completeMilestone(id, milestoneId, userId, notes);
@@ -243,7 +308,14 @@ export const completeMilestoneHandler = asyncHandler(async (req: Request, res: R
 // @access  Private
 export const completeMentorshipHandler = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { rating, feedback } = req.body;
 
   const mentorship = await completeMentorship(id, userId, {

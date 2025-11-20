@@ -1,10 +1,11 @@
-import SavedContent from '../models/SavedContent';
+import SavedContent, { ISavedContent } from '../models/SavedContent';
 import Course from '../models/Course';
 import Lesson from '../models/Lesson';
 import Post from '../models/Post';
 import Project from '../models/Project';
 import ForumPost from '../models/ForumPost';
 import logger from '../utils/logger';
+import mongoose from 'mongoose';
 
 /**
  * Get the model name for a content type
@@ -51,7 +52,7 @@ const verifyContentExists = async (
         return false;
     }
 
-    const content = await Model.findById(contentId);
+    const content = await (Model as any).findById(contentId);
     return !!content;
   } catch (error) {
     logger.error('Error verifying content exists:', error);
@@ -71,7 +72,7 @@ export const saveContent = async (
     tags?: string[];
     notes?: string;
   }
-): Promise<SavedContent> => {
+): Promise<ISavedContent> => {
   try {
     // Verify content exists
     const exists = await verifyContentExists(data.contentType, data.contentId);
@@ -174,7 +175,7 @@ export const getUserSavedContent = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ savedContent: SavedContent[]; total: number }> => {
+): Promise<{ savedContent: ISavedContent[]; total: number }> => {
   try {
     const query: any = { user: userId };
 
@@ -225,11 +226,11 @@ export const getUserSavedContent = async (
               return content;
           }
 
-          const populated = await Model.findById(item.contentId)
+          const populated = await (Model as any).findById(item.contentId)
             .select('title description thumbnail username profilePhoto content');
           
           if (populated) {
-            content.content = populated;
+            (content as any).content = populated;
           }
         } catch (error) {
           logger.error('Error populating saved content:', error);
@@ -257,7 +258,7 @@ export const getSavedContentByType = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ savedContent: SavedContent[]; total: number }> => {
+): Promise<{ savedContent: ISavedContent[]; total: number }> => {
   return getUserSavedContent(userId, {
     ...options,
     contentType,
@@ -275,7 +276,7 @@ export const updateSavedContent = async (
     tags?: string[];
     notes?: string;
   }
-): Promise<SavedContent | null> => {
+): Promise<ISavedContent | null> => {
   try {
     const savedContent = await SavedContent.findOneAndUpdate(
       { _id: savedContentId, user: userId },

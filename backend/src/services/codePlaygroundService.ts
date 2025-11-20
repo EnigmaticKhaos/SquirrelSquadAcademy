@@ -1,4 +1,4 @@
-import CodeSnippet, { SupportedLanguage } from '../models/CodeSnippet';
+import CodeSnippet, { ICodeSnippet, SupportedLanguage } from '../models/CodeSnippet';
 import Course from '../models/Course';
 import { executeCode, validateCode } from './codeExecutionService';
 import logger from '../utils/logger';
@@ -19,7 +19,7 @@ export const saveCodeSnippet = async (
     tags?: string[];
     description?: string;
   }
-): Promise<CodeSnippet> => {
+): Promise<ICodeSnippet> => {
   try {
     // Verify course is coding type if courseId is provided
     if (data.courseId) {
@@ -67,7 +67,7 @@ export const updateCodeSnippet = async (
     tags?: string[];
     description?: string;
   }
-): Promise<CodeSnippet> => {
+): Promise<ICodeSnippet> => {
   try {
     const snippet = await CodeSnippet.findById(snippetId);
     if (!snippet) {
@@ -128,7 +128,7 @@ export const getUserSnippets = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ snippets: CodeSnippet[]; total: number }> => {
+): Promise<{ snippets: ICodeSnippet[]; total: number }> => {
   try {
     const query: any = { user: userId };
 
@@ -170,7 +170,7 @@ export const getPublicSnippets = async (options?: {
   courseId?: string;
   limit?: number;
   offset?: number;
-}): Promise<{ snippets: CodeSnippet[]; total: number }> => {
+}): Promise<{ snippets: ICodeSnippet[]; total: number }> => {
   try {
     const query: any = { isPublic: true };
 
@@ -203,7 +203,7 @@ export const getPublicSnippets = async (options?: {
 export const getCodeSnippet = async (
   snippetId: string,
   userId?: string
-): Promise<CodeSnippet> => {
+): Promise<ICodeSnippet> => {
   try {
     const snippet = await CodeSnippet.findById(snippetId)
       .populate('user', 'username profilePhoto')
@@ -234,7 +234,7 @@ export const executeAndSave = async (
   snippetId: string,
   userId: string,
   stdin?: string
-): Promise<CodeSnippet> => {
+): Promise<ICodeSnippet> => {
   try {
     const snippet = await CodeSnippet.findById(snippetId);
     if (!snippet) {

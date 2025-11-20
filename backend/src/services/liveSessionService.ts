@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import LiveSession from '../models/LiveSession';
 import LiveSessionParticipant from '../models/LiveSessionParticipant';
 import LiveSessionPoll from '../models/LiveSessionPoll';
@@ -576,7 +577,7 @@ export const answerQuestion = async (
     }
 
     qa.answer = answer;
-    qa.answeredBy = userId;
+    qa.answeredBy = new mongoose.Types.ObjectId(userId);
     qa.answeredAt = new Date();
     qa.status = 'answered';
     await qa.save();
@@ -595,8 +596,10 @@ export const answerQuestion = async (
     // Emit real-time answer update
     try {
       const io = getIO();
+      await qa.populate('askedBy', 'username profilePhoto');
+      await qa.populate('answeredBy', 'username profilePhoto');
       io.to(`live_session:${session._id}`).emit('question_answered', {
-        question: await qa.populate('askedBy', 'username profilePhoto').populate('answeredBy', 'username profilePhoto'),
+        question: qa,
       });
     } catch (error) {
       logger.warn('Could not emit answer update:', error);

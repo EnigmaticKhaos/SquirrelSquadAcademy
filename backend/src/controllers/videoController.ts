@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
 import {
@@ -16,7 +18,14 @@ import { isValidYouTubeUrl } from '../utils/youtubeUtils';
 // @access  Private
 export const updateProgress = asyncHandler(async (req: Request, res: Response) => {
   const { lessonId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { currentTime, duration, playbackSpeed, volume, muted, captionsEnabled, captionsLanguage } = req.body;
 
   if (!currentTime || !duration) {
@@ -47,7 +56,14 @@ export const updateProgress = asyncHandler(async (req: Request, res: Response) =
 // @access  Private
 export const getProgress = asyncHandler(async (req: Request, res: Response) => {
   const { lessonId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const progress = await getVideoProgress(userId, lessonId);
 

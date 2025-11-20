@@ -3,6 +3,7 @@ import {
   register,
   login,
   verifyEmail,
+  resendVerificationEmail,
   forgotPassword,
   resetPassword,
   getMe,
@@ -18,6 +19,7 @@ const router = express.Router();
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
 router.get('/verify-email/:token', verifyEmail);
+router.post('/resend-verification', authLimiter, resendVerificationEmail);
 router.post('/forgot-password', passwordResetLimiter, forgotPassword);
 router.post('/reset-password/:token', passwordResetLimiter, resetPassword);
 router.get('/me', protect, getMe);

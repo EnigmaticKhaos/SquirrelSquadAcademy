@@ -1,4 +1,4 @@
-import CourseTestSession from '../models/CourseTestSession';
+import CourseTestSession, { ICourseTestSession } from '../models/CourseTestSession';
 import Course from '../models/Course';
 import { validateCourse } from './courseValidationService';
 import { calculateLevel } from '../utils/levelCalculator';
@@ -10,7 +10,7 @@ import logger from '../utils/logger';
 export const startTestSession = async (
   userId: string,
   courseId: string
-): Promise<CourseTestSession> => {
+): Promise<ICourseTestSession> => {
   try {
     // Check if test session already exists
     let testSession = await CourseTestSession.findOne({
@@ -174,7 +174,7 @@ export const updateTestProgress = async (
     completedAssignments?: string[];
     progressPercentage?: number;
   }
-): Promise<CourseTestSession | null> => {
+): Promise<ICourseTestSession | null> => {
   try {
     const testSession = await CourseTestSession.findOne({
       user: userId,
@@ -229,7 +229,7 @@ export const runCourseValidation = async (
 export const getTestSession = async (
   userId: string,
   courseId: string
-): Promise<CourseTestSession | null> => {
+): Promise<ICourseTestSession | null> => {
   try {
     return await CourseTestSession.findOne({
       user: userId,
@@ -247,7 +247,7 @@ export const getTestSession = async (
 export const completeTestSession = async (
   userId: string,
   courseId: string
-): Promise<CourseTestSession | null> => {
+): Promise<ICourseTestSession | null> => {
   try {
     const testSession = await CourseTestSession.findOne({
       user: userId,

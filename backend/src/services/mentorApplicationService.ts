@@ -1,4 +1,4 @@
-import MentorApplication, { ApplicationStatus, ReviewPriority } from '../models/MentorApplication';
+import MentorApplication, { IMentorApplication, ApplicationStatus, ReviewPriority } from '../models/MentorApplication';
 import User from '../models/User';
 import CourseCompletion from '../models/CourseCompletion';
 import CourseReview from '../models/CourseReview';
@@ -160,7 +160,7 @@ export const submitMentorApplication = async (
     };
     maxMentees?: number;
   }
-): Promise<MentorApplication> => {
+): Promise<IMentorApplication> => {
   try {
     // Check if user already has an application
     const existingApplication = await MentorApplication.findOne({ user: userId });
@@ -468,7 +468,7 @@ export const getApplicationsForReview = async (options?: {
 /**
  * Get user's application
  */
-export const getUserApplication = async (userId: string): Promise<MentorApplication | null> => {
+export const getUserApplication = async (userId: string): Promise<IMentorApplication | null> => {
   try {
     return await MentorApplication.findOne({ user: userId })
       .populate('reviewedBy', 'username');
@@ -558,7 +558,7 @@ export const updateMentorStats = async (mentorId: string): Promise<void> => {
 /**
  * Notify admins of new application
  */
-const notifyAdminsOfApplication = async (application: MentorApplication): Promise<void> => {
+const notifyAdminsOfApplication = async (application: IMentorApplication): Promise<void> => {
   try {
     const admins = await User.find({ role: 'admin' }).select('_id');
     for (const admin of admins) {

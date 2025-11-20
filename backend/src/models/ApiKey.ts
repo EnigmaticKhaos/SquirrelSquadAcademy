@@ -42,7 +42,6 @@ const apiKeySchema = new Schema<IApiKey>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     name: {
       type: String,
@@ -57,7 +56,6 @@ const apiKeySchema = new Schema<IApiKey>(
     keyPrefix: {
       type: String,
       required: true,
-      index: true,
     },
     permissions: [{
       type: String,

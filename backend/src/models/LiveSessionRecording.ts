@@ -35,7 +35,6 @@ const liveSessionRecordingSchema = new Schema<ILiveSessionRecording>(
       ref: 'LiveSession',
       required: true,
       unique: true,
-      index: true,
     },
     recordingUrl: {
       type: String,
@@ -79,7 +78,7 @@ const liveSessionRecordingSchema = new Schema<ILiveSessionRecording>(
   }
 );
 
-liveSessionRecordingSchema.index({ session: 1 });
+// session already has unique: true which creates an index automatically
 liveSessionRecordingSchema.index({ isPublic: 1, recordedAt: -1 });
 
 export default mongoose.model<ILiveSessionRecording>('LiveSessionRecording', liveSessionRecordingSchema);

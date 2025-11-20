@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect, authorize } from '../middleware/auth';
+import { IUser } from '../models/User';
 import {
   createReport,
   reviewReport,
@@ -17,7 +19,14 @@ import {
 // @route   POST /api/moderation/reports
 // @access  Private
 export const createContentReport = asyncHandler(async (req: Request, res: Response) => {
-  const reporterId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const reporterId = userDoc._id.toString();
   const { contentType, contentId, reason, description, evidence } = req.body;
 
   if (!contentType || !contentId || !reason) {
@@ -93,7 +102,14 @@ export const getReport = asyncHandler(async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const reviewContentReport = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const moderatorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const moderatorId = userDoc._id.toString();
   const { status, actionType, actionDetails, moderationNotes } = req.body;
 
   if (!status) {
@@ -121,7 +137,14 @@ export const reviewContentReport = asyncHandler(async (req: Request, res: Respon
 // @route   POST /api/moderation/warnings
 // @access  Private/Admin
 export const issueUserWarning = asyncHandler(async (req: Request, res: Response) => {
-  const moderatorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const moderatorId = userDoc._id.toString();
   const { userId, type, severity, reason, description, relatedReport, relatedContent, expiresInDays } = req.body;
 
   if (!userId || !type || !severity || !reason || !description) {
@@ -169,7 +192,14 @@ export const getUserWarningsList = asyncHandler(async (req: Request, res: Respon
 // @access  Private/Admin
 export const suspendUserAccount = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const moderatorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const moderatorId = userDoc._id.toString();
   const { reason, duration = 7 } = req.body;
 
   if (!reason) {
@@ -196,7 +226,14 @@ export const suspendUserAccount = asyncHandler(async (req: Request, res: Respons
 // @access  Private/Admin
 export const banUserAccount = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const moderatorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const moderatorId = userDoc._id.toString();
   const { reason, bannedUntil } = req.body;
 
   if (!reason) {
@@ -223,7 +260,14 @@ export const banUserAccount = asyncHandler(async (req: Request, res: Response) =
 // @access  Private/Admin
 export const unbanUserAccount = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const moderatorId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const moderatorId = userDoc._id.toString();
 
   await unbanUser(userId, moderatorId);
 

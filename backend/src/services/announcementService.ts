@@ -1,7 +1,8 @@
-import Announcement, { AnnouncementType, AnnouncementStatus, AnnouncementPriority } from '../models/Announcement';
+import Announcement, { IAnnouncement, AnnouncementType, AnnouncementStatus, AnnouncementPriority } from '../models/Announcement';
 import User from '../models/User';
 import Course from '../models/Course';
 import CourseEnrollment from '../models/CourseEnrollment';
+import mongoose from 'mongoose';
 import { createNotification } from './notificationService';
 import logger from '../utils/logger';
 
@@ -29,7 +30,7 @@ export const createAnnouncement = async (
     videoUrl?: string;
     actionUrl?: string;
   }
-): Promise<Announcement> => {
+): Promise<IAnnouncement> => {
   try {
     const announcement = await Announcement.create({
       ...data,
@@ -59,7 +60,7 @@ export const createAnnouncement = async (
 export const publishAnnouncement = async (
   announcementId: string,
   authorId: string
-): Promise<Announcement> => {
+): Promise<IAnnouncement> => {
   try {
     const announcement = await Announcement.findById(announcementId);
     if (!announcement) {
@@ -90,7 +91,7 @@ export const publishAnnouncement = async (
 /**
  * Send notifications for announcement
  */
-const sendAnnouncementNotifications = async (announcement: Announcement): Promise<void> => {
+const sendAnnouncementNotifications = async (announcement: IAnnouncement): Promise<void> => {
   try {
     const targetUsers: string[] = [];
 
@@ -126,7 +127,7 @@ const sendAnnouncementNotifications = async (announcement: Announcement): Promis
 
       // Add specific users
       if (announcement.targetAudience?.specificUsers && announcement.targetAudience.specificUsers.length > 0) {
-        targetUsers.push(...announcement.targetAudience.specificUsers.map(id => id.toString()));
+        targetUsers.push(...announcement.targetAudience.specificUsers.map((id: mongoose.Types.ObjectId) => id.toString()));
       }
     }
 
@@ -169,7 +170,7 @@ export const getUserAnnouncements = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ announcements: Announcement[]; total: number; unreadCount: number }> => {
+): Promise<{ announcements: IAnnouncement[]; total: number; unreadCount: number }> => {
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -255,7 +256,7 @@ export const getUserAnnouncements = async (
 export const markAsRead = async (
   announcementId: string,
   userId: string
-): Promise<Announcement | null> => {
+): Promise<IAnnouncement | null> => {
   try {
     const announcement = await Announcement.findById(announcementId);
     if (!announcement) {
@@ -296,7 +297,7 @@ export const updateAnnouncement = async (
     videoUrl: string;
     actionUrl: string;
   }>
-): Promise<Announcement | null> => {
+): Promise<IAnnouncement | null> => {
   try {
     const announcement = await Announcement.findById(announcementId);
     if (!announcement) {
@@ -383,7 +384,7 @@ export const getAllAnnouncements = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ announcements: Announcement[]; total: number }> => {
+): Promise<{ announcements: IAnnouncement[]; total: number }> => {
   try {
     const query: any = {};
 

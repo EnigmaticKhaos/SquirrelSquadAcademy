@@ -40,7 +40,6 @@ const pomodoroSessionSchema = new Schema<IPomodoroSession>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     workDuration: {
       type: Number,
@@ -79,7 +78,6 @@ const pomodoroSessionSchema = new Schema<IPomodoroSession>(
     startTime: {
       type: Date,
       default: Date.now,
-      index: true,
     },
     endTime: Date,
     duration: {

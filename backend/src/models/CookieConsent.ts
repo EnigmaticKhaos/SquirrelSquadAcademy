@@ -24,7 +24,6 @@ const cookieConsentSchema = new Schema<ICookieConsent>(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     sessionId: String,
     necessary: {

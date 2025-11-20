@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   createFAQ,
   trackFAQView,
@@ -79,7 +81,14 @@ export const getFAQ = asyncHandler(async (req: Request, res: Response) => {
 // @route   POST /api/help/faqs
 // @access  Private/Admin
 export const createFAQHandler = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const faq = await createFAQ(adminId, req.body);
 
   res.status(201).json({
@@ -92,7 +101,14 @@ export const createFAQHandler = asyncHandler(async (req: Request, res: Response)
 // @route   PUT /api/help/faqs/:id
 // @access  Private/Admin
 export const updateFAQ = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { id } = req.params;
 
   const faq = await FAQ.findByIdAndUpdate(
@@ -224,7 +240,14 @@ export const getHelpArticle = asyncHandler(async (req: Request, res: Response) =
 // @route   POST /api/help/articles
 // @access  Private/Admin
 export const createHelpArticleHandler = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const article = await createHelpArticle(adminId, req.body);
 
   res.status(201).json({
@@ -237,7 +260,14 @@ export const createHelpArticleHandler = asyncHandler(async (req: Request, res: R
 // @route   PUT /api/help/articles/:id
 // @access  Private/Admin
 export const updateHelpArticle = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { id } = req.params;
 
   const updateData: any = { ...req.body, lastUpdatedBy: adminId };
@@ -318,7 +348,14 @@ export const rateArticleHandler = asyncHandler(async (req: Request, res: Respons
 // @route   GET /api/help/tickets
 // @access  Private
 export const getUserTickets = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { status, category } = req.query;
 
   const query: any = { user: userId };
@@ -345,7 +382,14 @@ export const getUserTickets = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/help/tickets/:id
 // @access  Private
 export const getSupportTicket = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { default: User } = await import('../models/User');
 
@@ -391,7 +435,14 @@ export const getSupportTicket = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/help/tickets
 // @access  Private
 export const createSupportTicketHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const ticket = await createSupportTicket(userId, req.body);
 
   res.status(201).json({
@@ -405,7 +456,14 @@ export const createSupportTicketHandler = asyncHandler(async (req: Request, res:
 // @route   POST /api/help/tickets/:id/messages
 // @access  Private
 export const addTicketMessageHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { content, attachments, isInternal } = req.body;
 
@@ -429,7 +487,14 @@ export const addTicketMessageHandler = asyncHandler(async (req: Request, res: Re
 // @route   PUT /api/help/tickets/:id/status
 // @access  Private/Admin
 export const updateTicketStatusHandler = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { id } = req.params;
   const { status, resolution } = req.body;
 
@@ -452,7 +517,14 @@ export const updateTicketStatusHandler = asyncHandler(async (req: Request, res: 
 // @route   POST /api/help/tickets/:id/assign
 // @access  Private/Admin
 export const assignTicketHandler = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const { id } = req.params;
   const { assignedToId } = req.body;
 
@@ -564,7 +636,14 @@ export const getVideoTutorial = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/help/tutorials
 // @access  Private/Admin
 export const createVideoTutorialHandler = asyncHandler(async (req: Request, res: Response) => {
-  const adminId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const adminId = userDoc._id.toString();
   const tutorial = await createVideoTutorial(adminId, req.body);
 
   res.status(201).json({

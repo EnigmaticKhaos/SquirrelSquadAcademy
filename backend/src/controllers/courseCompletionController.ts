@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { asyncHandler } from '../middleware/errorHandler';
 import { protect } from '../middleware/auth';
 import {
@@ -17,7 +19,14 @@ import CourseEnrollment from '../models/CourseEnrollment';
 // @access  Private
 export const getCompletion = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const completion = await getCourseCompletion(userId, courseId);
 
@@ -39,7 +48,14 @@ export const getCompletion = asyncHandler(async (req: Request, res: Response) =>
 // @access  Private
 export const shareCompletion = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const result = await shareCourseCompletion(userId, courseId);
 
@@ -61,7 +77,14 @@ export const shareCompletion = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const markCelebration = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const success = await markCelebrationViewed(userId, courseId);
 
@@ -83,7 +106,14 @@ export const markCelebration = asyncHandler(async (req: Request, res: Response) 
 // @access  Private
 export const getAnalytics = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const analytics = await getCourseCompletionAnalytics(userId, courseId);
 
@@ -105,7 +135,14 @@ export const getAnalytics = asyncHandler(async (req: Request, res: Response) => 
 // @access  Private
 export const getTimeRemaining = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   const timeRemaining = await getEstimatedTimeRemaining(userId, courseId);
 
@@ -128,7 +165,14 @@ export const getTimeRemaining = asyncHandler(async (req: Request, res: Response)
 // @access  Private
 export const updateProgress = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   await updateEnrollmentProgress(userId, courseId);
 
@@ -147,7 +191,14 @@ export const updateProgress = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/course-completions/user/enrollments
 // @access  Private
 export const getUserEnrollments = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id;
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id;
   const { status } = req.query;
 
   const query: any = { user: userId };
@@ -170,7 +221,14 @@ export const getUserEnrollments = asyncHandler(async (req: Request, res: Respons
 // @route   GET /api/course-completions/user/completed
 // @access  Private
 export const getUserCompletedCourses = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id;
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id;
   const { limit = 20, offset = 0 } = req.query;
 
   const CourseCompletion = (await import('../models/CourseCompletion')).default;
@@ -192,7 +250,14 @@ export const getUserCompletedCourses = asyncHandler(async (req: Request, res: Re
 // @access  Private
 export const triggerCompletion = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
 
   try {
     const completion = await completeCourse(userId, courseId);

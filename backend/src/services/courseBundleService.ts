@@ -1,6 +1,6 @@
-import CourseBundle from '../models/CourseBundle';
-import BundlePurchase from '../models/BundlePurchase';
-import Course from '../models/Course';
+import CourseBundle, { ICourseBundle } from '../models/CourseBundle';
+import BundlePurchase, { IBundlePurchase } from '../models/BundlePurchase';
+import Course, { ICourse } from '../models/Course';
 import CourseEnrollment from '../models/CourseEnrollment';
 import LearningPath from '../models/LearningPath';
 import logger from '../utils/logger';
@@ -55,7 +55,7 @@ export const getCourseBundles = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ bundles: CourseBundle[]; total: number }> => {
+): Promise<{ bundles: ICourseBundle[]; total: number }> => {
   try {
     const query: any = {};
 
@@ -115,7 +115,7 @@ export const getCourseBundles = async (
  */
 export const getCourseBundle = async (
   bundleId: string
-): Promise<CourseBundle | null> => {
+): Promise<ICourseBundle | null> => {
   try {
     const bundle = await CourseBundle.findById(bundleId)
       .populate('courses', 'title description thumbnail difficulty estimatedDuration price isFree category tags');
@@ -146,7 +146,7 @@ export const purchaseBundle = async (
     stripePaymentIntentId?: string;
     paymentStatus?: 'pending' | 'completed' | 'failed';
   }
-): Promise<BundlePurchase> => {
+): Promise<IBundlePurchase> => {
   try {
     const bundle = await CourseBundle.findById(bundleId);
     if (!bundle) {
@@ -291,7 +291,7 @@ export const getUserBundlePurchases = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ purchases: BundlePurchase[]; total: number }> => {
+): Promise<{ purchases: IBundlePurchase[]; total: number }> => {
   try {
     const total = await BundlePurchase.countDocuments({
       user: userId,
@@ -320,7 +320,7 @@ export const getUserBundlePurchases = async (
 export const updateBundlePurchaseStatus = async (
   purchaseId: string,
   paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded'
-): Promise<BundlePurchase | null> => {
+): Promise<IBundlePurchase | null> => {
   try {
     const purchase = await BundlePurchase.findById(purchaseId).populate('bundle');
     if (!purchase) {
@@ -440,7 +440,7 @@ export const createBundleFromLearningPath = async (
     price?: number;
     discountPercentage?: number;
   }
-): Promise<CourseBundle> => {
+): Promise<ICourseBundle> => {
   try {
     const path = await LearningPath.findById(learningPathId);
     if (!path) {
@@ -506,7 +506,7 @@ export const createBundleFromLearningPath = async (
 export const getRelatedCourses = async (
   courseId: string,
   limit: number = 5
-): Promise<Course[]> => {
+): Promise<ICourse[]> => {
   try {
     const course = await Course.findById(courseId);
     if (!course) {
@@ -538,7 +538,7 @@ export const getRelatedCourses = async (
 export const getCommonlyPurchasedTogether = async (
   courseId: string,
   limit: number = 5
-): Promise<{ course: Course; count: number }[]> => {
+): Promise<{ course: ICourse; count: number }[]> => {
   try {
     // Get all bundles that contain this course
     const bundles = await CourseBundle.find({
@@ -573,7 +573,7 @@ export const getCommonlyPurchasedTogether = async (
       return { course: course!, count };
     }).filter(item => item.course);
     
-    return result as { course: Course; count: number }[];
+    return result as { course: ICourse; count: number }[];
   } catch (error) {
     logger.error('Error getting commonly purchased together courses:', error);
     return [];
@@ -591,7 +591,7 @@ export const getAIBundleSuggestions = async (
     difficulty?: string;
   }
 ): Promise<{
-  suggestedCourses: Course[];
+  suggestedCourses: ICourse[];
   reasoning: string;
 }> => {
   try {
@@ -649,9 +649,9 @@ export const getAIBundleSuggestions = async (
 export const getSmartBundleSuggestions = async (
   courseId: string
 ): Promise<{
-  relatedCourses: Course[];
-  commonlyPurchased: { course: Course; count: number }[];
-  aiSuggestions: { suggestedCourses: Course[]; reasoning: string };
+  relatedCourses: ICourse[];
+  commonlyPurchased: { course: ICourse; count: number }[];
+  aiSuggestions: { suggestedCourses: ICourse[]; reasoning: string };
 }> => {
   try {
     const [relatedCourses, commonlyPurchased, aiSuggestions] = await Promise.all([

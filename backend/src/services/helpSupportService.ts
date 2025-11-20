@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import FAQ from '../models/FAQ';
 import HelpArticle from '../models/HelpArticle';
 import SupportTicket from '../models/SupportTicket';
@@ -365,11 +366,11 @@ export const updateTicketStatus = async (
     }
 
     ticket.status = status;
-    ticket.assignedTo = ticket.assignedTo || adminId;
+    ticket.assignedTo = ticket.assignedTo || new mongoose.Types.ObjectId(adminId);
 
     if (status === 'resolved' || status === 'closed') {
       ticket.resolvedAt = new Date();
-      ticket.resolvedBy = adminId;
+      ticket.resolvedBy = new mongoose.Types.ObjectId(adminId);
       ticket.resolution = resolution;
 
       // Calculate resolution time

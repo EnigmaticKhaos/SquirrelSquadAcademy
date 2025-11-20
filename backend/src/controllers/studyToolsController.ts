@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { asyncHandler } from '../middleware/errorHandler';
+import { IUser } from '../models/User';
 import {
   startPomodoroSession,
   pausePomodoroSession,
@@ -32,7 +34,14 @@ import SavedResource from '../models/SavedResource';
 // @route   GET /api/study-tools/pomodoro/active
 // @access  Private
 export const getActivePomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const session = await getActiveSession(userId);
 
   res.json({
@@ -45,7 +54,14 @@ export const getActivePomodoro = asyncHandler(async (req: Request, res: Response
 // @route   POST /api/study-tools/pomodoro/start
 // @access  Private
 export const startPomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const {
     workDuration,
     shortBreakDuration,
@@ -76,7 +92,14 @@ export const startPomodoro = asyncHandler(async (req: Request, res: Response) =>
 // @route   POST /api/study-tools/pomodoro/:id/pause
 // @access  Private
 export const pausePomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await pausePomodoroSession(id, userId);
@@ -91,7 +114,14 @@ export const pausePomodoro = asyncHandler(async (req: Request, res: Response) =>
 // @route   POST /api/study-tools/pomodoro/:id/resume
 // @access  Private
 export const resumePomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await resumePomodoroSession(id, userId);
@@ -106,7 +136,14 @@ export const resumePomodoro = asyncHandler(async (req: Request, res: Response) =
 // @route   POST /api/study-tools/pomodoro/:id/complete
 // @access  Private
 export const completePomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await completePomodoroSession(id, userId);
@@ -121,7 +158,14 @@ export const completePomodoro = asyncHandler(async (req: Request, res: Response)
 // @route   POST /api/study-tools/pomodoro/:id/end
 // @access  Private
 export const endPomodoro = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const session = await endPomodoroSession(id, userId);
@@ -136,7 +180,14 @@ export const endPomodoro = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/study-tools/pomodoro/history
 // @access  Private
 export const getPomodoroHistory = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { limit } = req.query;
 
   const sessions = await getSessionHistory(
@@ -154,7 +205,14 @@ export const getPomodoroHistory = asyncHandler(async (req: Request, res: Respons
 // @route   GET /api/study-tools/pomodoro/statistics
 // @access  Private
 export const getPomodoroStats = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const stats = await getPomodoroStatistics(userId);
 
   res.json({
@@ -169,7 +227,14 @@ export const getPomodoroStats = asyncHandler(async (req: Request, res: Response)
 // @route   GET /api/study-tools/reminders
 // @access  Private
 export const getReminders = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { active, type } = req.query;
 
   const query: any = { user: userId };
@@ -197,7 +262,14 @@ export const getReminders = asyncHandler(async (req: Request, res: Response) => 
 // @route   POST /api/study-tools/reminders
 // @access  Private
 export const createReminder = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const reminder = await createStudyReminder(userId, req.body);
 
   res.status(201).json({
@@ -210,7 +282,14 @@ export const createReminder = asyncHandler(async (req: Request, res: Response) =
 // @route   PUT /api/study-tools/reminders/:id
 // @access  Private
 export const updateReminder = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   const reminder = await updateStudyReminder(id, userId, req.body);
@@ -225,7 +304,14 @@ export const updateReminder = asyncHandler(async (req: Request, res: Response) =
 // @route   DELETE /api/study-tools/reminders/:id
 // @access  Private
 export const deleteReminder = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await deleteStudyReminder(id, userId);
@@ -242,7 +328,14 @@ export const deleteReminder = asyncHandler(async (req: Request, res: Response) =
 // @route   GET /api/study-tools/resources
 // @access  Private
 export const getResources = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { type, category, search, public: publicOnly, featured } = req.query;
 
   const query: any = {};
@@ -287,8 +380,15 @@ export const getResources = asyncHandler(async (req: Request, res: Response) => 
 // @route   POST /api/study-tools/resources
 // @access  Private
 export const createResourceHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
-  const isAdmin = req.user.role === 'admin';
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId; role?: string };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
+  const isAdmin = userDoc.role === 'admin';
 
   const resource = await createResource(userId, req.body, isAdmin);
 
@@ -302,7 +402,14 @@ export const createResourceHandler = asyncHandler(async (req: Request, res: Resp
 // @route   GET /api/study-tools/resources/saved
 // @access  Private
 export const getSavedResourcesHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { folder } = req.query;
 
   const savedResources = await getSavedResources(userId, folder as string);
@@ -317,7 +424,14 @@ export const getSavedResourcesHandler = asyncHandler(async (req: Request, res: R
 // @route   POST /api/study-tools/resources/:id/save
 // @access  Private
 export const saveResourceHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
   const { folder, tags, notes } = req.body;
 
@@ -333,7 +447,14 @@ export const saveResourceHandler = asyncHandler(async (req: Request, res: Respon
 // @route   DELETE /api/study-tools/resources/:id/save
 // @access  Private
 export const unsaveResourceHandler = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await unsaveResource(userId, id);
@@ -348,7 +469,14 @@ export const unsaveResourceHandler = asyncHandler(async (req: Request, res: Resp
 // @route   POST /api/study-tools/resources/:id/view
 // @access  Private
 export const viewResource = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user._id.toString();
+  const userDoc = req.user as unknown as IUser & { _id: mongoose.Types.ObjectId };
+  if (!userDoc || !userDoc._id) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized',
+    });
+  }
+  const userId = userDoc._id.toString();
   const { id } = req.params;
 
   await trackResourceView(id, userId);

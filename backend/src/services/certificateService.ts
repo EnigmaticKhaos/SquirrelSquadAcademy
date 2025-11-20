@@ -1,9 +1,9 @@
 import PDFDocument from 'pdfkit';
-import Certificate from '../models/Certificate';
+import Certificate, { ICertificate } from '../models/Certificate';
 import CourseCompletion from '../models/CourseCompletion';
 import Course from '../models/Course';
 import User from '../models/User';
-import { uploadFileToS3, downloadFileFromS3 } from './s3Service';
+import { uploadFile, getFile } from './s3Service';
 import logger from '../utils/logger';
 import crypto from 'crypto';
 
@@ -33,7 +33,7 @@ const generateShareableLink = (certificateId: string): string => {
  */
 export const createCertificateFromCompletion = async (
   completionId: string
-): Promise<Certificate> => {
+): Promise<ICertificate> => {
   try {
     const completion = await CourseCompletion.findById(completionId)
       .populate('user')
@@ -91,12 +91,11 @@ export const createCertificateFromCompletion = async (
     const pdfBuffer = await generateCertificatePDF(certificate);
     
     // Upload PDF to S3
-    const uploadResult = await uploadFileToS3({
-      fileBuffer: pdfBuffer,
-      fileName: `certificate-${certificateId}.pdf`,
+    const uploadResult = await uploadFile({
+      file: pdfBuffer,
+      filename: `certificate-${certificateId}.pdf`,
       folder: 'squirrelsquadacademy/certificates',
       contentType: 'application/pdf',
-      isPublic: false,
     });
 
     // Update certificate with PDF URL
@@ -115,7 +114,7 @@ export const createCertificateFromCompletion = async (
 /**
  * Generate certificate PDF
  */
-const generateCertificatePDF = async (certificate: Certificate): Promise<Buffer> => {
+const generateCertificatePDF = async (certificate: ICertificate): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
@@ -155,26 +154,23 @@ const generateCertificatePDF = async (certificate: Certificate): Promise<Buffer>
       doc.fontSize(48)
         .fillColor(certificate.design?.textColor || '#2c3e50')
         .font('Helvetica-Bold')
-        .text('CERTIFICATE OF COMPLETION', {
+        .text('CERTIFICATE OF COMPLETION', doc.page.width / 2, 150, {
           align: 'center',
-          y: 150,
         });
 
       // Subtitle
       doc.fontSize(20)
         .font('Helvetica')
-        .text('This is to certify that', {
+        .text('This is to certify that', doc.page.width / 2, 250, {
           align: 'center',
-          y: 250,
         });
 
       // User name
       doc.fontSize(36)
         .font('Helvetica-Bold')
         .fillColor('#3498db')
-        .text(certificate.certificateData.userName, {
+        .text(certificate.certificateData.userName, doc.page.width / 2, 300, {
           align: 'center',
-          y: 300,
         });
 
       // Course name
@@ -182,17 +178,15 @@ const generateCertificatePDF = async (certificate: Certificate): Promise<Buffer>
         doc.fontSize(24)
           .font('Helvetica')
           .fillColor(certificate.design?.textColor || '#2c3e50')
-          .text('has successfully completed', {
+          .text('has successfully completed', doc.page.width / 2, 370, {
             align: 'center',
-            y: 370,
           });
 
         doc.fontSize(28)
           .font('Helvetica-Bold')
           .fillColor('#e74c3c')
-          .text(certificate.certificateData.courseName, {
+          .text(certificate.certificateData.courseName, doc.page.width / 2, 410, {
             align: 'center',
-            y: 410,
           });
       }
 
@@ -206,40 +200,35 @@ const generateCertificatePDF = async (certificate: Certificate): Promise<Buffer>
       doc.fontSize(16)
         .font('Helvetica')
         .fillColor(certificate.design?.textColor || '#2c3e50')
-        .text(`Issued on ${dateStr}`, {
+        .text(`Issued on ${dateStr}`, doc.page.width / 2, 500, {
           align: 'center',
-          y: 500,
         });
 
       // Score (if available)
       if (certificate.certificateData.finalScore !== undefined) {
         doc.fontSize(14)
-          .text(`Final Score: ${certificate.certificateData.finalScore}%`, {
+          .text(`Final Score: ${certificate.certificateData.finalScore}%`, doc.page.width / 2, 530, {
             align: 'center',
-            y: 530,
           });
       }
 
       // Verification code
       doc.fontSize(10)
         .fillColor('#95a5a6')
-        .text(`Verification Code: ${certificate.verificationCode}`, {
+        .text(`Verification Code: ${certificate.verificationCode}`, doc.page.width / 2, doc.page.height - 100, {
           align: 'center',
-          y: doc.page.height - 100,
         });
 
       // Certificate ID
-      doc.text(`Certificate ID: ${certificate.certificateId}`, {
+      doc.text(`Certificate ID: ${certificate.certificateId}`, doc.page.width / 2, doc.page.height - 80, {
         align: 'center',
-        y: doc.page.height - 80,
       });
 
       // Issued by
       doc.fontSize(12)
         .fillColor(certificate.design?.textColor || '#2c3e50')
-        .text(`Issued by ${certificate.certificateData.issuedBy}`, {
+        .text(`Issued by ${certificate.certificateData.issuedBy}`, doc.page.width / 2, doc.page.height - 50, {
           align: 'center',
-          y: doc.page.height - 50,
         });
 
       doc.end();
@@ -252,7 +241,7 @@ const generateCertificatePDF = async (certificate: Certificate): Promise<Buffer>
 /**
  * Get certificate by ID
  */
-export const getCertificate = async (certificateId: string): Promise<Certificate | null> => {
+export const getCertificate = async (certificateId: string): Promise<ICertificate | null> => {
   try {
     return await Certificate.findOne({ certificateId })
       .populate('user', 'username profilePhoto')
@@ -271,7 +260,7 @@ export const verifyCertificate = async (
   verificationCode?: string
 ): Promise<{
   valid: boolean;
-  certificate?: Certificate;
+  certificate?: ICertificate;
   message?: string;
 }> => {
   try {
@@ -317,7 +306,7 @@ export const getUserCertificates = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ certificates: Certificate[]; total: number }> => {
+): Promise<{ certificates: ICertificate[]; total: number }> => {
   try {
     const query: any = { user: userId };
 
@@ -354,7 +343,7 @@ export const downloadCertificatePDF = async (certificateId: string): Promise<Buf
     if (!certificate.pdfKey) {
       return null;
     }
-    return await downloadFileFromS3(certificate.pdfKey);
+    return await getFile(certificate.pdfKey);
   } catch (error) {
     logger.error('Error downloading certificate PDF:', error);
     return null;

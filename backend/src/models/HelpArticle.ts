@@ -122,7 +122,7 @@ const helpArticleSchema = new Schema<IHelpArticle>(
   }
 );
 
-helpArticleSchema.index({ slug: 1 }, { unique: true });
+// slug already has unique: true which creates an index automatically
 helpArticleSchema.index({ category: 1, status: 1, order: 1 });
 helpArticleSchema.index({ status: 1, publishedAt: -1 });
 helpArticleSchema.index({ title: 'text', content: 'text', excerpt: 'text' });

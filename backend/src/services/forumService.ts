@@ -1,4 +1,4 @@
-import ForumPost from '../models/ForumPost';
+import ForumPost, { IForumPost } from '../models/ForumPost';
 import ForumVote from '../models/ForumVote';
 import Course from '../models/Course';
 import { extractAndResolveMentions, extractAndResolveMentionsWithDetails } from '../utils/mentionUtils';
@@ -17,7 +17,7 @@ export const createForumPost = async (
     parentPostId?: string;
     tags?: string[];
   }
-): Promise<ForumPost> => {
+): Promise<IForumPost> => {
   try {
     const course = await Course.findById(data.courseId);
     if (!course) {
@@ -114,7 +114,7 @@ export const getCourseForumPosts = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ posts: ForumPost[]; total: number }> => {
+): Promise<{ posts: IForumPost[]; total: number }> => {
   try {
     const query: any = { course: courseId };
 
@@ -182,7 +182,7 @@ export const getCourseForumPosts = async (
  */
 export const getForumPost = async (
   postId: string
-): Promise<ForumPost | null> => {
+): Promise<IForumPost | null> => {
   try {
     const post = await ForumPost.findById(postId)
       .populate('author', 'username profilePhoto level bio')
@@ -212,7 +212,7 @@ export const getPostReplies = async (
     limit?: number;
     offset?: number;
   }
-): Promise<{ replies: ForumPost[]; total: number }> => {
+): Promise<{ replies: IForumPost[]; total: number }> => {
   try {
     const query = { parentPost: postId };
 
@@ -261,7 +261,7 @@ export const updateForumPost = async (
     isPinned?: boolean;
     isLocked?: boolean;
   }
-): Promise<ForumPost | null> => {
+): Promise<IForumPost | null> => {
   try {
     const post = await ForumPost.findById(postId);
     if (!post) {
@@ -439,7 +439,7 @@ export const markAsAnswer = async (
 export const togglePinPost = async (
   postId: string,
   userId: string
-): Promise<ForumPost | null> => {
+): Promise<IForumPost | null> => {
   try {
     if (!(await isAdmin(userId))) {
       throw new Error('Unauthorized: Admin access required');
@@ -466,7 +466,7 @@ export const togglePinPost = async (
 export const toggleLockPost = async (
   postId: string,
   userId: string
-): Promise<ForumPost | null> => {
+): Promise<IForumPost | null> => {
   try {
     if (!(await isAdmin(userId))) {
       throw new Error('Unauthorized: Admin access required');
