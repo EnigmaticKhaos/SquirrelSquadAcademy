@@ -73,11 +73,11 @@
 **Backend:** ✅ Complete (`/api/course-waitlist`)
 - Join/leave waitlist
 - Notification when course becomes available
-**Missing Frontend:**
-- Waitlist UI on course pages
-- Waitlist management page
-- Notification integration
+**Frontend:** ✅ Complete
+- Waitlist UI on course detail pages
+- Waitlist management page (`/waitlist`)
 - API client & hooks
+- Real-time waitlist status and position tracking
 
 ### User Features
 

@@ -23,8 +23,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div className={cn('text-center py-12', className)}>
       {icon && <div className="mx-auto mb-4 text-gray-400">{icon}</div>}
-      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-      {description && <p className="text-sm text-gray-500 mb-6">{description}</p>}
+      <h3 className="text-lg font-medium text-gray-100 mb-2">{title}</h3>
+      {description && <p className="text-sm text-gray-400 mb-6">{description}</p>}
       {action && (
         <Button onClick={action.onClick} variant="primary">
           {action.label}

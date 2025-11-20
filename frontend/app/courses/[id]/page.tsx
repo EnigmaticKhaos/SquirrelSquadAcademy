@@ -5,10 +5,12 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import { useCourse, useEnrollCourse } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
+import { useWaitlistStatus, useJoinWaitlist, useLeaveWaitlist } from '@/hooks/useWaitlist';
 import { Button, Card, CardContent, Rating, Badge, LoadingSpinner, ErrorMessage } from '@/components/ui';
 import { showToast, getErrorMessage } from '@/lib/toast';
 import { PageHeader, Breadcrumbs } from '@/components/layout';
 import { ReviewSection } from '@/components/courses/ReviewSection';
+import { Clock, Users, BookOpen } from 'lucide-react';
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -17,6 +19,9 @@ export default function CourseDetailPage() {
   const { user } = useAuth();
   const { data: course, isLoading, error } = useCourse(id);
   const enrollMutation = useEnrollCourse();
+  const { data: waitlistStatus, isLoading: isLoadingWaitlist } = useWaitlistStatus(id, !!id);
+  const joinWaitlistMutation = useJoinWaitlist();
+  const leaveWaitlistMutation = useLeaveWaitlist();
 
   const handleEnroll = async () => {
     if (!user) {
@@ -32,6 +37,34 @@ export default function CourseDetailPage() {
       showToast.error('Failed to enroll in course', getErrorMessage(error));
     }
   };
+
+  const handleJoinWaitlist = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      await joinWaitlistMutation.mutateAsync({ courseId: id });
+    } catch (error: any) {
+      // Error is handled by the hook
+    }
+  };
+
+  const handleLeaveWaitlist = async () => {
+    if (!user) return;
+
+    try {
+      await leaveWaitlistMutation.mutateAsync(id);
+    } catch (error: any) {
+      // Error is handled by the hook
+    }
+  };
+
+  const isCourseFull = waitlistStatus?.isFull || false;
+  const hasWaitlist = waitlistStatus?.hasWaitlist || course?.hasWaitlist || false;
+  const userPosition = waitlistStatus?.userPosition ?? null;
+  const isOnWaitlist = waitlistStatus?.isOnWaitlist || (userPosition !== null && userPosition > 0);
 
   if (isLoading) {
     return (
@@ -149,14 +182,63 @@ export default function CourseDetailPage() {
                   </div>
                 )}
 
-                <Button
-                  onClick={handleEnroll}
-                  isLoading={enrollMutation.isPending}
-                  className="w-full"
-                  size="lg"
-                >
-                  {course.isFree ? 'Enroll for Free' : 'Enroll Now'}
-                </Button>
+                {isCourseFull && hasWaitlist ? (
+                  <div className="space-y-3">
+                    {isOnWaitlist ? (
+                      <>
+                        <div className="rounded-lg border border-blue-500 bg-blue-50 p-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-blue-700 mb-2">
+                            <Clock className="h-5 w-5" />
+                            <span className="font-semibold">You're on the waitlist</span>
+                          </div>
+                          {userPosition && (
+                            <p className="text-sm text-blue-600">
+                              Your position: <span className="font-bold">#{userPosition}</span>
+                            </p>
+                          )}
+                          <p className="text-xs text-blue-600 mt-2">
+                            You'll be notified when a spot becomes available
+                          </p>
+                        </div>
+                        <Button
+                          onClick={handleLeaveWaitlist}
+                          isLoading={leaveWaitlistMutation.isPending}
+                          className="w-full"
+                          size="lg"
+                          variant="outline"
+                        >
+                          Leave Waitlist
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        onClick={handleJoinWaitlist}
+                        isLoading={joinWaitlistMutation.isPending}
+                        className="w-full"
+                        size="lg"
+                        variant="primary"
+                      >
+                        Join Waitlist
+                      </Button>
+                    )}
+                    <div className="rounded-lg border border-yellow-500 bg-yellow-50 p-3 text-center">
+                      <p className="text-sm text-yellow-800">
+                        <Users className="h-4 w-4 inline mr-1" />
+                        Course is full ({waitlistStatus?.currentEnrollments || course.enrollmentCount}
+                        {waitlistStatus?.maxEnrollments && ` / ${waitlistStatus.maxEnrollments}`} enrolled)
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleEnroll}
+                    isLoading={enrollMutation.isPending}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {course.isFree ? 'Enroll for Free' : 'Enroll Now'}
+                  </Button>
+                )}
 
                 <div className="mt-6 space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">

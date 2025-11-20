@@ -41,6 +41,18 @@ export default function Header() {
                   Courses
                 </Link>
                 <Link
+                  href="/course-comparison"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Compare Courses
+                </Link>
+                <Link
+                  href="/waitlist"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  My Waitlist
+                </Link>
+                <Link
                   href="/learning-paths"
                   className="text-sm font-medium text-gray-300 hover:text-gray-100"
                 >
