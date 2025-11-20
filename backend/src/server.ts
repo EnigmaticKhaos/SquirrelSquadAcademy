@@ -42,26 +42,39 @@ app.use(preventHPP);
 
 // CORS - Allow both www and non-www versions
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-const allowedOrigins = [
+// Build allowed origins list
+const allowedOrigins: string[] = [
   frontendUrl,
-  frontendUrl.replace('https://', 'https://www.'),
-  frontendUrl.replace('https://www.', 'https://'),
   'http://localhost:3000',
 ];
+
+// Add www and non-www versions if it's an https URL
+if (frontendUrl.startsWith('https://')) {
+  if (frontendUrl.startsWith('https://www.')) {
+    allowedOrigins.push(frontendUrl.replace('https://www.', 'https://'));
+  } else {
+    allowedOrigins.push(frontendUrl.replace('https://', 'https://www.'));
+  }
+}
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    // Check if origin is in allowed list
-    if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
+    // Check if origin exactly matches or is in the allowed list
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin, 'Allowed:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
 // Body parsing
