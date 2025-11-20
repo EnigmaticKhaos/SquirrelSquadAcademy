@@ -23,7 +23,8 @@ export const challengesApi = {
   getChallenges: (params?: { page?: number; limit?: number; status?: string }) =>
     api.get<ApiResponse<PaginatedResponse<Challenge>>>('/challenges', { params }),
   
-  getChallenge: (id: string) => api.get<ApiResponse<Challenge>>(`/challenges/${id}`),
+  getChallenge: (id: string, params?: { userId?: string }) => 
+    api.get<ApiResponse<{ challenge: Challenge; participant: any; eligibility: any }>>(`/challenges/${id}`, { params }),
   
   joinChallenge: (id: string) => api.post<ApiResponse<Challenge>>(`/challenges/${id}/join`),
   

@@ -3,12 +3,20 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
-import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, Button } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Badge, LoadingSpinner, ErrorMessage, Button, Select } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useChallenges } from '@/hooks/useChallenges';
 
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('active');
+  const { data, isLoading, error } = useChallenges({
+    status: statusFilter || undefined,
+    limit: 20,
+    page: 1,
+    isPublic: true,
+  });
+
+  const challenges = data?.data || [];
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-900">
@@ -20,29 +28,51 @@ export default function ChallengesPage() {
             description="Participate in challenges to earn rewards and compete with others"
           />
 
+          <div className="mb-6">
+            <Select
+              options={[
+                { value: '', label: 'All' },
+                { value: 'active', label: 'Active' },
+                { value: 'upcoming', label: 'Upcoming' },
+                { value: 'ended', label: 'Ended' },
+              ]}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-48"
+            />
+          </div>
+
           {isLoading && (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
             </div>
           )}
 
-          {!isLoading && challenges.length === 0 && (
+          {error && (
             <Card>
-              <CardContent className="p-12 text-center">
-                <p className="text-gray-400">No active challenges at the moment</p>
+              <CardContent className="p-6">
+                <ErrorMessage message="Failed to load challenges. Please try again later." />
               </CardContent>
             </Card>
           )}
 
-          {!isLoading && challenges.length > 0 && (
+          {!isLoading && !error && challenges.length === 0 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <p className="text-gray-400">No challenges found</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {!isLoading && !error && challenges.length > 0 && (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {challenges.map((challenge) => (
-                <Link key={challenge._id} href={`/challenges/${challenge._id}`}>
-                  <Card hover className="h-full">
+                <Link key={challenge._id} href={'/challenges/' + challenge._id}>
+                  <Card hover={true} className="h-full">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <CardTitle className="text-gray-100">{challenge.title}</CardTitle>
-                        <Badge variant={challenge.status === 'active' ? 'success' : 'secondary'}>
+                        <Badge variant={challenge.status === 'active' ? 'success' : challenge.status === 'upcoming' ? 'info' : 'secondary'}>
                           {challenge.status}
                         </Badge>
                       </div>
@@ -57,6 +87,11 @@ export default function ChallengesPage() {
                           <Badge variant="info">{challenge.xpReward} XP</Badge>
                         )}
                       </div>
+                      {challenge.endDate && (
+                        <p className="mt-2 text-xs text-gray-500">
+                          Ends: {new Date(challenge.endDate).toLocaleDateString()}
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
                 </Link>
