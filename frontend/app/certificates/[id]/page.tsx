@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Header from '@/components/layout/Header';
 import { Card, CardContent, LoadingSpinner, ErrorMessage, Button } from '@/components/ui';
 import { Breadcrumbs } from '@/components/layout';
@@ -11,9 +12,16 @@ export default function CertificateDetailPage() {
   const params = useParams();
   const { id } = params as { id: string };
   const { data: certificate, isLoading, error } = useCertificate(id);
+  const [origin, setOrigin] = useState<string>('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const handleDownload = async () => {
-    if (!certificate) return;
+    if (!certificate || typeof window === 'undefined') return;
     try {
       const response = await certificatesApi.downloadCertificate(certificate.certificateId);
       // Handle blob response
@@ -35,8 +43,8 @@ export default function CertificateDetailPage() {
   };
 
   const handleShare = async () => {
-    if (!certificate) return;
-    const shareUrl = certificate.shareableLink || `${window.location.origin}/certificates/verify/${certificate.certificateId}`;
+    if (!certificate || typeof window === 'undefined') return;
+    const shareUrl = certificate.shareableLink || `${origin}/certificates/verify/${certificate.certificateId}`;
     
     if (navigator.share) {
       try {
@@ -154,14 +162,19 @@ export default function CertificateDetailPage() {
                       <p className="text-lg font-mono text-gray-100 mb-4">{certificate.verificationCode}</p>
                       <p className="text-xs text-gray-400">
                         Use this code to verify the authenticity of this certificate at{' '}
-                        <a 
-                          href={`${window.location.origin}/certificates/verify/${certificate.certificateId}`}
-                          className="text-blue-400 hover:text-blue-300"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {window.location.origin}/certificates/verify/{certificate.certificateId}
-                        </a>
+                        {origin && (
+                          <a 
+                            href={`${origin}/certificates/verify/${certificate.certificateId}`}
+                            className="text-blue-400 hover:text-blue-300"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {origin}/certificates/verify/{certificate.certificateId}
+                          </a>
+                        )}
+                        {!origin && (
+                          <span className="text-gray-500">Loading verification link...</span>
+                        )}
                       </p>
                     </div>
                   </div>
