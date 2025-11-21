@@ -9,4 +9,5 @@ export { Breadcrumbs } from './Breadcrumbs';
 export type { BreadcrumbItem, BreadcrumbsProps } from './Breadcrumbs';
 export { PageHeader } from './PageHeader';
 export type { PageHeaderProps } from './PageHeader';
+export { CookieConsentBanner } from './CookieConsentBanner';
 
