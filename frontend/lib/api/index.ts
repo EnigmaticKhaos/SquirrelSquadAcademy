@@ -39,6 +39,8 @@ export { mentorApplicationsApi } from './mentorApplications';
 export { liveSessionsApi } from './liveSessions';
 export { helpSupportApi } from './helpSupport';
 export type { FAQ, HelpArticle, SupportTicket, VideoTutorial, FAQCategory, HelpArticleCategory, TicketStatus, TicketCategory, TicketPriority } from './helpSupport';
+export { dataPrivacyApi } from './dataPrivacy';
+export type { DataExport, CookieConsent, PrivacySettings, ExportStatus, ExportFormat, ExportOptions, CookieConsentPreferences } from './dataPrivacy';
 
 // Also export everything from each module
 export * from './auth';
@@ -69,4 +71,5 @@ export * from './mentorship';
 export * from './mentorApplications';
 export * from './liveSessions';
 export * from './helpSupport';
+export * from './dataPrivacy';
 

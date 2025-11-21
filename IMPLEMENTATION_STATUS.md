@@ -283,9 +283,16 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete accessibility system
   - **Missing**: Accessibility settings UI, preferences
 
-- ❌ **Data Privacy**
+- ✅ **Data Privacy**
   - Backend: Complete data privacy system
-  - **Missing**: Privacy settings, data export, account deletion UI
+  - Frontend: Privacy settings page with comprehensive GDPR compliance features
+  - Data export with format selection (JSON, CSV, PDF) and scope options
+  - Export history tracking with status indicators
+  - Account deletion with scheduled and immediate options
+  - Cookie consent banner with granular preferences
+  - Privacy policy acceptance and consent management
+  - API client & hooks fully implemented
+  - Integrated into settings navigation
 
 - ❌ **PWA Features**
   - Backend: Complete PWA system
@@ -357,6 +364,7 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `savedContent.ts` - Saved Content API
 - ✅ `recommendations.ts` - Recommendations API (exists, hooks created)
 - ✅ `helpSupport.ts` - Help & Support API (implemented)
+- ✅ `dataPrivacy.ts` - Data Privacy API (implemented)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -381,6 +389,7 @@ This document tracks the implementation status of features across the platform, 
 - ❌ `useSavedContent` - Saved Content hooks
 - ✅ `useRecommendations` - Recommendations hooks (created)
 - ✅ `useHelpSupport` - Help & Support hooks (implemented)
+- ✅ `useDataPrivacy` - Data Privacy hooks (implemented)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
@@ -391,8 +400,8 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 22 (helpSupport added)
-### Frontend Hooks: 23 (useHelpSupport added)
+### Frontend API Files: 23 (helpSupport, dataPrivacy added)
+### Frontend Hooks: 24 (useHelpSupport, useDataPrivacy added)
 ### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:

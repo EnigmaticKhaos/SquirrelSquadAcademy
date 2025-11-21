@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { CookieConsentBanner } from './CookieConsentBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -73,6 +74,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, requireAuth = fa
           {children}
         </main>
       </div>
+      
+      {/* Cookie Consent Banner */}
+      <CookieConsentBanner />
     </div>
   );
 };
