@@ -121,7 +121,7 @@ const executeWithJudge0 = async (
         headers,
         params: {
           base64_encoded: 'false',
-          wait: 'true', // Wait for execution to complete
+          wait: true, // Wait for execution to complete (boolean, not string)
         },
         timeout: 30000, // 30 second timeout
         validateStatus: (status) => status < 500,
@@ -134,20 +134,26 @@ const executeWithJudge0 = async (
     const submitData = submitResponse.data;
     const token = submitData.token;
 
+    if (!token) {
+      throw new Error('Judge0 did not return a token');
+    }
+
     logger.info('Judge0 submission response:', {
       hasToken: !!token,
+      token,
       hasStatus: !!submitData.status,
       statusId: submitData.status?.id,
       hasStdout: !!submitData.stdout,
       stdoutPreview: submitData.stdout?.substring(0, 100),
     });
 
-    // When wait=true, Judge0 returns the full result in the initial response
-    // Check if we have the full result (status object) or just a token
+    // When wait=true, Judge0 may return the full result in the initial response
+    // But some instances only return a token, so we always fetch the result to be safe
     let result = submitData;
     
-    // If we only got a token, fetch the result
-    if (token && !result.status) {
+    // Always fetch the result by token to ensure we have the complete execution result
+    // This handles cases where wait=true doesn't return the full result immediately
+    if (token) {
       logger.info('Fetching result for token:', token);
       // Build headers for result request
       const resultHeaders: Record<string, string> = {};
@@ -158,28 +164,68 @@ const executeWithJudge0 = async (
         resultHeaders['X-Auth-Token'] = JUDGE0_AUTH_TOKEN;
       }
 
-      // Get execution result
-      const resultResponse = await axios.get(
+      // Get execution result - poll until we get a final status
+    // Status 1 = In Queue, 2 = Processing, 3+ = Final status
+    let resultResponse: any = null;
+    let attempts = 0;
+    const maxAttempts = 30; // Wait up to 30 seconds
+    const pollInterval = 1000; // 1 second
+    
+    while (attempts < maxAttempts) {
+      resultResponse = await axios.get(
         `${JUDGE0_API_URL}/submissions/${token}`,
         {
           headers: resultHeaders,
           params: {
             base64_encoded: 'false',
           },
-          timeout: 10000, // 10 second timeout
+          timeout: 10000,
           validateStatus: (status) => status < 500,
           httpsAgent: new https.Agent({
-            rejectUnauthorized: false, // Allow self-signed certificates for self-hosted instances
+            rejectUnauthorized: false,
           }),
         }
       );
+      
+      const currentResult = resultResponse.data;
+      const statusId = currentResult.status?.id;
+      
+      // Status 1 = In Queue, 2 = Processing - keep polling
+      // Status 3+ = Final status (Accepted, Error, etc.)
+      if (statusId && statusId > 2) {
+        logger.info(`Got final status ${statusId} after ${attempts} attempts`);
+        break;
+      }
+      
+      // If still processing, wait and retry
+      if (statusId === 1 || statusId === 2) {
+        attempts++;
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          continue;
+        }
+      }
+      
+      break;
+    }
+    
+    if (!resultResponse) {
+      throw new Error('Failed to get execution result from Judge0');
+    }
 
       result = resultResponse.data;
       logger.info('Judge0 result fetched:', {
         statusId: result.status?.id,
+        statusDescription: result.status?.description,
         hasStdout: !!result.stdout,
-        stdoutPreview: result.stdout?.substring(0, 100),
+        stdoutValue: result.stdout,
+        stdoutLength: result.stdout?.length || 0,
+        hasStderr: !!result.stderr,
+        stderrValue: result.stderr,
       });
+    } else {
+      // If we got the full result in the initial response, use it
+      logger.info('Using result from initial response');
     }
 
     // Map Judge0 status to our status
