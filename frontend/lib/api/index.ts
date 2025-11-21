@@ -24,7 +24,6 @@ export { certificatesApi } from './certificates';
 export { forumsApi } from './forums';
 export { lessonsApi } from './lessons';
 export { modulesApi } from './modules';
-export { videosApi } from './videos';
 export { courseCompletionApi } from './courseCompletion';
 export { assignmentsApi } from './assignments';
 export { submissionsApi } from './submissions';
@@ -47,6 +46,7 @@ export { referralsApi } from './referrals';
 export type { Referral, ReferralStats, ReferralStatus, ReferralCode, CreateCustomReferralData, UseReferralData, RewardType, ReferralReward } from './referrals';
 export { accessibilityApi } from './accessibility';
 export type { AccessibilityPreferences, UpdateAccessibilityPreferencesData, FontSize, ColorBlindMode } from './accessibility';
+export type { VideoProgress, VideoUploadResponse, YouTubeVideoResponse, UpdateVideoSettingsData } from './videos';
 
 // Also export everything from each module
 export * from './auth';

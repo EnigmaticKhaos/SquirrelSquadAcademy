@@ -21,6 +21,27 @@ export interface VideoProgress {
   updatedAt: string;
 }
 
+export interface VideoUploadResponse {
+  url: string;
+  thumbnail: string;
+  duration?: number;
+}
+
+export interface YouTubeVideoResponse {
+  videoId: string;
+  thumbnail: string;
+  embedUrl: string;
+  url: string;
+}
+
+export interface UpdateVideoSettingsData {
+  videoTranscript?: string;
+  videoCaptions?: string;
+  allowDownload?: boolean;
+  playbackSpeedOptions?: number[];
+  interactiveQuizData?: any[];
+}
+
 export const videosApi = {
   updateProgress: (lessonId: string, data: {
     currentTime: number;
@@ -43,5 +64,32 @@ export const videosApi = {
     
     return api.get<ApiResponse<{ playbackUrl: string }>>(`/videos/${lessonId}/playback`, { params: queryParams });
   },
+  
+  // Admin endpoints
+  uploadVideo: (lessonId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('video', file);
+    return api.post<ApiResponse<{ video: VideoUploadResponse; message: string }>>(
+      `/videos/${lessonId}/upload`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  },
+  
+  setYouTubeVideo: (lessonId: string, youtubeUrl: string) =>
+    api.post<ApiResponse<{ video: YouTubeVideoResponse; message: string }>>(
+      `/videos/${lessonId}/youtube`,
+      { youtubeUrl }
+    ),
+  
+  updateVideoSettings: (lessonId: string, data: UpdateVideoSettingsData) =>
+    api.put<ApiResponse<{ lesson: any; message: string }>>(
+      `/videos/${lessonId}/settings`,
+      data
+    ),
 };
 

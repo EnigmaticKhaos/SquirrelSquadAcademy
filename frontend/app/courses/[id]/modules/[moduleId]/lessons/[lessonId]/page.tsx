@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/layout/Header';
 import { useCourse } from '@/hooks/useCourses';
 import { useLesson } from '@/hooks/useLessons';
@@ -10,7 +10,9 @@ import { useLessons } from '@/hooks/useLessons';
 import { useModule } from '@/hooks/useModules';
 import { useVideoProgress, useUpdateVideoProgress } from '@/hooks/useVideos';
 import { useUpdateCourseProgress } from '@/hooks/useCourseCompletion';
-import { Card, CardContent, Button, VideoPlayer, LoadingSpinner, ErrorMessage, MarkdownRenderer, Badge } from '@/components/ui';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, Button, VideoPlayer, LoadingSpinner, ErrorMessage, MarkdownRenderer, Badge, VideoUploadModal } from '@/components/ui';
+import { Upload } from 'lucide-react';
 import { Breadcrumbs } from '@/components/layout';
 
 export default function LessonPage() {
@@ -24,6 +26,10 @@ export default function LessonPage() {
   const { data: videoProgress } = useVideoProgress(lessonId);
   const updateVideoProgress = useUpdateVideoProgress();
   const updateCourseProgress = useUpdateCourseProgress();
+  const { user } = useAuth();
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  
+  const isAdmin = user?.role === 'admin';
 
   const isLoading = courseLoading || lessonLoading;
   const error = courseError || lessonError;
@@ -45,11 +51,27 @@ export default function LessonPage() {
     }
   };
 
-  const handleVideoTimeUpdate = (currentTime: number, duration: number) => {
+  const handleVideoTimeUpdate = (currentTime: number, duration: number, settings?: {
+    playbackSpeed?: number;
+    volume?: number;
+    muted?: boolean;
+    captionsEnabled?: boolean;
+    captionsLanguage?: string;
+  }) => {
     if (!lesson || !lesson.hasVideo) return;
     updateVideoProgress.mutate({
       lessonId: lesson._id,
-      data: { currentTime, duration },
+      data: { 
+        currentTime, 
+        duration,
+        ...(settings && {
+          playbackSpeed: settings.playbackSpeed,
+          volume: settings.volume,
+          muted: settings.muted,
+          captionsEnabled: settings.captionsEnabled,
+          captionsLanguage: settings.captionsLanguage,
+        }),
+      },
     });
   };
 
@@ -124,21 +146,50 @@ export default function LessonPage() {
             <div className="lg:col-span-3">
               <Card>
                 <CardContent className="p-6">
-                  <div className="mb-4 flex items-center gap-2">
-                    <h1 className="text-3xl font-bold text-gray-100">{lesson.title}</h1>
-                    {isCompleted && <Badge variant="success">Completed</Badge>}
+                  <div className="mb-4 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-3xl font-bold text-gray-100">{lesson.title}</h1>
+                      {isCompleted && <Badge variant="success">Completed</Badge>}
+                    </div>
+                    {isAdmin && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowUploadModal(true)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {lesson.hasVideo ? 'Change Video' : 'Add Video'}
+                      </Button>
+                    )}
                   </div>
                   
-                  {lesson.hasVideo && lesson.videoUrl && (
+                  {lesson.hasVideo && lesson.videoUrl ? (
                     <div className="mb-6">
                       <VideoPlayer
                         src={lesson.videoUrl}
+                        poster={lesson.videoThumbnail}
                         controls
+                        lessonId={lesson._id}
+                        videoProgress={videoProgress || undefined}
                         onTimeUpdate={handleVideoTimeUpdate}
                         startTime={videoProgress?.currentTime}
+                        videoSource={lesson.videoSource as 'upload' | 'youtube'}
+                        videoId={lesson.videoId}
                       />
                     </div>
-                  )}
+                  ) : isAdmin ? (
+                    <div className="mb-6 border-2 border-dashed border-gray-700 rounded-lg p-12 text-center">
+                      <Upload className="w-12 h-12 mx-auto mb-4 text-gray-500" />
+                      <p className="text-gray-400 mb-2">No video uploaded for this lesson</p>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowUploadModal(true)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Video
+                      </Button>
+                    </div>
+                  ) : null}
 
                   <div className="mb-6">
                     <MarkdownRenderer content={lesson.content} />
@@ -203,6 +254,20 @@ export default function LessonPage() {
           </div>
         </div>
       </main>
+      
+      {isAdmin && lesson && (
+        <VideoUploadModal
+          lessonId={lesson._id}
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={() => {
+            // Refetch lesson data
+            if (typeof window !== 'undefined') {
+              window.location.reload();
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
