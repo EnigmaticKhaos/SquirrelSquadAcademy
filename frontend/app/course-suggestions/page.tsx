@@ -23,6 +23,7 @@ import {
   Modal,
   Input,
   Textarea,
+  CardSkeleton,
 } from '@/components/ui';
 import { showToast } from '@/lib/toast';
 import type { SuggestionStatus } from '@/lib/api/courseSuggestions';
@@ -186,9 +187,7 @@ export default function CourseSuggestionsPage() {
 
         {/* Suggestions List */}
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
+          <CardSkeleton count={5} />
         ) : suggestions && suggestions.length > 0 ? (
           <div className="space-y-4">
             {suggestions.map((suggestion) => (

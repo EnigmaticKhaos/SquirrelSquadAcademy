@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout';
 import { useCourses } from '@/hooks/useCourses';
-import { Card, CardContent, Badge, LoadingSpinner, ErrorMessage, EmptyState, SearchBar, FilterPanel, Button } from '@/components/ui';
+import { Card, CardContent, Badge, LoadingSpinner, ErrorMessage, EmptyState, SearchBar, FilterPanel, Button, CourseCardSkeleton } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 export default function CoursesPage() {
@@ -90,9 +90,7 @@ export default function CoursesPage() {
 
           {/* Courses Grid */}
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <LoadingSpinner size="lg" />
-            </div>
+            <CourseCardSkeleton count={6} />
           ) : error ? (
             <ErrorMessage message="Failed to load courses. Please try again." />
           ) : courses.length === 0 ? (

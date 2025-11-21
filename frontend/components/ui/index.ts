@@ -17,6 +17,18 @@ export { Modal } from './Modal';
 export type { ModalProps } from './Modal';
 
 export { LoadingSpinner } from './LoadingSpinner';
+export { 
+  LoadingSkeleton, 
+  CardSkeleton, 
+  ListSkeleton, 
+  TableSkeleton, 
+  CourseCardSkeleton, 
+  StatsCardSkeleton, 
+  AvatarSkeleton, 
+  FormSkeleton, 
+  PageHeaderSkeleton 
+} from './LoadingSkeleton';
+export type { LoadingSkeletonProps } from './LoadingSkeleton';
 export type { LoadingSpinnerProps } from './LoadingSpinner';
 
 export { ErrorMessage } from './ErrorMessage';
