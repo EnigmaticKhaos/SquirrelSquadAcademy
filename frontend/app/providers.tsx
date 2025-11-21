@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { SocketProvider } from '@/providers/SocketProvider';
 import { Toaster } from '@/components/ui/Toaster';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
+import { AccessibilityProvider } from '@/components/AccessibilityProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -26,8 +27,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ErrorBoundaryWrapper level="page">
       <QueryClientProvider client={queryClient}>
         <SocketProvider>
-          {children}
-          <Toaster />
+          <AccessibilityProvider>
+            {children}
+            <Toaster />
+          </AccessibilityProvider>
         </SocketProvider>
       </QueryClientProvider>
     </ErrorBoundaryWrapper>
