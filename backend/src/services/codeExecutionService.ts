@@ -131,57 +131,108 @@ const executeWithJudge0 = async (
       }
     );
 
-    const token = submitResponse.data.token;
+    const submitData = submitResponse.data;
+    const token = submitData.token;
 
-    // Build headers for result request
-    const resultHeaders: Record<string, string> = {};
-    if (IS_RAPIDAPI) {
-      resultHeaders['X-RapidAPI-Key'] = JUDGE0_API_KEY || '';
-      resultHeaders['X-RapidAPI-Host'] = 'judge0-ce.p.rapidapi.com';
-    } else if (IS_SELF_HOSTED && JUDGE0_AUTH_TOKEN) {
-      resultHeaders['X-Auth-Token'] = JUDGE0_AUTH_TOKEN;
-    }
+    logger.info('Judge0 submission response:', {
+      hasToken: !!token,
+      hasStatus: !!submitData.status,
+      statusId: submitData.status?.id,
+      hasStdout: !!submitData.stdout,
+      stdoutPreview: submitData.stdout?.substring(0, 100),
+    });
 
-    // Get execution result
-    const resultResponse = await axios.get(
-      `${JUDGE0_API_URL}/submissions/${token}`,
-      {
-        headers: resultHeaders,
-        params: {
-          base64_encoded: 'false',
-        },
-        timeout: 10000, // 10 second timeout
-        validateStatus: (status) => status < 500,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false, // Allow self-signed certificates for self-hosted instances
-        }),
+    // When wait=true, Judge0 returns the full result in the initial response
+    // Check if we have the full result (status object) or just a token
+    let result = submitData;
+    
+    // If we only got a token, fetch the result
+    if (token && !result.status) {
+      logger.info('Fetching result for token:', token);
+      // Build headers for result request
+      const resultHeaders: Record<string, string> = {};
+      if (IS_RAPIDAPI) {
+        resultHeaders['X-RapidAPI-Key'] = JUDGE0_API_KEY || '';
+        resultHeaders['X-RapidAPI-Host'] = 'judge0-ce.p.rapidapi.com';
+      } else if (IS_SELF_HOSTED && JUDGE0_AUTH_TOKEN) {
+        resultHeaders['X-Auth-Token'] = JUDGE0_AUTH_TOKEN;
       }
-    );
 
-    const result = resultResponse.data;
+      // Get execution result
+      const resultResponse = await axios.get(
+        `${JUDGE0_API_URL}/submissions/${token}`,
+        {
+          headers: resultHeaders,
+          params: {
+            base64_encoded: 'false',
+          },
+          timeout: 10000, // 10 second timeout
+          validateStatus: (status) => status < 500,
+          httpsAgent: new https.Agent({
+            rejectUnauthorized: false, // Allow self-signed certificates for self-hosted instances
+          }),
+        }
+      );
+
+      result = resultResponse.data;
+      logger.info('Judge0 result fetched:', {
+        statusId: result.status?.id,
+        hasStdout: !!result.stdout,
+        stdoutPreview: result.stdout?.substring(0, 100),
+      });
+    }
 
     // Map Judge0 status to our status
+    // Status IDs: 1=In Queue, 2=Processing, 3=Accepted, 4=Wrong Answer, 5=Time Limit, 6=Compilation Error, 7-12=Runtime Errors
     let status: CodeExecutionResult['status'] = 'success';
-    if (result.status.id === 3) {
-      // Accepted
+    const statusId = result.status?.id;
+    
+    logger.info('Processing Judge0 result:', {
+      statusId,
+      statusDescription: result.status?.description,
+      stdout: result.stdout,
+      stderr: result.stderr,
+      compileOutput: result.compile_output,
+    });
+    
+    if (statusId === 1 || statusId === 2) {
+      // Still processing - this shouldn't happen with wait=true, but handle it
+      logger.warn('Judge0 result still processing', { statusId, token });
+      status = 'error';
+    } else if (statusId === 3) {
+      // Accepted - success
       status = 'success';
-    } else if (result.status.id === 4 || result.status.id === 5) {
+    } else if (statusId === 4 || statusId === 5) {
       // Wrong Answer or Time Limit Exceeded
       status = 'error';
-    } else if (result.status.id === 6) {
+    } else if (statusId === 6) {
       // Compilation Error
       status = 'error';
-    } else if (result.status.id === 7 || result.status.id === 8) {
-      // Runtime Error
+    } else if (statusId >= 7 && statusId <= 12) {
+      // Runtime Errors (7=SIGSEGV, 8=SIGXFSZ, 9=SIGFPE, 10=SIGABRT, 11=NZEC, 12=Other)
       status = 'runtime_error';
-    } else if (result.status.id === 9) {
-      // Runtime Error (NZEC)
-      status = 'runtime_error';
+    } else if (statusId === 13 || statusId === 14) {
+      // Internal Error or Exec Format Error
+      status = 'error';
     }
 
+    // Handle both string and null/empty stdout
+    const output = result.stdout !== null && result.stdout !== undefined && result.stdout !== '' 
+      ? result.stdout 
+      : undefined;
+    const error = result.stderr || result.compile_output || undefined;
+
+    logger.info('Judge0 execution result:', {
+      statusId: result.status?.id,
+      statusDescription: result.status?.description,
+      hasStdout: !!result.stdout,
+      hasStderr: !!result.stderr,
+      stdoutLength: result.stdout?.length || 0,
+    });
+
     return {
-      output: result.stdout || undefined,
-      error: result.stderr || result.compile_output || undefined,
+      output,
+      error,
       executionTime: result.time ? parseFloat(result.time) * 1000 : undefined, // Convert to milliseconds
       memoryUsed: result.memory ? result.memory * 1024 : undefined, // Convert to bytes
       status,
