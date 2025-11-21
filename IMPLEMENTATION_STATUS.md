@@ -243,6 +243,19 @@ This document tracks the implementation status of features across the platform, 
   - Personalized recommendations based on user learning history
   - Empty states for when no recommendations are available
 
+- ✅ **Referrals**
+  - Backend: Complete referral system
+  - Frontend: Referral dashboard with comprehensive tracking and management
+  - Referral code and link display with copy/share functionality
+  - Statistics cards showing total, completed, pending referrals and rewards earned
+  - Referral listing with status filtering (pending, completed, expired)
+  - Use referral code modal for applying codes
+  - Create custom referral code with configurable rewards and conditions
+  - Support for XP, subscription days, badges, and achievements as rewards
+  - Optional requirements (purchase, subscription) and expiration settings
+  - API client & hooks fully implemented
+  - Integrated into main navigation
+
 - ✅ **Course Suggestions**
   - Backend: Complete suggestion service
   - Frontend: Complete suggestion listing, creation, voting, and admin approval flow
@@ -275,9 +288,6 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete waitlist system
   - **Missing**: Waitlist UI, notification when available
 
-- ❌ **Referrals**
-  - Backend: Complete referral system
-  - **Missing**: Referral link generation, tracking UI
 
 - ✅ **Help & Support**
   - Backend: Complete help/support system
@@ -375,6 +385,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `helpSupport.ts` - Help & Support API (implemented)
 - ✅ `dataPrivacy.ts` - Data Privacy API (implemented)
 - ✅ `courseSuggestions.ts` - Course Suggestions API (implemented)
+- ✅ `referrals.ts` - Referrals API (implemented)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -401,6 +412,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `useHelpSupport` - Help & Support hooks (implemented)
 - ✅ `useDataPrivacy` - Data Privacy hooks (implemented)
 - ✅ `useCourseSuggestions` - Course Suggestions hooks (implemented)
+- ✅ `useReferrals` - Referrals hooks (implemented)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
@@ -411,8 +423,8 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 24 (helpSupport, dataPrivacy, courseSuggestions added)
-### Frontend Hooks: 25 (useHelpSupport, useDataPrivacy, useCourseSuggestions added)
+### Frontend API Files: 25 (helpSupport, dataPrivacy, courseSuggestions, referrals added)
+### Frontend Hooks: 26 (useHelpSupport, useDataPrivacy, useCourseSuggestions, useReferrals added)
 ### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:

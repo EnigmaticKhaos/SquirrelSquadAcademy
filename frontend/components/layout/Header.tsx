@@ -94,6 +94,12 @@ export default function Header() {
                 >
                   Course Suggestions
                 </Link>
+                <Link
+                  href="/referrals"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Referrals
+                </Link>
                 <NotificationBell />
                 {user._id && (
                   <Link href={`/profile/${user._id}`}>
