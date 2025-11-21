@@ -66,3 +66,103 @@ body {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Accessibility Styles */
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+.high-contrast * {
+  border-color: currentColor !important;
+}
+
+/* Font Sizes */
+.font-small {
+  font-size: 0.875rem;
+}
+
+.font-medium {
+  font-size: 1rem;
+}
+
+.font-large {
+  font-size: 1.125rem;
+}
+
+.font-extra-large {
+  font-size: 1.25rem;
+}
+
+/* Reduced Motion */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Screen Reader Optimized */
+.screen-reader-optimized [aria-hidden="true"] {
+  display: none !important;
+}
+
+.screen-reader-optimized img:not([alt]),
+.screen-reader-optimized img[alt=""] {
+  border: 2px dashed red;
+}
+
+/* Enhanced Focus Indicators */
+.focus-visible-enhanced *:focus-visible {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+}
+
+.keyboard-navigation *:focus-visible {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* Color Blind Modes */
+.color-blind-protanopia {
+  filter: url('#protanopia');
+}
+
+.color-blind-deuteranopia {
+  filter: url('#deuteranopia');
+}
+
+.color-blind-tritanopia {
+  filter: url('#tritanopia');
+}
+
+/* Dyslexia Font */
+.dyslexia-font {
+  font-family: 'Comic Sans MS', 'OpenDyslexic', 'Arial', sans-serif;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  line-height: 1.6;
+}
+
+/* Reading Assistance */
+.reading-assistance p,
+.reading-assistance li {
+  line-height: 1.8;
+  max-width: 65ch;
+}
+
+/* Alt Text Display */
+.alt-text-for-images img::after {
+  content: attr(alt);
+  display: block;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

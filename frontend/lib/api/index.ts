@@ -45,6 +45,8 @@ export { courseSuggestionsApi } from './courseSuggestions';
 export type { CourseSuggestion, SuggestionStatus, CreateSuggestionData } from './courseSuggestions';
 export { referralsApi } from './referrals';
 export type { Referral, ReferralStats, ReferralStatus, ReferralCode, CreateCustomReferralData, UseReferralData, RewardType, ReferralReward } from './referrals';
+export { accessibilityApi } from './accessibility';
+export type { AccessibilityPreferences, UpdateAccessibilityPreferencesData, FontSize, ColorBlindMode } from './accessibility';
 
 // Also export everything from each module
 export * from './auth';
@@ -78,4 +80,5 @@ export * from './helpSupport';
 export * from './dataPrivacy';
 export * from './courseSuggestions';
 export * from './referrals';
+export * from './accessibility';
 
