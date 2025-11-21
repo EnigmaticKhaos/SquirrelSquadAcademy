@@ -85,3 +85,7 @@ export type { SkeletonProps } from './Skeleton';
 export { FileUpload } from './FileUpload';
 export type { FileUploadProps } from './FileUpload';
 
+// Error Boundaries
+export { ErrorBoundary } from '../ErrorBoundary';
+export { ErrorBoundaryWrapper, useErrorHandler } from '../ErrorBoundaryWrapper';
+

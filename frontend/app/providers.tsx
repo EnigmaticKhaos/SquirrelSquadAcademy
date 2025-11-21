@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { SocketProvider } from '@/providers/SocketProvider';
 import { Toaster } from '@/components/ui/Toaster';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,14 +23,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundaryWrapper level="page">
       <QueryClientProvider client={queryClient}>
         <SocketProvider>
           {children}
           <Toaster />
         </SocketProvider>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </ErrorBoundaryWrapper>
   );
 }
 
