@@ -107,11 +107,37 @@ const executeWithJudge0 = async (
     }
     // If self-hosted without auth token, no auth headers are sent
 
+    // Helper function to decode HTML entities (used for both input and output)
+    const decodeHtmlEntities = (text: string | null | undefined): string | undefined => {
+      if (!text) return undefined;
+      return text
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&#x27;/g, "'")
+        .replace(/&#x2F;/g, '/');
+    };
+
+    // Decode code in case it was HTML-encoded before reaching us
+    const decodedCode = decodeHtmlEntities(code) || code;
+    
+    // Log the code being sent for debugging
+    if (process.env.NODE_ENV === 'development' || process.env.LOG_JUDGE0_CODE === 'true') {
+      logger.info('Sending code to Judge0:', {
+        codeLength: decodedCode.length,
+        codePreview: decodedCode.substring(0, 100),
+        hasHtmlEntities: decodedCode.includes('&quot;') || decodedCode.includes('&amp;'),
+      });
+    }
+
     // Submit code for execution
     const submitResponse = await axios.post(
       `${JUDGE0_API_URL}/submissions`,
       {
-        source_code: code,
+        source_code: decodedCode,
         language_id: languageId,
         stdin: stdin || '',
         cpu_time_limit: 5, // 5 seconds
@@ -262,23 +288,13 @@ const executeWithJudge0 = async (
       status = 'error';
     }
 
-    // Helper function to decode HTML entities
-    const decodeHtmlEntities = (text: string | null | undefined): string | undefined => {
-      if (!text) return undefined;
-      return text
-        .replace(/&quot;/g, '"')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&#39;/g, "'")
-        .replace(/&apos;/g, "'");
-    };
-
     // Handle both string and null/empty stdout
     const output = result.stdout !== null && result.stdout !== undefined && result.stdout !== '' 
       ? decodeHtmlEntities(result.stdout) || result.stdout
       : undefined;
-    const error = decodeHtmlEntities(result.stderr || result.compile_output || undefined);
+    // Combine all possible error fields and decode
+    const errorText = result.message || result.stderr || result.compile_output || undefined;
+    const error = decodeHtmlEntities(errorText);
 
     logger.info('Judge0 execution result:', {
       statusId: result.status?.id,

@@ -82,6 +82,12 @@ export default function Header() {
                 >
                   Analytics
                 </Link>
+                <Link
+                  href="/help"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Help & Support
+                </Link>
                 <NotificationBell />
                 {user._id && (
                   <Link href={`/profile/${user._id}`}>
