@@ -27,6 +27,8 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
+  CardSkeleton,
+  ListSkeleton,
 } from '@/components/ui';
 import { showToast } from '@/lib/toast';
 import type { FAQCategory, HelpArticleCategory, TicketStatus, TicketCategory } from '@/lib/api/helpSupport';
@@ -182,9 +184,7 @@ export default function HelpPage() {
             </div>
 
             {faqsLoading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" />
-              </div>
+              <CardSkeleton count={5} />
             ) : faqs && faqs.length > 0 ? (
               <div className="space-y-4">
                 {faqs.map((faq) => (
@@ -270,8 +270,8 @@ export default function HelpPage() {
             </div>
 
             {articlesLoading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" />
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <CardSkeleton count={6} />
               </div>
             ) : articles && articles.length > 0 ? (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -319,8 +319,8 @@ export default function HelpPage() {
           {/* Video Tutorials Tab */}
           <TabsContent value="tutorials">
             {tutorialsLoading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" />
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <CardSkeleton count={6} />
               </div>
             ) : tutorials && tutorials.length > 0 ? (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -423,9 +423,7 @@ export default function HelpPage() {
             </div>
 
             {ticketsLoading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" />
-              </div>
+              <CardSkeleton count={5} />
             ) : tickets && tickets.length > 0 ? (
               <div className="space-y-4">
                 {tickets.map((ticket) => (

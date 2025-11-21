@@ -15,6 +15,7 @@ import {
   SearchBar,
   Pagination,
   Modal,
+  CourseCardSkeleton,
 } from '@/components/ui';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { PageHeader } from '@/components/layout';
@@ -101,9 +102,7 @@ export default function BundlesPage() {
           </div>
 
           {isLoading && (
-            <div className="flex justify-center py-12">
-              <LoadingSpinner size="lg" />
-            </div>
+            <CourseCardSkeleton count={6} />
           )}
 
           {error && (

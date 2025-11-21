@@ -21,6 +21,8 @@ import {
   Button,
   Modal,
   Input,
+  StatsCardSkeleton,
+  CardSkeleton,
 } from '@/components/ui';
 import { showToast } from '@/lib/toast';
 import type { ReferralStatus, RewardType } from '@/lib/api/referrals';
@@ -229,9 +231,7 @@ export default function ReferralsPage() {
 
         {/* Stats Cards */}
         {statsLoading ? (
-          <div className="flex justify-center py-8">
-            <LoadingSpinner size="lg" />
-          </div>
+          <StatsCardSkeleton count={4} className="mb-8" />
         ) : stats ? (
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card>
@@ -286,9 +286,7 @@ export default function ReferralsPage() {
 
         {/* Referral Code Section */}
         {codeLoading ? (
-          <div className="flex justify-center py-8">
-            <LoadingSpinner size="lg" />
-          </div>
+          <CardSkeleton count={1} className="mb-8" />
         ) : referralCode?.code ? (
           <Card className="mb-8">
             <CardContent className="p-6">
@@ -379,9 +377,7 @@ export default function ReferralsPage() {
         </div>
 
         {referralsLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
+          <CardSkeleton count={3} />
         ) : referrals && referrals.length > 0 ? (
           <div className="space-y-4">
             {referrals.map((referral) => (
