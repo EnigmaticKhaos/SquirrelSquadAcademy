@@ -262,11 +262,23 @@ const executeWithJudge0 = async (
       status = 'error';
     }
 
+    // Helper function to decode HTML entities
+    const decodeHtmlEntities = (text: string | null | undefined): string | undefined => {
+      if (!text) return undefined;
+      return text
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'");
+    };
+
     // Handle both string and null/empty stdout
     const output = result.stdout !== null && result.stdout !== undefined && result.stdout !== '' 
-      ? result.stdout 
+      ? decodeHtmlEntities(result.stdout) || result.stdout
       : undefined;
-    const error = result.stderr || result.compile_output || undefined;
+    const error = decodeHtmlEntities(result.stderr || result.compile_output || undefined);
 
     logger.info('Judge0 execution result:', {
       statusId: result.status?.id,
