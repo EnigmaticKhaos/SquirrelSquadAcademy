@@ -88,6 +88,12 @@ export default function Header() {
                 >
                   Help & Support
                 </Link>
+                <Link
+                  href="/course-suggestions"
+                  className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                >
+                  Course Suggestions
+                </Link>
                 <NotificationBell />
                 {user._id && (
                   <Link href={`/profile/${user._id}`}>
