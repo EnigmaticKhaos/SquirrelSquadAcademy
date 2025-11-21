@@ -1,36 +1,127 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button, Card, CardContent } from './ui';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  level?: 'page' | 'component';
+  resetKeys?: Array<string | number>;
+  onReset?: () => void;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
+  errorInfo: ErrorInfo | null;
+  errorId: string | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  private resetTimeoutId: NodeJS.Timeout | null = null;
+
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      errorInfo: null,
+      errorId: null,
+    };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    // Generate a unique error ID for tracking
+    const errorId = `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return { hasError: true, error, errorId };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Generate error ID if not already set
+    const errorId = this.state.errorId || `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Log error details
+    this.setState({ errorInfo, errorId: this.state.errorId || errorId });
+    
+    // Call custom error handler
     this.props.onError?.(error, errorInfo);
+    
+    // Log to error tracking service (if available)
+    if (typeof window !== 'undefined' && (window as any).Sentry) {
+      (window as any).Sentry.captureException(error, {
+        contexts: {
+          react: {
+            componentStack: errorInfo.componentStack,
+          },
+        },
+        tags: {
+          errorId,
+        },
+      });
+    }
+    
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.group('🚨 Error Boundary Caught Error');
+      console.error('Error:', error);
+      console.error('Error Info:', errorInfo);
+      console.error('Error ID:', errorId);
+      console.groupEnd();
+    }
   }
 
+  componentDidUpdate(prevProps: Props) {
+    const { resetKeys } = this.props;
+    const { hasError } = this.state;
+    
+    // Reset error boundary when resetKeys change
+    if (hasError && prevProps.resetKeys !== resetKeys) {
+      if (resetKeys && prevProps.resetKeys) {
+        const hasResetKeyChanged = resetKeys.some(
+          (key, index) => key !== prevProps.resetKeys?.[index]
+        );
+        
+        if (hasResetKeyChanged) {
+          this.resetErrorBoundary();
+        }
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.resetTimeoutId) {
+      clearTimeout(this.resetTimeoutId);
+    }
+  }
+
+  resetErrorBoundary = () => {
+    if (this.resetTimeoutId) {
+      clearTimeout(this.resetTimeoutId);
+    }
+    
+    this.setState({ 
+      hasError: false, 
+      error: null, 
+      errorInfo: null,
+      errorId: null,
+    });
+    
+    this.props.onReset?.();
+  };
+
   handleReset = () => {
-    this.setState({ hasError: false, error: null });
+    this.resetErrorBoundary();
+  };
+
+  handleReload = () => {
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   };
 
   render() {
@@ -70,20 +161,42 @@ export class ErrorBoundary extends Component<Props, State> {
                     Try again
                   </Button>
                   <Button
-                    onClick={() => (window.location.href = '/')}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.location.href = '/';
+                      }
+                    }}
                     variant="outline"
                   >
                     Go home
                   </Button>
+                  <Button
+                    onClick={this.handleReload}
+                    variant="outline"
+                  >
+                    Reload page
+                  </Button>
                 </div>
-                {process.env.NODE_ENV === 'development' && this.state.error && (
+                {this.state.errorId && (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Error ID: {this.state.errorId}
+                  </p>
+                )}
+                {(process.env.NODE_ENV === 'development' || this.props.level === 'component') && this.state.error && (
                   <details className="mt-4 text-left">
                     <summary className="cursor-pointer text-sm text-gray-400 hover:text-gray-300">
                       Error details
                     </summary>
-                    <pre className="mt-2 overflow-auto rounded bg-gray-900 p-2 text-xs text-red-400">
-                      {this.state.error.stack}
-                    </pre>
+                    <div className="mt-2 space-y-2">
+                      <pre className="overflow-auto rounded bg-gray-900 p-2 text-xs text-red-400">
+                        {this.state.error.stack}
+                      </pre>
+                      {this.state.errorInfo && (
+                        <pre className="overflow-auto rounded bg-gray-900 p-2 text-xs text-yellow-400">
+                          {this.state.errorInfo.componentStack}
+                        </pre>
+                      )}
+                    </div>
                   </details>
                 )}
               </div>
