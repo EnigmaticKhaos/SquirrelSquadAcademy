@@ -41,6 +41,8 @@ export { helpSupportApi } from './helpSupport';
 export type { FAQ, HelpArticle, SupportTicket, VideoTutorial, FAQCategory, HelpArticleCategory, TicketStatus, TicketCategory, TicketPriority } from './helpSupport';
 export { dataPrivacyApi } from './dataPrivacy';
 export type { DataExport, CookieConsent, PrivacySettings, ExportStatus, ExportFormat, ExportOptions, CookieConsentPreferences } from './dataPrivacy';
+export { courseSuggestionsApi } from './courseSuggestions';
+export type { CourseSuggestion, SuggestionStatus, CreateSuggestionData } from './courseSuggestions';
 
 // Also export everything from each module
 export * from './auth';
@@ -72,4 +74,5 @@ export * from './mentorApplications';
 export * from './liveSessions';
 export * from './helpSupport';
 export * from './dataPrivacy';
+export * from './courseSuggestions';
 

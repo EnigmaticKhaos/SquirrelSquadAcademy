@@ -243,6 +243,18 @@ This document tracks the implementation status of features across the platform, 
   - Personalized recommendations based on user learning history
   - Empty states for when no recommendations are available
 
+- ✅ **Course Suggestions**
+  - Backend: Complete suggestion service
+  - Frontend: Complete suggestion listing, creation, voting, and admin approval flow
+  - Suggestions listing page with status filtering and sorting
+  - Suggestion creation form with title, description, and desired content
+  - Voting UI with vote count and user vote tracking
+  - Admin approval flow with AI-powered course generation
+  - Admin denial flow with optional review notes
+  - Status badges and generated course links
+  - API client & hooks fully implemented
+  - Integrated into main navigation
+
 ---
 
 ## ❌ Not Implemented (Backend Ready, No Frontend)
@@ -258,9 +270,6 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete comparison service
   - **Missing**: Comparison UI, side-by-side view
 
-- ❌ **Course Suggestions**
-  - Backend: Complete suggestion service
-  - **Missing**: Suggestion display, acceptance flow
 
 - ❌ **Course Waitlist**
   - Backend: Complete waitlist system
@@ -365,6 +374,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `recommendations.ts` - Recommendations API (exists, hooks created)
 - ✅ `helpSupport.ts` - Help & Support API (implemented)
 - ✅ `dataPrivacy.ts` - Data Privacy API (implemented)
+- ✅ `courseSuggestions.ts` - Course Suggestions API (implemented)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -390,6 +400,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `useRecommendations` - Recommendations hooks (created)
 - ✅ `useHelpSupport` - Help & Support hooks (implemented)
 - ✅ `useDataPrivacy` - Data Privacy hooks (implemented)
+- ✅ `useCourseSuggestions` - Course Suggestions hooks (implemented)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
@@ -400,8 +411,8 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 23 (helpSupport, dataPrivacy added)
-### Frontend Hooks: 24 (useHelpSupport, useDataPrivacy added)
+### Frontend API Files: 24 (helpSupport, dataPrivacy, courseSuggestions added)
+### Frontend Hooks: 25 (useHelpSupport, useDataPrivacy, useCourseSuggestions added)
 ### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:
