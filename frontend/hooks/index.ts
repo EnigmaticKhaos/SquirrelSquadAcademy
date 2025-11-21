@@ -16,4 +16,5 @@ export * from './useDataPrivacy';
 export * from './useCourseSuggestions';
 export * from './useReferrals';
 export * from './useAccessibility';
+export * from './useVideos';
 
