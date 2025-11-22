@@ -18,4 +18,5 @@ export * from './useReferrals';
 export * from './useAccessibility';
 export * from './useVideos';
 export * from './useAnnouncements';
+export * from './useAdmin';
 
