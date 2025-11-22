@@ -352,9 +352,22 @@ This document tracks the implementation status of features across the platform, 
   - Backend: Complete translation service
   - **Missing**: Language selector, translation UI
 
-- ❌ **Announcements**
+- ✅ **Announcements**
   - Backend: Complete announcement system
-  - **Missing**: Announcement display, admin announcement creation
+  - Frontend: Comprehensive announcement management and display
+  - AnnouncementBanner component with sticky positioning
+  - Priority-based styling (urgent, high, normal, low)
+  - Type-based icons (platform, course, maintenance, feature)
+  - Dismiss and mark as read functionality
+  - Admin announcement management page (`/admin/announcements`)
+  - Create, edit, delete, and publish announcements
+  - Search and filter by status
+  - Process scheduled announcements
+  - Targeted announcements with audience filtering
+  - Action URLs and external links
+  - Unread count tracking
+  - API client & hooks fully implemented
+  - Integrated into AppLayout and Header navigation
 
 - ❌ **Moderation**
   - Backend: Complete moderation system
@@ -415,6 +428,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `referrals.ts` - Referrals API (implemented)
 - ✅ `accessibility.ts` - Accessibility API (implemented)
 - ✅ `videos.ts` - Video Management API (enhanced with upload, YouTube, settings)
+- ✅ `announcements.ts` - Announcements API (implemented)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -444,6 +458,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `useReferrals` - Referrals hooks (implemented)
 - ✅ `useAccessibility` - Accessibility hooks (implemented)
 - ✅ `useVideos` - Video Management hooks (enhanced with upload, YouTube, settings, playback)
+- ✅ `useAnnouncements` - Announcements hooks (implemented)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
@@ -454,8 +469,8 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 26 (helpSupport, dataPrivacy, courseSuggestions, referrals, accessibility added, videos enhanced)
-### Frontend Hooks: 27 (useHelpSupport, useDataPrivacy, useCourseSuggestions, useReferrals, useAccessibility added, useVideos enhanced)
+### Frontend API Files: 27 (helpSupport, dataPrivacy, courseSuggestions, referrals, accessibility, videos enhanced, announcements added)
+### Frontend Hooks: 28 (useHelpSupport, useDataPrivacy, useCourseSuggestions, useReferrals, useAccessibility, useVideos enhanced, useAnnouncements added)
 ### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:

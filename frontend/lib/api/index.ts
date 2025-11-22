@@ -47,6 +47,8 @@ export type { Referral, ReferralStats, ReferralStatus, ReferralCode, CreateCusto
 export { accessibilityApi } from './accessibility';
 export type { AccessibilityPreferences, UpdateAccessibilityPreferencesData, FontSize, ColorBlindMode } from './accessibility';
 export type { VideoProgress, VideoUploadResponse, YouTubeVideoResponse, UpdateVideoSettingsData } from './videos';
+export { announcementsApi } from './announcements';
+export type { Announcement, AnnouncementsResponse, CreateAnnouncementData, UpdateAnnouncementData, AnnouncementType, AnnouncementPriority, AnnouncementStatus, TargetAudience, GetAnnouncementsParams } from './announcements';
 
 // Also export everything from each module
 export * from './auth';
@@ -81,4 +83,5 @@ export * from './dataPrivacy';
 export * from './courseSuggestions';
 export * from './referrals';
 export * from './accessibility';
+export * from './announcements';
 
