@@ -186,6 +186,12 @@ export default function AdminDashboardPage() {
             >
               Manage Announcements
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin/moderation')}
+            >
+              Content Moderation
+            </Button>
           </div>
         </div>
         
