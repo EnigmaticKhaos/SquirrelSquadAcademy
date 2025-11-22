@@ -51,6 +51,8 @@ export { announcementsApi } from './announcements';
 export type { Announcement, AnnouncementsResponse, CreateAnnouncementData, UpdateAnnouncementData, AnnouncementType, AnnouncementPriority, AnnouncementStatus, TargetAudience, GetAnnouncementsParams } from './announcements';
 export { adminApi } from './admin';
 export type { DashboardAnalytics, UserAnalytics, CourseAnalytics, RevenueAnalytics, GamificationAnalytics, SocialAnalytics, LearningAnalytics, ReferralAnalytics, ProjectAnalytics, ModerationAnalytics, MentorApplicationAnalytics, AnalyticsParams } from './admin';
+export { moderationApi } from './moderation';
+export type { ContentReport, UserWarning, ModerationStats, CreateReportData, ReviewReportData, IssueWarningData, SuspendUserData, BanUserData, ReportType, ReportReason, ReportStatus, ReportPriority, WarningType, WarningSeverity, ActionType, GetReportsParams } from './moderation';
 
 // Also export everything from each module
 export * from './auth';
@@ -87,4 +89,5 @@ export * from './referrals';
 export * from './accessibility';
 export * from './announcements';
 export * from './admin';
+export * from './moderation';
 
