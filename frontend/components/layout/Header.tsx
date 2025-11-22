@@ -100,6 +100,14 @@ export default function Header() {
                 >
                   Referrals
                 </Link>
+                {user?.role === 'admin' && (
+                  <Link
+                    href="/admin/announcements"
+                    className="text-sm font-medium text-gray-300 hover:text-gray-100"
+                  >
+                    Admin
+                  </Link>
+                )}
                 <NotificationBell />
                 {user._id && (
                   <Link href={`/profile/${user._id}`}>

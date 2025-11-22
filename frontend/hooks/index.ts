@@ -17,4 +17,5 @@ export * from './useCourseSuggestions';
 export * from './useReferrals';
 export * from './useAccessibility';
 export * from './useVideos';
+export * from './useAnnouncements';
 

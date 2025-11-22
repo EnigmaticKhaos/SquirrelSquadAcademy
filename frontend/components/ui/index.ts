@@ -79,6 +79,7 @@ export type { MarkdownRendererProps } from './MarkdownRenderer';
 export { VideoPlayer } from './VideoPlayer';
 export type { VideoPlayerProps } from './VideoPlayer';
 export { VideoUploadModal } from '../VideoUploadModal';
+export { AnnouncementBanner } from '../AnnouncementBanner';
 
 export { Toaster } from './Toaster';
 export { Skeleton, SkeletonText, SkeletonCard, SkeletonAvatar, SkeletonButton, SkeletonTable } from './Skeleton';

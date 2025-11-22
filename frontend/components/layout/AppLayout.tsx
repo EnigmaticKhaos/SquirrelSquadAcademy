@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { CookieConsentBanner } from './CookieConsentBanner';
 import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
+import { AnnouncementBanner } from '@/components/AnnouncementBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -73,6 +74,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, requireAuth = fa
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto custom-scrollbar bg-gray-900">
           <ErrorBoundaryWrapper level="page">
+            <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 px-4 pt-3 pb-2 sm:px-6 lg:px-8">
+              <AnnouncementBanner maxAnnouncements={3} showUnreadOnly={true} />
+            </div>
             {children}
           </ErrorBoundaryWrapper>
         </main>
