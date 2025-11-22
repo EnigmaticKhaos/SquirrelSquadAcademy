@@ -33,6 +33,8 @@ This document tracks the implementation status of features across the platform, 
 - ✅ Loading skeleton components (CardSkeleton, ListSkeleton, TableSkeleton, CourseCardSkeleton, StatsCardSkeleton, etc.)
 - ✅ Error boundaries with ErrorBoundary and ErrorBoundaryWrapper components
 - ✅ Error recovery mechanisms with reset keys and custom fallbacks
+- ✅ Enhanced VideoPlayer and VideoUploadModal components
+- ✅ AnnouncementBanner component for platform communications
 - ✅ Responsive design with dark theme
 
 ---
