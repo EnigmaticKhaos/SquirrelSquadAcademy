@@ -102,7 +102,7 @@ export default function Header() {
                 </Link>
                 {user?.role === 'admin' && (
                   <Link
-                    href="/admin/announcements"
+                    href="/admin"
                     className="text-sm font-medium text-gray-300 hover:text-gray-100"
                   >
                     Admin

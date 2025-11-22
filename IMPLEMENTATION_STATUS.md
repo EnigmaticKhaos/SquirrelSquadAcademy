@@ -431,6 +431,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `accessibility.ts` - Accessibility API (implemented)
 - ✅ `videos.ts` - Video Management API (enhanced with upload, YouTube, settings)
 - ✅ `announcements.ts` - Announcements API (implemented)
+- ✅ `admin.ts` - Admin API (implemented)
 
 ### API Files Existing (but hooks missing)
 - ✅ `social.ts` - Posts/Comments/Projects API (exists, hooks created)
@@ -461,6 +462,7 @@ This document tracks the implementation status of features across the platform, 
 - ✅ `useAccessibility` - Accessibility hooks (implemented)
 - ✅ `useVideos` - Video Management hooks (enhanced with upload, YouTube, settings, playback)
 - ✅ `useAnnouncements` - Announcements hooks (implemented)
+- ✅ `useAdmin` - Admin hooks (implemented)
 - ❌ `useAchievements` - Achievement hooks - API exists but no hooks
 - ❌ `useBadges` - Badge hooks - API exists but no hooks
 - ❌ `useChallenges` - Challenge hooks - API exists but no hooks
@@ -471,8 +473,8 @@ This document tracks the implementation status of features across the platform, 
 
 ### Backend Routes: 57
 ### Frontend Pages: ~50
-### Frontend API Files: 27 (helpSupport, dataPrivacy, courseSuggestions, referrals, accessibility, videos enhanced, announcements added)
-### Frontend Hooks: 28 (useHelpSupport, useDataPrivacy, useCourseSuggestions, useReferrals, useAccessibility, useVideos enhanced, useAnnouncements added)
+### Frontend API Files: 28 (helpSupport, dataPrivacy, courseSuggestions, referrals, accessibility, videos enhanced, announcements, admin added)
+### Frontend Hooks: 29 (useHelpSupport, useDataPrivacy, useCourseSuggestions, useReferrals, useAccessibility, useVideos enhanced, useAnnouncements, useAdmin added)
 ### Implementation Coverage: ~90%
 
 ### Priority Areas for Next Phase:
